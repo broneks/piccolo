@@ -19,5 +19,6 @@ func Start() {
 
 	upload.Router(e)
 
+	e.HideBanner = true
 	e.Logger.Fatal(e.Start(":8000"))
 }
