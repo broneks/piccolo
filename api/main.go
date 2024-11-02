@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Run() {
+func Start() {
 	e := echo.New()
 
 	e.Use(Logger())
