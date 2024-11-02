@@ -1,0 +1,8 @@
+.git
+.gitignore
+.env.sample
+
+data
+pg_data
+tmp
+README.md

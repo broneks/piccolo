@@ -5,7 +5,6 @@ RUN apk update && apk add --no-cache git && apk add --no-cach bash && apk add bu
 RUN mkdir /app
 WORKDIR /app
 
-COPY .env .
 COPY . .
 
 RUN go mod download
