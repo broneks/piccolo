@@ -17,7 +17,7 @@ type WasabiUploader struct {
 }
 
 func (w *WasabiUploader) UploadFile(filename string, file multipart.File) (*manager.UploadOutput, error) {
-	return w.uploader.Upload(context.TODO(), &s3.PutObjectInput{
+	return w.uploader.Upload(context.Background(), &s3.PutObjectInput{
 		Bucket: aws.String(w.Config.Bucket),
 		Key:    aws.String(filepath.Base(filename)),
 		Body:   file,
