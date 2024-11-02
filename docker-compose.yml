@@ -1,0 +1,43 @@
+services:
+  app:
+    container_name: app
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST}
+      - DATABASE_PORT=${DB_PORT}
+    tty: true
+    build: .
+    ports:
+      - 8000:8000
+    restart: on-failure
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    networks:
+      - main
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST}
+    ports:
+      - '1234:5432'
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    networks:
+      - main
+
+volumes:
+  pg_data:
+
+# Networks to be created to facilitate communication between containers
+networks:
+  main:
+    driver: bridge
