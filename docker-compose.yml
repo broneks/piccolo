@@ -2,6 +2,7 @@ services:
   app:
     container_name: app
     environment:
+      - ENV=${ENV}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
@@ -37,7 +38,6 @@ services:
 volumes:
   pg_data:
 
-# Networks to be created to facilitate communication between containers
 networks:
   main:
     driver: bridge
