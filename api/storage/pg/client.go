@@ -26,7 +26,7 @@ var (
 	pgOnce     sync.Once
 )
 
-func Client(ctx context.Context) (*postgres, error) {
+func Client(ctx context.Context) *postgres {
 	pgOnce.Do(func() {
 		db, err := pgxpool.New(ctx, os.Getenv("DB_DOCKER_URL"))
 		if err != nil {
@@ -37,5 +37,5 @@ func Client(ctx context.Context) (*postgres, error) {
 		pgInstance = &postgres{db}
 	})
 
-	return pgInstance, nil
+	return pgInstance
 }

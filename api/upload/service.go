@@ -2,16 +2,21 @@ package upload
 
 import (
 	"context"
-	"io"
 	"log"
 	"mime/multipart"
-	"os"
-	"path/filepath"
+	"piccolo/api/model"
+	"piccolo/api/storage/pg"
 	"piccolo/api/storage/wasabi"
 )
 
 func uploadFile(file *multipart.FileHeader) error {
-	log.Printf("uploading file: %s", file.Filename)
+	var err error
+
+	var filename = file.Filename
+	var fileSize = int(file.Size)
+	var contentType = file.Header.Get("Content-Type")
+
+	log.Printf("uploading file: %s", filename)
 
 	src, err := file.Open()
 	if err != nil {
@@ -21,7 +26,7 @@ func uploadFile(file *multipart.FileHeader) error {
 
 	uploader := wasabi.NewUploader(context.Background())
 
-	result, err := uploader.UploadFile(context.Background(), file.Filename, src)
+	result, err := uploader.UploadFile(context.Background(), filename, src)
 	if err != nil {
 		log.Println("Error uploading file:", err)
 		return err
@@ -29,25 +34,17 @@ func uploadFile(file *multipart.FileHeader) error {
 
 	log.Printf("File uploaded successfully: %s\n", result.Location)
 
-	return nil
-}
+	db := pg.Client(context.Background())
 
-func uploadFileLocal(file *multipart.FileHeader) error {
-	log.Printf("uploading file: %s", file.Filename)
-
-	src, err := file.Open()
-	if err != nil {
-		return err
+	photo := model.Photo{
+		Location:    result.Location,
+		Filename:    filename,
+		FileSize:    fileSize,
+		ContentType: contentType,
 	}
-	defer src.Close()
 
-	dst, err := os.Create(filepath.Join("data", filepath.Base(file.Filename)))
+	err = db.InsertPhoto(context.Background(), photo)
 	if err != nil {
-		return err
-	}
-	defer dst.Close()
-
-	if _, err = io.Copy(dst, src); err != nil {
 		return err
 	}
 

@@ -19,3 +19,30 @@ func (pg *postgres) GetPhotos(ctx context.Context) ([]model.Photo, error) {
 
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Photo])
 }
+
+func (pg *postgres) InsertPhoto(ctx context.Context, photo model.Photo) error {
+	query := `insert into photos (
+		location,
+		filename,
+		file_size,
+		content_type
+	) values (
+		@location,
+		@filename,
+		@fileSize,
+		@contentType
+	)`
+
+	args := pgx.NamedArgs{
+		"location":    photo.Location,
+		"filename":    photo.Filename,
+		"fileSize":    photo.FileSize,
+		"contentType": photo.ContentType,
+	}
+	_, err := pg.db.Exec(ctx, query, args)
+	if err != nil {
+		return fmt.Errorf("unable to insert row: %w", err)
+	}
+
+	return nil
+}

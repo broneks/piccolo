@@ -6,6 +6,9 @@ build:
 run:
 	go run cmd/piccolo/main.go
 
+migrate_create:
+	migrate create -ext sql -dir db/migrations -seq $(name)
+
 migrate_up:
 	migrate -database $(DB_LOCALHOST_URL)?sslmode=disable -path db/migrations up
 
