@@ -26,9 +26,9 @@ var (
 	pgOnce     sync.Once
 )
 
-func Client() (*postgres, error) {
+func Client(ctx context.Context) (*postgres, error) {
 	pgOnce.Do(func() {
-		db, err := pgxpool.New(context.Background(), os.Getenv("DB_DOCKER_URL"))
+		db, err := pgxpool.New(ctx, os.Getenv("DB_DOCKER_URL"))
 		if err != nil {
 			log.Fatalf("unable to create postgres connection pool: %v", err)
 			return

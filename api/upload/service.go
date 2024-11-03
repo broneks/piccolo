@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"context"
 	"io"
 	"log"
 	"mime/multipart"
@@ -18,9 +19,9 @@ func uploadFile(file *multipart.FileHeader) error {
 	}
 	defer src.Close()
 
-	uploader := wasabi.NewUploader()
+	uploader := wasabi.NewUploader(context.Background())
 
-	result, err := uploader.UploadFile(file.Filename, src)
+	result, err := uploader.UploadFile(context.Background(), file.Filename, src)
 	if err != nil {
 		log.Println("Error uploading file:", err)
 		return err

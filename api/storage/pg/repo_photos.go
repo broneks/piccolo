@@ -8,10 +8,10 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (pg *postgres) GetPhotos() ([]model.Photo, error) {
+func (pg *postgres) GetPhotos(ctx context.Context) ([]model.Photo, error) {
 	query := `select * from photos`
 
-	rows, err := pg.db.Query(context.Background(), query)
+	rows, err := pg.db.Query(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query users: %v", err)
 	}

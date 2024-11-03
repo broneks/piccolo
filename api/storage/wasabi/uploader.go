@@ -16,16 +16,16 @@ type WasabiUploader struct {
 	uploader *manager.Uploader
 }
 
-func (w *WasabiUploader) UploadFile(filename string, file multipart.File) (*manager.UploadOutput, error) {
-	return w.uploader.Upload(context.Background(), &s3.PutObjectInput{
+func (w *WasabiUploader) UploadFile(ctx context.Context, filename string, file multipart.File) (*manager.UploadOutput, error) {
+	return w.uploader.Upload(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(w.Config.Bucket),
 		Key:    aws.String(filepath.Base(filename)),
 		Body:   file,
 	})
 }
 
-func NewUploader() *WasabiUploader {
-	client, err := newClient()
+func NewUploader(ctx context.Context) *WasabiUploader {
+	client, err := newClient(ctx)
 	if err != nil {
 		return nil
 	}

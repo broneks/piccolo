@@ -11,11 +11,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func newClient() (*s3.Client, error) {
+func newClient(ctx context.Context) (*s3.Client, error) {
 	accessKeyID := os.Getenv("WASABI_ACCESS_KEY_ID")
 	secretAccessKey := os.Getenv("WASABI_SECRET_ACCESS_KEY")
 
-	cfg, err := config.LoadDefaultConfig(context.Background(),
+	cfg, err := config.LoadDefaultConfig(ctx,
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, "")),
 		config.WithRegion("us-east-1"),
 		config.WithEndpointResolverWithOptions(
