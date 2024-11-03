@@ -1,7 +1,6 @@
 package upload
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -23,7 +22,7 @@ func uploadFile(file *multipart.FileHeader) error {
 
 	result, err := uploader.UploadFile(file.Filename, src)
 	if err != nil {
-		fmt.Println("Error uploading file:", err)
+		log.Println("Error uploading file:", err)
 		return err
 	}
 
