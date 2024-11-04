@@ -38,7 +38,7 @@ func Router(e *echo.Echo) {
 			return c.String(http.StatusOK, "No photos")
 		}
 
-		url := photos[0].GetUrl()
+		url := photos[0].GetUrl(c)
 
 		return c.HTML(
 			http.StatusOK,
