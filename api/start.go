@@ -2,42 +2,58 @@ package api
 
 import (
 	"context"
-	"piccolo/api/upload"
+	"fmt"
+	"log/slog"
+	"piccolo/api/middleware"
+	"piccolo/api/modules"
+	"piccolo/api/shared"
+	"piccolo/api/storage/pg"
+	"piccolo/api/storage/redis"
+	"piccolo/api/storage/wasabi"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
-type contextKey string
-
-const redisKey contextKey = "redisClient"
-
-var ctx = context.Background()
-
 func Start() {
-	rdb := redis.NewClient(&redis.Options{
-		Addr: "redis:6379", // Address of the Redis container
-	})
+	var err error
 
 	e := echo.New()
 
-	// Middleware to set the Redis client in the context
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Set(string(redisKey), rdb) // Store the Redis client in the context
-			return next(c)
-		}
-	})
-
-	e.Use(Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.RequestID())
-	e.Use(middleware.Secure())
-
+	e.Use(middleware.Logger())
+	e.Use(echoMiddleware.Recover())
+	e.Use(echoMiddleware.RequestID())
+	e.Use(echoMiddleware.Secure())
 	e.Static("/", "public")
 
-	upload.Router(e)
+	logger := slog.Default()
+
+	db, err := pg.NewClient(context.Background())
+	if err != nil {
+		logger.Error(fmt.Sprintf("Cannot load postgres db: %v", err))
+		return
+	}
+
+	redis, err := redis.NewClient()
+	if err != nil {
+		logger.Error(fmt.Sprintf("Cannot load redis db: %v", err))
+		return
+	}
+
+	wasabi, err := wasabi.NewClient(context.Background())
+	if err != nil {
+		logger.Error(fmt.Sprintf("Cannot load wasabi db: %v", err))
+		return
+	}
+
+	server := &shared.Server{
+		Logger: logger,
+		DB:     db,
+		Redis:  redis,
+		Wasabi: wasabi,
+	}
+
+	modules.Routes(e, server)
 
 	e.HideBanner = true
 	e.Logger.Fatal(e.Start(":8001"))

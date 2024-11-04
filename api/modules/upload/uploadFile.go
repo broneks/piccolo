@@ -5,11 +5,9 @@ import (
 	"log"
 	"mime/multipart"
 	"piccolo/api/model"
-	"piccolo/api/storage/pg"
-	"piccolo/api/storage/wasabi"
 )
 
-func uploadFile(file *multipart.FileHeader) error {
+func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeader) error {
 	var err error
 
 	var filename = file.Filename
@@ -24,17 +22,13 @@ func uploadFile(file *multipart.FileHeader) error {
 	}
 	defer src.Close()
 
-	uploader := wasabi.NewUploader(context.Background())
-
-	result, err := uploader.UploadFile(context.Background(), filename, src)
+	result, err := m.server.Wasabi.UploadFile(ctx, filename, src)
 	if err != nil {
 		log.Println("Error uploading file:", err)
 		return err
 	}
 
 	log.Printf("File uploaded successfully: %s\n", result.Location)
-
-	db := pg.Client(context.Background())
 
 	photo := model.Photo{
 		Location:    result.Location,
@@ -43,7 +37,7 @@ func uploadFile(file *multipart.FileHeader) error {
 		ContentType: contentType,
 	}
 
-	err = db.InsertPhoto(context.Background(), photo)
+	err = m.photoRepo.InsertOne(ctx, photo)
 	if err != nil {
 		return err
 	}

@@ -1,17 +1,26 @@
-package pg
+package repo
 
 import (
 	"context"
 	"fmt"
 	"piccolo/api/model"
+	"piccolo/api/storage/pg"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func (pg *postgres) GetPhotos(ctx context.Context) ([]model.Photo, error) {
+type PhotoRepo struct {
+	pg *pg.PostgresClient
+}
+
+func NewPhotoRepo(pg *pg.PostgresClient) *PhotoRepo {
+	return &PhotoRepo{pg: pg}
+}
+
+func (r *PhotoRepo) GetAll(ctx context.Context) ([]model.Photo, error) {
 	query := `select * from photos`
 
-	rows, err := pg.db.Query(ctx, query)
+	rows, err := r.pg.DB.Query(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query users: %v", err)
 	}
@@ -20,7 +29,7 @@ func (pg *postgres) GetPhotos(ctx context.Context) ([]model.Photo, error) {
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Photo])
 }
 
-func (pg *postgres) InsertPhoto(ctx context.Context, photo model.Photo) error {
+func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 	query := `insert into photos (
 		location,
 		filename,
@@ -39,7 +48,7 @@ func (pg *postgres) InsertPhoto(ctx context.Context, photo model.Photo) error {
 		"fileSize":    photo.FileSize,
 		"contentType": photo.ContentType,
 	}
-	_, err := pg.db.Exec(ctx, query, args)
+	_, err := r.pg.DB.Exec(ctx, query, args)
 	if err != nil {
 		return fmt.Errorf("unable to insert row: %w", err)
 	}
