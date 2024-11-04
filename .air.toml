@@ -1,0 +1,11 @@
+[build]
+  bin = "tmp/piccolo"
+  cmd = "go build -o tmp/piccolo cmd/piccolo/main.go"
+  watch_dir = ["."]
+  include_ext = ["go"]
+
+[log]
+  log_level = "warn"
+
+[watch]
+  include_ext = ["go"]

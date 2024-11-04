@@ -4,7 +4,7 @@ build:
 	go build --o bin/piccolo cmd/piccolo/main.go
 
 run:
-	go run cmd/piccolo/main.go
+	air
 
 migrate_create:
 	migrate create -ext sql -dir db/migrations -seq $(name)
