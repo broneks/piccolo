@@ -18,14 +18,10 @@ func Start() {
     rdb := redis.NewClient(&redis.Options{
         Addr: "redis:6379", // Address of the Redis container
     })
-    err := rdb.Ping(ctx).Err()
-
     if err != nil {
         fmt.Println("Could not connect to Redis:", err)
         return
     }
-
-	err = rdb.Set(ctx, "key", "foobar", 0).Err()
 
 	e := echo.New()
 
