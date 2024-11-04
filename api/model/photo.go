@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"context"
+	"piccolo/api/storage/wasabi"
+	"time"
+)
 
 type Photo struct {
 	Id          string
@@ -10,4 +14,10 @@ type Photo struct {
 	ContentType string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+func (p *Photo) GetUrl() string {
+	url, _ := wasabi.GetPresignedUrl(context.Background(), p.Filename)
+
+	return url
 }
