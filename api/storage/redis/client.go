@@ -7,8 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// GetFromRedis retrieves a value from Redis by key.
-func GetFromRedis(c echo.Context, key string) (string, error) {
+func Get(c echo.Context, key string) (string, error) {
 	reqCtx := c.Request().Context()
 	rdb := c.Get("redisClient").(*redis.Client)
 
@@ -20,8 +19,7 @@ func GetFromRedis(c echo.Context, key string) (string, error) {
 	return val, nil
 }
 
-// SetInRedis sets a key-value pair in Redis.
-func SetInRedis(c echo.Context, key string, value string) error {
+func Set(c echo.Context, key string, value string) error {
 	reqCtx := c.Request().Context()
 	rdb := c.Get("redisClient").(*redis.Client)
 
