@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func GetUpload(c echo.Context) error {
+func PostUpload(c echo.Context) error {
 	file, err := c.FormFile("file")
 	if err != nil {
 		return err
@@ -49,5 +49,5 @@ func Router(e *echo.Echo) {
 		)
 	})
 
-	e.POST("/upload", GetUpload)
+	e.POST("/upload", PostUpload)
 }

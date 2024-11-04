@@ -1,27 +1,29 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"piccolo/api/upload"
+
+	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/go-redis/redis/v8"
-    "context"
 )
 
-
 type contextKey string
+
 const redisKey contextKey = "redisClient"
+
 var ctx = context.Background()
 
 func Start() {
-    rdb := redis.NewClient(&redis.Options{
-        Addr: "redis:6379", // Address of the Redis container
-    })
-    if err != nil {
-        fmt.Println("Could not connect to Redis:", err)
-        return
-    }
+	rdb := redis.NewClient(&redis.Options{
+		Addr: "redis:6379", // Address of the Redis container
+	})
+	if err != nil {
+		fmt.Println("Could not connect to Redis:", err)
+		return
+	}
 
 	e := echo.New()
 
