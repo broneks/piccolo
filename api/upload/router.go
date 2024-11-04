@@ -10,9 +10,6 @@ import (
 )
 
 func GetUpload(c echo.Context) error {
-	name := c.FormValue("name")
-	email := c.FormValue("email")
-
 	file, err := c.FormFile("file")
 	if err != nil {
 		return err
@@ -26,10 +23,8 @@ func GetUpload(c echo.Context) error {
 	return c.HTML(
 		http.StatusOK,
 		fmt.Sprintf(
-			"<p>File %s uploaded successfully with fields name=%s and email=%s.</p>",
+			"<p>File %s uploaded successfully.</p>",
 			file.Filename,
-			name,
-			email,
 		),
 	)
 }
@@ -48,7 +43,7 @@ func Router(e *echo.Echo) {
 		return c.HTML(
 			http.StatusOK,
 			fmt.Sprintf(
-				"<img src='%s' alt='' width='1000' />",
+				"<img src='%s' alt='' />",
 				url,
 			),
 		)
