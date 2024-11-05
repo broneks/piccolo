@@ -1,32 +1,19 @@
 package redis
 
 import (
-	"fmt"
-
 	"github.com/go-redis/redis/v8"
-	"github.com/labstack/echo/v4"
 )
 
-func Get(c echo.Context, key string) (string, error) {
-	reqCtx := c.Request().Context()
-	rdb := c.Get("redisClient").(*redis.Client)
-
-	val, err := rdb.Get(reqCtx, key).Result()
-	if err != nil {
-		return "", fmt.Errorf("failed to get value from Redis: %w", err)
-	}
-
-	return val, nil
+type RedisClient struct {
+	client *redis.Client
 }
 
-func Set(c echo.Context, key string, value string) error {
-	reqCtx := c.Request().Context()
-	rdb := c.Get("redisClient").(*redis.Client)
+func NewClient() (*RedisClient, error) {
+	rdb := redis.NewClient(&redis.Options{
+		Addr: "redis:6379",
+	})
 
-	err := rdb.Set(reqCtx, key, value, 0).Err() // 0 means no expiration
-	if err != nil {
-		return fmt.Errorf("failed to set value in Redis: %w", err)
-	}
+	client := &RedisClient{rdb}
 
-	return nil
+	return client, nil
 }

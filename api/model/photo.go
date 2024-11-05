@@ -2,12 +2,8 @@ package model
 
 import (
 	"context"
-	"fmt"
-	"piccolo/api/storage/redis"
-	"piccolo/api/storage/wasabi"
+	"piccolo/api/shared"
 	"time"
-
-	"github.com/labstack/echo/v4"
 )
 
 type Photo struct {
@@ -20,15 +16,25 @@ type Photo struct {
 	UpdatedAt   time.Time
 }
 
-func (p *Photo) GetUrl(c echo.Context) string {
-	val, _ := redis.Get(c, p.Filename)
-	if val == "" {
-		fmt.Println("no cache found for url image.")
-		url, _ := wasabi.GetPresignedUrl(context.Background(), p.Filename)
-		redis.Set(c, p.Filename, url)
-		return url
-	} else {
-		fmt.Println("found cached url for image")
+func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
+	key := p.Id
+
+	val, err := server.Redis.Get(ctx, key)
+	if err != nil {
+		server.Logger.Error(err.Error())
+		return ""
+	}
+
+	if val != "" {
 		return val
+	} else {
+		url, expirationDuration := server.Wasabi.GetPresignedUrl(context.Background(), p.Filename)
+
+		err := server.Redis.Set(ctx, key, url, expirationDuration-(time.Minute*5))
+		if err != nil {
+			server.Logger.Error(err.Error())
+		}
+
+		return url
 	}
 }
