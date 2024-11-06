@@ -8,12 +8,10 @@ type RedisClient struct {
 	client *redis.Client
 }
 
-func NewClient() (*RedisClient, error) {
+func NewClient() *RedisClient {
 	rdb := redis.NewClient(&redis.Options{
 		Addr: "redis:6379",
 	})
 
-	client := &RedisClient{rdb}
-
-	return client, nil
+	return &RedisClient{rdb}
 }

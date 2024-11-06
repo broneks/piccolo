@@ -34,11 +34,7 @@ func Start() {
 		return
 	}
 
-	redis, err := redis.NewClient()
-	if err != nil {
-		logger.Error(fmt.Sprintf("Cannot load redis db: %v", err))
-		return
-	}
+	redis := redis.NewClient()
 
 	wasabi, err := wasabi.NewClient(context.Background())
 	if err != nil {
