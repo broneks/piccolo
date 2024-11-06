@@ -47,10 +47,10 @@ func Start() {
 	}
 
 	server := &shared.Server{
-		Logger: logger,
-		DB:     db,
-		Redis:  redis,
-		Wasabi: wasabi,
+		Logger:        logger,
+		DB:            db,
+		Cache:         redis,
+		ObjectStorage: wasabi,
 	}
 
 	modules.Routes(e, server)

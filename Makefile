@@ -3,6 +3,9 @@ include .env
 build:
 	go build --o bin/piccolo cmd/piccolo/main.go
 
+lint:
+	go vet ./...
+
 run:
 	air
 

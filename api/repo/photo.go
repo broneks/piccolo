@@ -4,23 +4,23 @@ import (
 	"context"
 	"fmt"
 	"piccolo/api/model"
-	"piccolo/api/storage/pg"
+	"piccolo/api/shared"
 
 	"github.com/jackc/pgx/v5"
 )
 
 type PhotoRepo struct {
-	pg *pg.PostgresClient
+	db shared.ServerDB
 }
 
-func NewPhotoRepo(pg *pg.PostgresClient) *PhotoRepo {
-	return &PhotoRepo{pg: pg}
+func NewPhotoRepo(db shared.ServerDB) *PhotoRepo {
+	return &PhotoRepo{db: db}
 }
 
 func (r *PhotoRepo) GetAll(ctx context.Context) ([]model.Photo, error) {
 	query := `select * from photos`
 
-	rows, err := r.pg.DB.Query(ctx, query)
+	rows, err := r.db.Query(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query users: %v", err)
 	}
@@ -48,7 +48,7 @@ func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 		"fileSize":    photo.FileSize,
 		"contentType": photo.ContentType,
 	}
-	_, err := r.pg.DB.Exec(ctx, query, args)
+	_, err := r.db.Exec(ctx, query, args)
 	if err != nil {
 		return fmt.Errorf("unable to insert row: %w", err)
 	}

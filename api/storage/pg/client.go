@@ -8,7 +8,7 @@ import (
 )
 
 type PostgresClient struct {
-	DB *pgxpool.Pool
+	*pgxpool.Pool
 }
 
 func NewClient(ctx context.Context) (*PostgresClient, error) {

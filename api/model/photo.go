@@ -19,7 +19,7 @@ type Photo struct {
 func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
 	key := p.Id
 
-	val, err := server.Redis.Get(ctx, key)
+	val, err := server.Cache.Get(ctx, key)
 	if err != nil {
 		server.Logger.Error(err.Error())
 		return ""
@@ -28,9 +28,9 @@ func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
 	if val != "" {
 		return val
 	} else {
-		url, expirationDuration := server.Wasabi.GetPresignedUrl(context.Background(), p.Filename)
+		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), p.Filename)
 
-		err := server.Redis.Set(ctx, key, url, expirationDuration-(time.Minute*5))
+		err := server.Cache.Set(ctx, key, url, expirationDuration-(time.Minute*5))
 		if err != nil {
 			server.Logger.Error(err.Error())
 		}

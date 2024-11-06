@@ -22,16 +22,16 @@ func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeade
 	}
 	defer src.Close()
 
-	result, err := m.server.Wasabi.UploadFile(ctx, filename, src)
+	location, err := m.server.ObjectStorage.UploadFile(ctx, filename, src)
 	if err != nil {
 		log.Println("Error uploading file:", err)
 		return err
 	}
 
-	log.Printf("File uploaded successfully: %s\n", result.Location)
+	log.Printf("File uploaded successfully: %s\n", location)
 
 	photo := model.Photo{
-		Location:    result.Location,
+		Location:    location,
 		Filename:    filename,
 		FileSize:    fileSize,
 		ContentType: contentType,
