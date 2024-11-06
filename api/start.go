@@ -53,7 +53,8 @@ func Start() {
 		ObjectStorage: wasabi,
 	}
 
-	modules.Routes(e, server)
+	g := e.Group("/api")
+	modules.Routes(g, server)
 
 	e.HideBanner = true
 	e.Logger.Fatal(e.Start(":8001"))

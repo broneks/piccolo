@@ -8,9 +8,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Routes(e *echo.Echo, server *shared.Server) {
+func Routes(g *echo.Group, server *shared.Server) {
+	v1 := g.Group("/v1")
+
 	photoRepo := repo.NewPhotoRepo(server.DB)
 
 	uploadModule := upload.New(server, photoRepo)
-	uploadModule.Routes(e)
+	uploadModule.Routes(v1)
 }

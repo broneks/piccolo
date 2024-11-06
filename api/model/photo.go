@@ -7,13 +7,13 @@ import (
 )
 
 type Photo struct {
-	Id          string
-	Location    string
-	Filename    string
-	FileSize    int
-	ContentType string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	Id          string    `json:"id"`
+	Location    string    `json:"-"`
+	Filename    string    `json:"filename"`
+	FileSize    int       `json:"fileSize"`
+	ContentType string    `json:"contentType"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"-"`
 }
 
 func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
