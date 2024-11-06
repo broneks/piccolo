@@ -3,6 +3,7 @@ package upload
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -14,14 +15,20 @@ func (m *UploadModule) handleGetUploads(c echo.Context) error {
 		return c.String(http.StatusOK, "No photos")
 	}
 
-	url := photos[0].GetUrl(c.Request().Context(), m.server)
+	var imageTags []string
+
+	for _, photo := range photos {
+		url := photo.GetUrl(c.Request().Context(), m.server)
+
+		imageTags = append(imageTags, fmt.Sprintf(
+			"<img src='%s' alt='' />",
+			url,
+		))
+	}
 
 	return c.HTML(
 		http.StatusOK,
-		fmt.Sprintf(
-			"<img src='%s' alt='' />",
-			url,
-		),
+		strings.Join(imageTags, "<br/>"),
 	)
 }
 
