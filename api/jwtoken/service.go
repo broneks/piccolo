@@ -21,7 +21,7 @@ func (j *JwtClient) GenerateToken() (string, error) {
 
 func ExtractTokenString(authHeader string) (string, error) {
 	if authHeader == "" {
-		return "", fmt.Errorf("authorization header missing")
+		return "", nil
 	}
 
 	if strings.HasPrefix(authHeader, "Bearer ") {
@@ -38,6 +38,10 @@ func ExtractTokenString(authHeader string) (string, error) {
 }
 
 func getClaims(tokenString string) *JwtClaims {
+	if tokenString == "" {
+		return nil
+	}
+
 	token, err := jwt.ParseWithClaims(tokenString, &JwtClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -80,11 +84,5 @@ func GetUserEmail(tokenString string) string {
 func VerifyToken(tokenString string) bool {
 	claims := getClaims(tokenString)
 
-	if claims != nil {
-		fmt.Printf("Token is valid! Email: %s\n", claims.Email)
-		return true
-	}
-
-	log.Println("Token is invalid or expired.")
-	return false
+	return claims != nil
 }

@@ -7,10 +7,9 @@ import (
 	"piccolo/api/model"
 )
 
-func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeader) error {
+func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeader, userId string) error {
 	var err error
 
-	var userId = "" // TODO
 	var filename = file.Filename
 	var fileSize = int(file.Size)
 	var contentType = file.Header.Get("Content-Type")

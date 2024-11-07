@@ -6,13 +6,13 @@ import (
 )
 
 type AuthModule struct {
-	server    *shared.Server
-	photoRepo *repo.PhotoRepo
+	server   *shared.Server
+	userRepo *repo.UserRepo
 }
 
-func New(server *shared.Server, photoRepo *repo.PhotoRepo) *AuthModule {
+func New(server *shared.Server, userRepo *repo.UserRepo) *AuthModule {
 	return &AuthModule{
-		server:    server,
-		photoRepo: photoRepo,
+		server:   server,
+		userRepo: userRepo,
 	}
 }

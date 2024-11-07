@@ -22,7 +22,7 @@ func Start() {
 
 	// custom
 	e.Use(middleware.Logger())
-	e.Use(middleware.SetUserHeaders())
+	e.Use(middleware.SetUserData())
 
 	// echo built-in
 	e.Use(echoMiddleware.Recover())
