@@ -4,7 +4,7 @@ create table if not exists users(
   email text not null unique,
   hash text not null,
   hashed_at timestamptz not null default now(),
-  last_login_at timestampz not null default now(),
+  last_login_at timestamptz not null default now(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
