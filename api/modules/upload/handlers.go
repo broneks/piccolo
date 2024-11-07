@@ -1,9 +1,8 @@
 package upload
 
 import (
-	"fmt"
 	"net/http"
-	"strings"
+	"piccolo/api/shared"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -11,6 +10,7 @@ import (
 
 type PhotoRes struct {
 	Id          string    `json:"id"`
+	UserId      string    `json:"userId"`
 	Filename    string    `json:"filename"`
 	FileSize    int       `json:"fileSize"`
 	Url         string    `json:"url"`
@@ -19,7 +19,9 @@ type PhotoRes struct {
 }
 
 func (m *UploadModule) getUploadsHandler(c echo.Context) error {
-	photos, _ := m.photoRepo.GetAll(c.Request().Context())
+	ctx := c.Request().Context()
+
+	photos, _ := m.photoRepo.GetAll(ctx)
 
 	if len(photos) == 0 {
 		return c.JSON(http.StatusOK, []interface{}{})
@@ -28,10 +30,11 @@ func (m *UploadModule) getUploadsHandler(c echo.Context) error {
 	var photoResList []PhotoRes
 
 	for _, photo := range photos {
-		url := photo.GetUrl(c.Request().Context(), m.server)
+		url := photo.GetUrl(ctx, m.server)
 
 		photoResList = append(photoResList, PhotoRes{
 			Id:          photo.Id,
+			UserId:      photo.UserId,
 			Filename:    photo.Filename,
 			FileSize:    photo.FileSize,
 			Url:         url,
@@ -43,46 +46,37 @@ func (m *UploadModule) getUploadsHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, photoResList)
 }
 
-func (m *UploadModule) handleGetUploads(c echo.Context) error {
-	photos, _ := m.photoRepo.GetAll(c.Request().Context())
+func (m *UploadModule) postUploadHandler(c echo.Context) error {
+	ctx := c.Request().Context()
+	userId := c.Get("userId").(string)
 
-	if len(photos) == 0 {
-		return c.String(http.StatusOK, "No photos")
-	}
-
-	var imageTags []string
-
-	for _, photo := range photos {
-		url := photo.GetUrl(c.Request().Context(), m.server)
-
-		imageTags = append(imageTags, fmt.Sprintf(
-			"<img src='%s' alt='' />",
-			url,
-		))
-	}
-
-	return c.HTML(
-		http.StatusOK,
-		strings.Join(imageTags, "<br/>"),
-	)
-}
-
-func (m *UploadModule) handlePostUpload(c echo.Context) error {
 	file, err := c.FormFile("file")
 	if err != nil {
-		return err
+		return c.JSON(
+			http.StatusBadRequest,
+			shared.SuccessRes{
+				Success: false,
+				Message: "File is required",
+			},
+		)
 	}
 
-	err = m.UploadFile(c.Request().Context(), file)
+	err = m.UploadFile(ctx, file, userId)
 	if err != nil {
-		return err
+		m.server.Logger.Error("unexpected error", err.Error())
+		return c.JSON(
+			http.StatusBadRequest,
+			shared.SuccessRes{
+				Success: false,
+				Message: "Unexpected error",
+			},
+		)
 	}
 
-	return c.HTML(
+	return c.JSON(
 		http.StatusOK,
-		fmt.Sprintf(
-			"<p>File %s uploaded successfully.</p>",
-			file.Filename,
-		),
+		shared.SuccessRes{
+			Success: true,
+		},
 	)
 }

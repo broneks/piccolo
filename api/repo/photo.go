@@ -31,11 +31,13 @@ func (r *PhotoRepo) GetAll(ctx context.Context) ([]model.Photo, error) {
 
 func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 	query := `insert into photos (
+		user_id,
 		location,
 		filename,
 		file_size,
 		content_type
 	) values (
+		@userId,
 		@location,
 		@filename,
 		@fileSize,
@@ -43,6 +45,7 @@ func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 	)`
 
 	args := pgx.NamedArgs{
+		"userId":      photo.UserId,
 		"location":    photo.Location,
 		"filename":    photo.Filename,
 		"fileSize":    photo.FileSize,

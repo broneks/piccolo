@@ -9,6 +9,9 @@ lint:
 run:
 	air
 
+pg_schema:
+	docker compose exec postgres pg_dump -U $(DB_USER) --exclude-table-data=schema_migrations --schema-only $(DB_NAME) > db/schema.sql
+
 migrate_create:
 	migrate create -ext sql -dir db/migrations -seq $(name)
 

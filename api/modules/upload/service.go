@@ -7,7 +7,7 @@ import (
 	"piccolo/api/model"
 )
 
-func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeader) error {
+func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeader, userId string) error {
 	var err error
 
 	var filename = file.Filename
@@ -24,13 +24,13 @@ func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeade
 
 	location, err := m.server.ObjectStorage.UploadFile(ctx, filename, src)
 	if err != nil {
-		log.Println("Error uploading file:", err)
 		return err
 	}
 
 	log.Printf("File uploaded successfully: %s\n", location)
 
 	photo := model.Photo{
+		UserId:      userId,
 		Location:    location,
 		Filename:    filename,
 		FileSize:    fileSize,
