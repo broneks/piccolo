@@ -20,10 +20,15 @@ func Start() {
 
 	e := echo.New()
 
+	// custom
 	e.Use(middleware.Logger())
+	e.Use(middleware.SetUserHeaders())
+
+	// echo built-in
 	e.Use(echoMiddleware.Recover())
 	e.Use(echoMiddleware.RequestID())
 	e.Use(echoMiddleware.Secure())
+
 	e.Static("/", "public")
 
 	logger := slog.Default()

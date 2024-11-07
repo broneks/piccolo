@@ -10,6 +10,7 @@ import (
 func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeader) error {
 	var err error
 
+	var userId = "" // TODO
 	var filename = file.Filename
 	var fileSize = int(file.Size)
 	var contentType = file.Header.Get("Content-Type")
@@ -31,6 +32,7 @@ func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeade
 	log.Printf("File uploaded successfully: %s\n", location)
 
 	photo := model.Photo{
+		UserId:      userId,
 		Location:    location,
 		Filename:    filename,
 		FileSize:    fileSize,
