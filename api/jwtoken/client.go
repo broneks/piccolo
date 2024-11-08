@@ -17,7 +17,7 @@ type JwtClient struct {
 	claims JwtClaims
 }
 
-const ExpirationDuration = time.Hour * (24 * 5)
+const ExpirationDuration = time.Hour * (24 * 7) // 1 week (for now)
 
 func New(userId, email string) *JwtClient {
 	now := time.Now()

@@ -1,6 +1,13 @@
 package repo
 
-import "piccolo/api/shared"
+import (
+	"context"
+	"fmt"
+	"piccolo/api/model"
+	"piccolo/api/shared"
+
+	"github.com/jackc/pgx/v5"
+)
 
 type UserRepo struct {
 	db shared.ServerDB
@@ -18,7 +25,30 @@ func (r *UserRepo) GetByEmail(email string) (string, error) {
 	return "", nil
 }
 
-func (r *UserRepo) InsertOne(email, password string) error {
+func (r *UserRepo) InsertOne(ctx context.Context, user model.User) error {
+	query := `insert into users (
+		username,
+		email,
+		hash,
+		hashedAt,
+	) values (
+		@username,
+		@email,
+		@hash,
+		@hashedAt,
+	)`
+
+	args := pgx.NamedArgs{
+		"username": user.Username,
+		"email":    user.Email,
+		"hash":     user.Hash,
+		"hashedAt": user.HashedAt,
+	}
+	_, err := r.db.Exec(ctx, query, args)
+	if err != nil {
+		return fmt.Errorf("unable to insert row: %w", err)
+	}
+
 	return nil
 }
 
