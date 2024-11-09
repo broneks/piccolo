@@ -20,10 +20,17 @@ func Start() {
 
 	e := echo.New()
 
+	e.Validator = shared.NewValidator()
+
+	// custom
 	e.Use(middleware.Logger())
+	e.Use(middleware.SetUserData())
+
+	// echo built-in
 	e.Use(echoMiddleware.Recover())
 	e.Use(echoMiddleware.RequestID())
 	e.Use(echoMiddleware.Secure())
+
 	e.Static("/", "public")
 
 	logger := slog.Default()

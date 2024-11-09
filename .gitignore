@@ -3,8 +3,7 @@ bin
 
 # Binaries for programs and plugins
 *.exe
-*.exe~
-*.dll
+*.exe~ *.dll
 *.so
 *.dylib
 
@@ -27,6 +26,7 @@ go.work.sum
 # air
 tmp
 
+db/schema.sql
 data
 pg_data
 notes.md

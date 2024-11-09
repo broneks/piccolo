@@ -8,6 +8,7 @@ import (
 
 type Photo struct {
 	Id          string    `json:"id"`
+	UserId      string    `json:"userId"`
 	Location    string    `json:"-"`
 	Filename    string    `json:"filename"`
 	FileSize    int       `json:"fileSize"`

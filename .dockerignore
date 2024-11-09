@@ -2,6 +2,7 @@
 .gitignore
 .env.sample
 
+db/schema.sql
 data
 pg_data
 tmp

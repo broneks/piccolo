@@ -20,6 +20,8 @@ func Logger() echo.MiddlewareFunc {
 		LogError:    true,
 		HandleError: true, // forwards error to the global error handler, so it can decide appropriate status code
 		LogValuesFunc: func(c echo.Context, v echoMiddleware.RequestLoggerValues) error {
+			ctx := c.Request().Context()
+
 			method := v.Method
 			if method == "" {
 				method = "GET"
@@ -27,7 +29,7 @@ func Logger() echo.MiddlewareFunc {
 
 			if v.Error == nil {
 				logger.LogAttrs(
-					c.Request().Context(),
+					ctx,
 					slog.LevelInfo,
 					"request",
 					slog.String("uri", fmt.Sprintf("%s %s", method, v.URI)),
@@ -35,7 +37,7 @@ func Logger() echo.MiddlewareFunc {
 				)
 			} else {
 				logger.LogAttrs(
-					c.Request().Context(),
+					ctx,
 					slog.LevelError,
 					"request_error",
 					slog.String("uri", fmt.Sprintf("%s %s", method, v.URI)),
