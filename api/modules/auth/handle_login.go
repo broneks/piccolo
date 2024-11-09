@@ -73,7 +73,7 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 	}
 
 	c.Response().Header().Set("authorization", fmt.Sprintf("Bearer %s", accessToken))
-	c.Response().Header().Set("x-refresh-token", fmt.Sprintf("Bearer %s", refreshToken))
+	c.Response().Header().Set("x-refresh-token", refreshToken)
 
 	return c.JSON(http.StatusOK, shared.SuccessRes{
 		Success: true,
