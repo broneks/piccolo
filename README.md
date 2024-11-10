@@ -1,8 +1,5 @@
 # Piccolo
 
-
-
-
 ## Steps to setup
 
 1. make a duplicate of `.env.sample` and fill in values.

@@ -1,7 +1,9 @@
 package redis
 
 import (
-	"github.com/go-redis/redis/v8"
+	"os"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type RedisClient struct {
@@ -9,9 +11,12 @@ type RedisClient struct {
 }
 
 func NewClient() *RedisClient {
-	rdb := redis.NewClient(&redis.Options{
-		Addr: "redis:6379",
-	})
+	opts, err := redis.ParseURL(os.Getenv("REDIS_URL"))
+	if err != nil {
+		panic(err)
+	}
+
+	rdb := redis.NewClient(opts)
 
 	return &RedisClient{rdb}
 }

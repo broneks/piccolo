@@ -12,7 +12,14 @@ type PostgresClient struct {
 }
 
 func NewClient(ctx context.Context) (*PostgresClient, error) {
-	db, err := pgxpool.New(ctx, os.Getenv("DB_DOCKER_URL"))
+	var err error
+
+	db, err := pgxpool.New(ctx, os.Getenv("DB_URL"))
+	if err != nil {
+		panic(err)
+	}
+
+	err = db.Ping(ctx)
 	if err != nil {
 		return nil, err
 	}
