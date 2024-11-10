@@ -10,6 +10,10 @@ import (
 )
 
 func (j *JwtClient) GenerateToken() (string, error) {
+	if j.claims.RegisteredClaims.Subject == "" || j.claims.Email == "" {
+		return "", fmt.Errorf("token subject and email cannot be empty")
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, j.claims)
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {

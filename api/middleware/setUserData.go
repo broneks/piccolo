@@ -24,13 +24,8 @@ func SetUserData() echo.MiddlewareFunc {
 				userId := jwtoken.GetUserId(tokenString)
 				userEmail := jwtoken.GetUserEmail(tokenString)
 
-				if userId != "" {
-					c.Set("userId", userId)
-				}
-
-				if userEmail != "" {
-					c.Set("userEmail", userEmail)
-				}
+				c.Set("userId", userId)
+				c.Set("userEmail", userEmail)
 			}
 
 			return next(c)
