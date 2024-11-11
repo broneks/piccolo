@@ -1,4 +1,4 @@
-package photos
+package albums
 
 import (
 	"net/http"
@@ -18,12 +18,15 @@ type PhotoRes struct {
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
-func (m *PhotosModule) getPhotosHandler(c echo.Context) error {
+func (m *AlbumsModule) getAlbumPhotosHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	userId := c.Get("userId").(string)
+	albumId := shared.GetIdParam(c)
+	if albumId == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
+	}
 
-	photos, _ := m.photoRepo.GetAll(ctx, userId)
+	photos, _ := m.albumRepo.GetPhotos(ctx, albumId)
 
 	if len(photos) == 0 {
 		return c.JSON(http.StatusOK, shared.EmptySlice{})

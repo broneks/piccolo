@@ -21,10 +21,12 @@ type PhotoRes struct {
 func (m *UploadModule) getUploadsHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	photos, _ := m.photoRepo.GetAll(ctx)
+	userId := c.Get("userId").(string)
+
+	photos, _ := m.photoRepo.GetAll(ctx, userId)
 
 	if len(photos) == 0 {
-		return c.JSON(http.StatusOK, []interface{}{})
+		return c.JSON(http.StatusOK, shared.EmptySlice{})
 	}
 
 	var photoResList []PhotoRes

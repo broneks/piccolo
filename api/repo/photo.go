@@ -17,10 +17,10 @@ func NewPhotoRepo(db shared.ServerDB) *PhotoRepo {
 	return &PhotoRepo{db: db}
 }
 
-func (r *PhotoRepo) GetAll(ctx context.Context) ([]model.Photo, error) {
-	query := `select * from photos`
+func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, error) {
+	query := `select * from photos where user_id = $1`
 
-	rows, err := r.db.Query(ctx, query)
+	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query users: %v", err)
 	}
