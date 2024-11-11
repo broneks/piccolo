@@ -17,9 +17,30 @@ func NewUserRepo(db shared.ServerDB) *UserRepo {
 	return &UserRepo{db: db}
 }
 
-// TODO
-func (r *UserRepo) GetById(id string) (string, error) {
-	return "", nil
+func (r *UserRepo) GetById(id string) (*model.User, error) {
+	query := `select * from users where id = $1`
+
+	var user model.User
+
+	err := r.db.QueryRow(context.Background(), query, id).Scan(
+		&user.Id,
+		&user.Username,
+		&user.Email,
+		&user.Hash,
+		&user.HashedAt,
+		&user.LastLoginAt,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, fmt.Errorf("user with id %s not found", id)
+		}
+		return nil, fmt.Errorf("query error: %v", err)
+	}
+
+	return &user, nil
 }
 
 func (r *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User, error) {

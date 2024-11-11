@@ -17,6 +17,31 @@ func NewAlbumRepo(db shared.ServerDB) *AlbumRepo {
 	return &AlbumRepo{db: db}
 }
 
+func (r *AlbumRepo) GetById(id string) (*model.Album, error) {
+	query := `select * from album where id = $1`
+
+	var album model.Album
+
+	err := r.db.QueryRow(context.Background(), query, id).Scan(
+		&album.Id,
+		&album.UserId,
+		&album.Name,
+		&album.Description,
+		&album.CoverPhotoId,
+		&album.CreatedAt,
+		&album.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, fmt.Errorf("album with id %s not found", id)
+		}
+		return nil, fmt.Errorf("query error: %v", err)
+	}
+
+	return &album, nil
+}
+
 func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, error) {
 	query := `select * from albums where user_id = $1`
 
@@ -68,5 +93,9 @@ func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 		return fmt.Errorf("unable to insert row: %w", err)
 	}
 
+	return nil
+}
+
+func (r *AlbumRepo) AddPhotos(ctx context.Context, photoIds []string) error {
 	return nil
 }
