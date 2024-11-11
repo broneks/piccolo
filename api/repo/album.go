@@ -28,6 +28,7 @@ func (r *AlbumRepo) GetById(id string) (*model.Album, error) {
 		&album.Name,
 		&album.Description,
 		&album.CoverPhotoId,
+		&album.ReadAccessHash,
 		&album.CreatedAt,
 		&album.UpdatedAt,
 	)
@@ -99,3 +100,27 @@ func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 func (r *AlbumRepo) AddPhotos(ctx context.Context, photoIds []string) error {
 	return nil
 }
+
+/*
+func InsertManyWithCopy(ctx context.Context, conn *pgx.Conn, users []User) error {
+	// Prepare data for bulk insert
+	rows := make([][]interface{}, len(users))
+	for i, user := range users {
+		rows[i] = []interface{}{user.Username, user.Email, user.Hash}
+	}
+
+	// Perform bulk insert using CopyFrom
+	// CopyFromRows
+	_, err := conn.CopyFrom(
+		ctx,
+		pgx.Identifier{"users"}, // Table name
+		[]string{"username", "email", "hash"}, // Columns to insert
+		pgx.CopyFromRows(rows), // Data to insert
+	)
+	if err != nil {
+		return fmt.Errorf("failed to bulk insert users: %w", err)
+	}
+
+	return nil
+}
+*/
