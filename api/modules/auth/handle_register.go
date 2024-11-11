@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"database/sql"
 	"net/http"
 	"piccolo/api/model"
 	"piccolo/api/shared"
@@ -44,7 +45,7 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 	}
 
 	err = m.userRepo.InsertOne(ctx, model.User{
-		Username: req.Email, // TODO
+		Username: sql.NullString{String: req.Email},
 		Email:    req.Email,
 		Hash:     hash,
 		HashedAt: time.Now(),

@@ -38,7 +38,7 @@ func (m *PhotosModule) getPhotosHandler(c echo.Context) error {
 			Id:          photo.Id,
 			UserId:      photo.UserId,
 			Filename:    photo.Filename,
-			FileSize:    photo.FileSize,
+			FileSize:    int(photo.FileSize.Int32),
 			Url:         url,
 			ContentType: photo.ContentType,
 			CreatedAt:   photo.CreatedAt,
