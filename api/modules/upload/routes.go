@@ -1,10 +1,13 @@
 package upload
 
 import (
+	"piccolo/api/middleware"
+
 	"github.com/labstack/echo/v4"
 )
 
 func (m *UploadModule) Routes(g *echo.Group) {
-	g.GET("/uploads", m.getUploadsHandler)
-	g.POST("/upload", m.postUploadHandler)
+	upload := g.Group("/upload", middleware.Auth())
+
+	upload.POST("", m.postUploadHandler)
 }
