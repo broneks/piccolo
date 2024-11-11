@@ -3,6 +3,7 @@ package albums
 import (
 	"net/http"
 	"piccolo/api/shared"
+	"piccolo/api/util"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -21,7 +22,7 @@ type PhotoRes struct {
 func (m *AlbumsModule) getAlbumPhotosHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	albumId := shared.GetIdParam(c)
+	albumId := util.GetIdParam(c)
 	if albumId == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
 	}

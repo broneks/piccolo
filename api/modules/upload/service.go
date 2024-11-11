@@ -32,11 +32,11 @@ func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeade
 	log.Printf("File uploaded successfully: %s\n", location)
 
 	photo := model.Photo{
-		UserId:      pgtype.Text{String: userId},
-		Location:    pgtype.Text{String: location},
-		Filename:    pgtype.Text{String: filename},
-		FileSize:    pgtype.Int4{Int32: int32(fileSize)},
-		ContentType: pgtype.Text{String: contentType},
+		UserId:      pgtype.Text{String: userId, Valid: true},
+		Location:    pgtype.Text{String: location, Valid: true},
+		Filename:    pgtype.Text{String: filename, Valid: true},
+		FileSize:    pgtype.Int4{Int32: int32(fileSize), Valid: true},
+		ContentType: pgtype.Text{String: contentType, Valid: true},
 	}
 
 	err = m.photoRepo.InsertOne(ctx, photo)

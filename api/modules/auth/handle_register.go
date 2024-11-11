@@ -45,10 +45,10 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 	}
 
 	err = m.userRepo.InsertOne(ctx, model.User{
-		Username: pgtype.Text{String: req.Email},
-		Email:    pgtype.Text{String: req.Email},
-		Hash:     pgtype.Text{String: hash},
-		HashedAt: pgtype.Timestamptz{Time: time.Now()},
+		Username: pgtype.Text{String: req.Email, Valid: true},
+		Email:    pgtype.Text{String: req.Email, Valid: true},
+		Hash:     pgtype.Text{String: hash, Valid: true},
+		HashedAt: pgtype.Timestamptz{Time: time.Now(), Valid: true},
 	})
 	if err != nil {
 		m.server.Logger.Error("unexpected error", err)

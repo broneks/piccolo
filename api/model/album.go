@@ -1,6 +1,8 @@
 package model
 
 import (
+	"piccolo/api/util"
+
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -13,4 +15,8 @@ type Album struct {
 	ReadAccessHash pgtype.Text        `json:"readAccessHash"`
 	CreatedAt      pgtype.Timestamptz `json:"createdAt"`
 	UpdatedAt      pgtype.Timestamptz `json:"-"`
+}
+
+func (a *Album) SetReadAccessHash() {
+	a.ReadAccessHash = pgtype.Text{String: util.GenerateRandomHash(), Valid: true}
 }
