@@ -54,11 +54,11 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 		})
 	}
 
-	if err = m.userRepo.UpdateLastLoginAt(ctx, user.Id); err != nil {
+	if err = m.userRepo.UpdateLastLoginAt(ctx, user.Id.String); err != nil {
 		m.server.Logger.Error("failed to update last login at", err.Error())
 	}
 
-	accessToken, err := jwtoken.NewAccessJwt(user.Id, user.Email).GenerateToken()
+	accessToken, err := jwtoken.NewAccessJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
 		m.server.Logger.Error("failed to create jwt access token", err.Error())
 		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
@@ -67,7 +67,7 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 		})
 	}
 
-	refreshToken, err := jwtoken.NewRefreshJwt(user.Id, user.Email).GenerateToken()
+	refreshToken, err := jwtoken.NewRefreshJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
 		m.server.Logger.Error("failed to create jwt refresh token", err.Error())
 	}

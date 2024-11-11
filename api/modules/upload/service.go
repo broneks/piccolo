@@ -5,6 +5,8 @@ import (
 	"log"
 	"mime/multipart"
 	"piccolo/api/model"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeader, userId string) error {
@@ -30,11 +32,11 @@ func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeade
 	log.Printf("File uploaded successfully: %s\n", location)
 
 	photo := model.Photo{
-		UserId:      userId,
-		Location:    location,
-		Filename:    filename,
-		FileSize:    fileSize,
-		ContentType: contentType,
+		UserId:      pgtype.Text{String: userId},
+		Location:    pgtype.Text{String: location},
+		Filename:    pgtype.Text{String: filename},
+		FileSize:    pgtype.Int4{Int32: int32(fileSize)},
+		ContentType: pgtype.Text{String: contentType},
 	}
 
 	err = m.photoRepo.InsertOne(ctx, photo)

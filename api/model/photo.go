@@ -2,24 +2,25 @@ package model
 
 import (
 	"context"
-	"database/sql"
 	"piccolo/api/shared"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Photo struct {
-	Id          string        `json:"id"`
-	UserId      string        `json:"userId"`
-	Location    string        `json:"-"`
-	Filename    string        `json:"filename"`
-	FileSize    sql.NullInt32 `json:"fileSize"`
-	ContentType string        `json:"contentType"`
-	CreatedAt   time.Time     `json:"createdAt"`
-	UpdatedAt   time.Time     `json:"-"`
+	Id          pgtype.Text        `json:"id"`
+	UserId      pgtype.Text        `json:"userId"`
+	Location    pgtype.Text        `json:"-"`
+	Filename    pgtype.Text        `json:"filename"`
+	FileSize    pgtype.Int4        `json:"fileSize"`
+	ContentType pgtype.Text        `json:"contentType"`
+	CreatedAt   pgtype.Timestamptz `json:"createdAt"`
+	UpdatedAt   pgtype.Timestamptz `json:"-"`
 }
 
 func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
-	key := p.Id
+	key := p.Id.String
 
 	val, err := server.Cache.Get(ctx, key)
 	if err != nil {
@@ -30,7 +31,7 @@ func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
 	if val != "" {
 		return val
 	} else {
-		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), p.Filename)
+		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), p.Filename.String)
 
 		err := server.Cache.Set(ctx, key, url, expirationDuration-(time.Minute*5))
 		if err != nil {

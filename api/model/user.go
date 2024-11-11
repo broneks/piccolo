@@ -1,24 +1,22 @@
 package model
 
 import (
-	"database/sql"
-	"time"
-
+	"github.com/jackc/pgx/v5/pgtype"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	Id          string         `json:"id"`
-	Username    sql.NullString `json:"username"`
-	Email       string         `json:"email"`
-	Hash        string         `json:"-"`
-	HashedAt    time.Time      `json:"-"`
-	LastLoginAt time.Time      `json:"-"`
-	CreatedAt   time.Time      `json:"createdAt"`
-	UpdatedAt   time.Time      `json:"-"`
+	Id          pgtype.Text        `json:"id"`
+	Username    pgtype.Text        `json:"username"`
+	Email       pgtype.Text        `json:"email"`
+	Hash        pgtype.Text        `json:"-"`
+	HashedAt    pgtype.Timestamptz `json:"-"`
+	LastLoginAt pgtype.Timestamptz `json:"-"`
+	CreatedAt   pgtype.Timestamptz `json:"createdAt"`
+	UpdatedAt   pgtype.Timestamptz `json:"-"`
 }
 
 func (u *User) CheckPassword(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Hash), []byte(password))
+	err := bcrypt.CompareHashAndPassword([]byte(u.Hash.String), []byte(password))
 	return err == nil
 }

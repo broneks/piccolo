@@ -1,16 +1,15 @@
 package model
 
 import (
-	"database/sql"
-	"time"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Album struct {
-	Id           string         `json:"id"`
-	UserId       string         `json:"userId"`
-	Name         string         `json:"name"`
-	Description  sql.NullString `json:"description"`
-	CoverPhotoId sql.NullString `json:"coverPhotoId"`
-	CreatedAt    time.Time      `json:"createdAt"`
-	UpdatedAt    time.Time      `json:"-"`
+	Id           pgtype.Text        `json:"id"`
+	UserId       pgtype.Text        `json:"userId"`
+	Name         pgtype.Text        `json:"name"`
+	Description  pgtype.Text        `json:"description"`
+	CoverPhotoId pgtype.Text        `json:"coverPhotoId"`
+	CreatedAt    pgtype.Timestamptz `json:"createdAt"`
+	UpdatedAt    pgtype.Timestamptz `json:"-"`
 }

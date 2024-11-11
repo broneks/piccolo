@@ -1,12 +1,12 @@
 package auth
 
 import (
-	"database/sql"
 	"net/http"
 	"piccolo/api/model"
 	"piccolo/api/shared"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/labstack/echo/v4"
 )
 
@@ -45,10 +45,10 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 	}
 
 	err = m.userRepo.InsertOne(ctx, model.User{
-		Username: sql.NullString{String: req.Email},
-		Email:    req.Email,
-		Hash:     hash,
-		HashedAt: time.Now(),
+		Username: pgtype.Text{String: req.Email},
+		Email:    pgtype.Text{String: req.Email},
+		Hash:     pgtype.Text{String: hash},
+		HashedAt: pgtype.Timestamptz{Time: time.Now()},
 	})
 	if err != nil {
 		m.server.Logger.Error("unexpected error", err)

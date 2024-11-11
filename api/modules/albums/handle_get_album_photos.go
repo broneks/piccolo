@@ -38,13 +38,13 @@ func (m *AlbumsModule) getAlbumPhotosHandler(c echo.Context) error {
 		url := photo.GetUrl(ctx, m.server)
 
 		photoResList = append(photoResList, PhotoRes{
-			Id:          photo.Id,
-			UserId:      photo.UserId,
-			Filename:    photo.Filename,
+			Id:          photo.Id.String,
+			UserId:      photo.UserId.String,
+			Filename:    photo.Filename.String,
 			FileSize:    int(photo.FileSize.Int32),
 			Url:         url,
-			ContentType: photo.ContentType,
-			CreatedAt:   photo.CreatedAt,
+			ContentType: photo.ContentType.String,
+			CreatedAt:   photo.CreatedAt.Time,
 		})
 	}
 
