@@ -4,13 +4,20 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
+	"github.com/lmittmann/tint"
 )
 
 func Logger() echo.MiddlewareFunc {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	w := os.Stderr
+
+	logger := slog.New(tint.NewHandler(w, &tint.Options{
+		Level:      slog.LevelDebug,
+		TimeFormat: time.Kitchen,
+	}))
 
 	slog.SetDefault(logger)
 
