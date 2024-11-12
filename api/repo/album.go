@@ -17,6 +17,14 @@ func NewAlbumRepo(db shared.ServerDB) *AlbumRepo {
 	return &AlbumRepo{db: db}
 }
 
+func (r *AlbumRepo) CanReadAlbum(albumId string) (bool, error) {
+	return false, nil
+}
+
+func (r *AlbumRepo) CanWriteAlbum(albumId string) (bool, error) {
+	return false, nil
+}
+
 func (r *AlbumRepo) GetById(id string) (*model.Album, error) {
 	query := `select * from album where id = $1`
 
