@@ -17,12 +17,12 @@ func NewUserRepo(db shared.ServerDB) *UserRepo {
 	return &UserRepo{db: db}
 }
 
-func (r *UserRepo) GetById(id string) (*model.User, error) {
+func (r *UserRepo) GetById(ctx context.Context, id string) (*model.User, error) {
 	query := `select * from users where id = $1`
 
 	var user model.User
 
-	err := r.db.QueryRow(context.Background(), query, id).Scan(
+	err := r.db.QueryRow(ctx, query, id).Scan(
 		&user.Id,
 		&user.Username,
 		&user.Email,

@@ -20,7 +20,6 @@ type PhotoRes struct {
 
 func (m *UploadModule) getUploadsHandler(c echo.Context) error {
 	ctx := c.Request().Context()
-
 	userId := c.Get("userId").(string)
 
 	photos, _ := m.photoRepo.GetAll(ctx, userId)
@@ -79,6 +78,7 @@ func (m *UploadModule) postUploadHandler(c echo.Context) error {
 		http.StatusOK,
 		shared.SuccessRes{
 			Success: true,
+			Message: "File uploaded",
 		},
 	)
 }

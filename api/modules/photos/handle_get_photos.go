@@ -20,7 +20,6 @@ type PhotoRes struct {
 
 func (m *PhotosModule) getPhotosHandler(c echo.Context) error {
 	ctx := c.Request().Context()
-
 	userId := c.Get("userId").(string)
 
 	photos, _ := m.photoRepo.GetAll(ctx, userId)

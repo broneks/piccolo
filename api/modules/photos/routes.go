@@ -10,4 +10,9 @@ func (m *PhotosModule) Routes(g *echo.Group) {
 	photos := g.Group("/photos", middleware.Auth())
 
 	photos.GET("", m.getPhotosHandler)
+
+	photo := photos.Group("/:id")
+
+	photo.GET("", m.getPhotoHandler)
+	photo.GET("/albums", m.getPhotoAlbumsHandler)
 }

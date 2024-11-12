@@ -17,20 +17,77 @@ func NewAlbumRepo(db shared.ServerDB) *AlbumRepo {
 	return &AlbumRepo{db: db}
 }
 
-func (r *AlbumRepo) CanReadAlbum(albumId string) (bool, error) {
-	return false, nil
+// Permits:
+// - album owner
+// - album user with any role
+func (r *AlbumRepo) CanReadAlbum(ctx context.Context, albumId, userId string) (bool, error) {
+	query := `select exists (
+		          select 1 from albums where id = @albumId and user_id = @userId
+							union
+							select 1 from album_users where album_id = @albumId and user_id = @userId
+						) as can`
+
+	var can bool
+
+	args := pgx.NamedArgs{
+		"albumId": albumId,
+		"userId":  userId,
+	}
+	err := r.db.QueryRow(ctx, query, args).Scan(&can)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return false, fmt.Errorf("no rows found for album id '%s' and user id '%s'", albumId, userId)
+		}
+		return false, fmt.Errorf("query error: %v", err)
+	}
+
+	return can, nil
 }
 
-func (r *AlbumRepo) CanWriteAlbum(albumId string) (bool, error) {
-	return false, nil
+// Permits:
+// - album owner
+// - album user with editor role
+func (r *AlbumRepo) CanWriteAlbum(ctx context.Context, albumId, userId string) (bool, error) {
+	query := `select exists (
+		          select 1 from albums where id = @albumId and user_id = @userId
+							union
+							select 1 from album_users where album_id = @albumId and user_id = @userId and role in ('editor')
+						) as can`
+
+	var can bool
+
+	args := pgx.NamedArgs{
+		"albumId": albumId,
+		"userId":  userId,
+	}
+	err := r.db.QueryRow(ctx, query, args).Scan(&can)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return false, fmt.Errorf("no rows found for album id '%s' and user id '%s'", albumId, userId)
+		}
+		return false, fmt.Errorf("query error: %v", err)
+	}
+
+	return can, nil
 }
 
-func (r *AlbumRepo) GetById(id string) (*model.Album, error) {
+// Checks for read access
+func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model.Album, error) {
+	var err error
+
+	canRead, err := r.CanReadAlbum(ctx, albumId, userId)
+	if err != nil {
+		return nil, err
+	}
+	if !canRead {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
 	query := `select * from album where id = $1`
 
 	var album model.Album
 
-	err := r.db.QueryRow(context.Background(), query, id).Scan(
+	err = r.db.QueryRow(ctx, query, albumId).Scan(
 		&album.Id,
 		&album.UserId,
 		&album.Name,
@@ -40,10 +97,9 @@ func (r *AlbumRepo) GetById(id string) (*model.Album, error) {
 		&album.CreatedAt,
 		&album.UpdatedAt,
 	)
-
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil, fmt.Errorf("album with id %s not found", id)
+			return nil, fmt.Errorf("album with id %s not found", albumId)
 		}
 		return nil, fmt.Errorf("query error: %v", err)
 	}
@@ -51,8 +107,11 @@ func (r *AlbumRepo) GetById(id string) (*model.Album, error) {
 	return &album, nil
 }
 
+// Get all albums irrespective of if the user is the owner or just a member
 func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, error) {
-	query := `select * from albums where user_id = $1`
+	query := `select * from albums where user_id = $1
+					  union
+						select * from albums a join album_users au on a.id = au.album_id where au.user_id = $1`
 
 	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
@@ -63,22 +122,104 @@ func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, e
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Album])
 }
 
-func (r *AlbumRepo) GetUsers(ctx context.Context, albumId string) ([]model.User, error) {
-	query := `select u.id, u.username, u.email, u.hash, u.hashed_at, u.last_login_at, u.created_at, u.updated_at
+func (r *AlbumRepo) GetUserRole(ctx context.Context, albumId, userId string) (string, error) {
+	query := `select role from album_users where album_id = $albumId and user_id = $userId`
+
+	var role string
+
+	args := pgx.NamedArgs{
+		"albumId": albumId,
+		"userId":  userId,
+	}
+	err := r.db.QueryRow(ctx, query, args).Scan(&role)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return "", fmt.Errorf("no rows found for album id '%s' and user id '%s'", albumId, userId)
+		}
+		return "", fmt.Errorf("query error: %v", err)
+	}
+
+	return role, nil
+}
+
+// Checks for read access
+func (r *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]model.AlbumUserWithUser, error) {
+	var err error
+
+	canRead, err := r.CanReadAlbum(ctx, albumId, userId)
+	if err != nil {
+		return nil, err
+	}
+	if !canRead {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	query := `select
+							au.album_id,
+							au.user_id,
+							au.role,
+							au.created_at,
+							u.id,
+							u.username,
+							u.email,
+							u.hash,
+							u.hashed_at,
+							u.last_login_at,
+							u.created_at,
+							u.updated_at
 						from users u
 						join album_users au on u.id = au.user_id
 						where au.album_id = $1`
 
+	var albumUsers []model.AlbumUserWithUser
+
 	rows, err := r.db.Query(ctx, query, albumId)
 	if err != nil {
-		return nil, fmt.Errorf("unable to query users: %v", err)
+		return nil, fmt.Errorf("unable to query users or album users: %v", err)
 	}
-	defer rows.Close()
 
-	return pgx.CollectRows(rows, pgx.RowToStructByName[model.User])
+	for rows.Next() {
+		albumUser := model.NewAlbumUserWithUser()
+
+		err = rows.Scan(
+			&albumUser.AlbumId,
+			&albumUser.UserId,
+			&albumUser.Role,
+			&albumUser.CreatedAt,
+			&albumUser.User.Id,
+			&albumUser.User.Username,
+			&albumUser.User.Email,
+			&albumUser.User.Hash,
+			&albumUser.User.HashedAt,
+			&albumUser.User.LastLoginAt,
+			&albumUser.User.CreatedAt,
+			&albumUser.User.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("row scan failed: %w", err)
+		}
+
+		albumUsers = append(albumUsers, *albumUser)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("iteration error: %w", err)
+	}
+
+	return albumUsers, nil
 }
 
-func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]model.Photo, error) {
+// Checks for read access
+func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]model.Photo, error) {
+	var err error
+
+	canRead, err := r.CanReadAlbum(ctx, albumId, userId)
+	if err != nil {
+		return nil, err
+	}
+	if !canRead {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
 	query := `select p.id, p.user_id, p.location, p.filename, p.file_size, p.content_type, p.created_at, p.updated_at
 						from photos p
 						join album_photos ap on p.id = ap.photo_id
@@ -120,6 +261,8 @@ func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 	return nil
 }
 
+// TODO
+// Checks for write access
 func (r *AlbumRepo) AddPhotos(ctx context.Context, photoIds []string) error {
 	return nil
 }

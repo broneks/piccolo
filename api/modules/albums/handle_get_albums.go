@@ -9,7 +9,6 @@ import (
 
 func (m *AlbumsModule) getAlbumsHandler(c echo.Context) error {
 	ctx := c.Request().Context()
-
 	userId := c.Get("userId").(string)
 
 	albums, _ := m.albumRepo.GetAll(ctx, userId)
