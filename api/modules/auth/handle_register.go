@@ -22,6 +22,7 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 	var err error
 
 	if err = c.Bind(req); err != nil {
+		m.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, shared.SuccessRes{
 			Success: false,
 			Message: "Invalid input",
