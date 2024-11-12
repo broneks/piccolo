@@ -14,4 +14,5 @@ func (m *AlbumsModule) Routes(g *echo.Group) {
 	album := albums.Group("/:id")
 
 	album.GET("/photos", m.getAlbumPhotosHandler)
+	album.GET("/users", m.getAlbumUsersHandler)
 }

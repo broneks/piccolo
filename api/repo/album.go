@@ -55,6 +55,21 @@ func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, e
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Album])
 }
 
+func (r *AlbumRepo) GetUsers(ctx context.Context, albumId string) ([]model.User, error) {
+	query := `select u.id, u.username, u.email, u.hash, u.hashed_at, u.last_login_at, u.created_at, u.updated_at
+						from users u
+						join album_users au on u.id = au.user_id
+						where au.album_id = $1`
+
+	rows, err := r.db.Query(ctx, query, albumId)
+	if err != nil {
+		return nil, fmt.Errorf("unable to query users: %v", err)
+	}
+	defer rows.Close()
+
+	return pgx.CollectRows(rows, pgx.RowToStructByName[model.User])
+}
+
 func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]model.Photo, error) {
 	query := `select p.id, p.user_id, p.location, p.filename, p.file_size, p.content_type, p.created_at, p.updated_at
 						from photos p
