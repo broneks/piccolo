@@ -18,7 +18,16 @@ func NewUserRepo(db shared.ServerDB) *UserRepo {
 }
 
 func (r *UserRepo) GetById(ctx context.Context, id string) (*model.User, error) {
-	query := `select * from users where id = $1`
+	query := `select
+							id,
+							username,
+							email,
+							hash,
+							hashed_at,
+							last_login_at,
+							created_at,
+							updated_at
+						from users where id = $1`
 
 	var user model.User
 
@@ -44,7 +53,16 @@ func (r *UserRepo) GetById(ctx context.Context, id string) (*model.User, error) 
 }
 
 func (r *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User, error) {
-	query := `select * from users where email = $1`
+	query := `select
+							id,
+							username,
+							email,
+							hash,
+							hashed_at,
+							last_login_at,
+							created_at,
+							updated_at
+						from users where email = $1`
 
 	var user model.User
 

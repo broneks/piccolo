@@ -1,4 +1,4 @@
-package photos
+package albums
 
 import (
 	"net/http"
@@ -8,16 +8,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *PhotosModule) getPhotoAlbumsHandler(c echo.Context) error {
+func (m *AlbumsModule) getAlbumHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
-	photoId := util.GetIdParam(c)
-	if photoId == "" {
+	albumId := util.GetIdParam(c)
+	if albumId == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
 	}
 
-	albums, err := m.photoRepo.GetAlbums(ctx, photoId, userId)
+	album, err := m.albumRepo.GetById(ctx, albumId, userId)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, shared.SuccessRes{
 			Success: false,
@@ -25,9 +25,5 @@ func (m *PhotosModule) getPhotoAlbumsHandler(c echo.Context) error {
 		})
 	}
 
-	if len(albums) == 0 {
-		return c.JSON(http.StatusOK, shared.EmptySlice{})
-	}
-
-	return c.JSON(http.StatusOK, albums)
+	return c.JSON(http.StatusOK, album)
 }

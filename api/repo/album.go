@@ -83,7 +83,16 @@ func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model
 		return nil, fmt.Errorf("unauthorized")
 	}
 
-	query := `select * from album where id = $1`
+	query := `select
+							id,
+							user_id,
+							name,
+							description,
+							cover_photo_id,
+							read_access_hash,
+							created_at,
+							updated_at
+						from albums where id = $1`
 
 	var album model.Album
 
@@ -109,9 +118,27 @@ func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model
 
 // Get all albums irrespective of if the user is the owner or just a member
 func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, error) {
-	query := `select * from albums where user_id = $1
+	query := `select
+							id,
+							user_id,
+							name,
+							description,
+							cover_photo_id,
+							read_access_hash,
+							created_at,
+							updated_at
+						from albums a1 where user_id = $1
 					  union
-						select * from albums a join album_users au on a.id = au.album_id where au.user_id = $1`
+						select
+							a.id,
+							a.user_id,
+							a.name,
+							a.description,
+							a.cover_photo_id,
+							a.read_access_hash,
+							a.created_at,
+							a.updated_at
+						from albums a join album_users au on a.id = au.album_id where au.user_id = $1`
 
 	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
@@ -220,7 +247,15 @@ func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]mo
 		return nil, fmt.Errorf("unauthorized")
 	}
 
-	query := `select p.id, p.user_id, p.location, p.filename, p.file_size, p.content_type, p.created_at, p.updated_at
+	query := `select
+							p.id,
+							p.user_id,
+							p.location,
+							p.filename,
+							p.file_size,
+							p.content_type,
+							p.created_at,
+							p.updated_at
 						from photos p
 						join album_photos ap on p.id = ap.photo_id
 						where ap.album_id = $1`

@@ -17,9 +17,59 @@ func NewPhotoRepo(db shared.ServerDB) *PhotoRepo {
 	return &PhotoRepo{db: db}
 }
 
-// Get all photo for which the user is the uploader
+// Get photos uploaded by the user
+func (r *PhotoRepo) GetById(ctx context.Context, photoId, userId string) (*model.Photo, error) {
+	var err error
+
+	query := `select
+							id,
+							user_id,
+							location,
+							filename,
+							file_size,
+							content_type,
+							created_at,
+							updated_at
+						from photos where id = @photoId and user_id = @userId`
+
+	var photo model.Photo
+
+	args := pgx.NamedArgs{
+		"photoId": photoId,
+		"userId":  userId,
+	}
+	err = r.db.QueryRow(ctx, query, args).Scan(
+		&photo.Id,
+		&photo.UserId,
+		&photo.Location,
+		&photo.Filename,
+		&photo.FileSize,
+		&photo.ContentType,
+		&photo.CreatedAt,
+		&photo.UpdatedAt,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, fmt.Errorf("photo with id %s not found", photoId)
+		}
+		return nil, fmt.Errorf("query error: %v", err)
+	}
+
+	return &photo, nil
+}
+
+// Get all photo uploaded by the user
 func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, error) {
-	query := `select * from photos where user_id = $1`
+	query := `select
+							id,
+							user_id,
+							name,
+							description,
+							cover_photo_id,
+							read_access_hash,
+							created_at,
+							updated_at
+						from photos where user_id = $1`
 
 	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
@@ -31,9 +81,17 @@ func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, e
 }
 
 func (r *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([]model.Album, error) {
-	query := `select a.id, a.user_id, a.name, a.description, a.cover_photo_id, a.read_access_hash, a.created_at, a.updated_at
+	query := `select
+							a.id,
+							a.user_id,
+							a.name,
+							a.description,
+							a.cover_photo_id,
+							a.read_access_hash,
+							a.created_at,
+							a.updated_at
 						from albums a
-						join album_photos ap on p.id = ap.album_id
+						join album_photos ap on a.id = ap.album_id
 						where ap.photo_id = @photoId
 						and ap.user_id = @userId`
 
