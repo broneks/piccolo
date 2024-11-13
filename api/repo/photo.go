@@ -63,10 +63,10 @@ func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, e
 	query := `select
 		id,
 		user_id,
-		name,
-		description,
-		cover_photo_id,
-		read_access_hash,
+		location,
+		filename,
+		file_size,
+		content_type,
 		created_at,
 		updated_at
 	from photos where user_id = $1`
