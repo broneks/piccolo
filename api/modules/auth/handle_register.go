@@ -38,7 +38,7 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 
 	hash, err := hashPassword(req.Password)
 	if err != nil {
-		m.server.Logger.Error("unexpected error", err)
+		m.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
@@ -52,7 +52,7 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 		HashedAt: pgtype.Timestamptz{Time: time.Now(), Valid: true},
 	})
 	if err != nil {
-		m.server.Logger.Error("unexpected error", err)
+		m.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",

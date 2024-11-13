@@ -17,15 +17,17 @@ func Logger() echo.MiddlewareFunc {
 	logger := slog.New(tint.NewHandler(w, &tint.Options{
 		Level:      slog.LevelDebug,
 		TimeFormat: time.Kitchen,
+		AddSource:  true,
 	}))
 
 	slog.SetDefault(logger)
 
 	return echoMiddleware.RequestLoggerWithConfig(echoMiddleware.RequestLoggerConfig{
-		LogStatus:   true,
-		LogURI:      true,
-		LogError:    true,
-		HandleError: true, // forwards error to the global error handler, so it can decide appropriate status code
+		LogStatus:    true,
+		LogURI:       true,
+		LogError:     true,
+		LogRequestID: true,
+		HandleError:  true, // forwards error to the global error handler, so it can decide appropriate status code
 		LogValuesFunc: func(c echo.Context, v echoMiddleware.RequestLoggerValues) error {
 			ctx := c.Request().Context()
 

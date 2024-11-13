@@ -16,7 +16,7 @@ func Auth() echo.MiddlewareFunc {
 
 			tokenString, err := jwtoken.ExtractTokenString(authHeader)
 			if err != nil {
-				log.Println(err)
+				log.Println(err.Error())
 			}
 
 			isAuthenticated := jwtoken.VerifyToken(tokenString)

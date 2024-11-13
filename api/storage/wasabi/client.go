@@ -48,7 +48,7 @@ func NewClient(ctx context.Context) (*WasabiClient, error) {
 		),
 	)
 	if err != nil {
-		log.Println("Configuration error:", err)
+		log.Println("Configuration error:", err.Error())
 		panic(err)
 	}
 

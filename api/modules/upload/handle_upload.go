@@ -64,7 +64,7 @@ func (m *UploadModule) postUploadHandler(c echo.Context) error {
 
 	err = m.UploadFile(ctx, file, userId)
 	if err != nil {
-		m.server.Logger.Error("unexpected error", err.Error())
+		m.server.Logger.Error(err.Error())
 		return c.JSON(
 			http.StatusBadRequest,
 			shared.SuccessRes{

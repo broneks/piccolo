@@ -55,12 +55,12 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 	}
 
 	if err = m.userRepo.UpdateLastLoginAt(ctx, user.Id.String); err != nil {
-		m.server.Logger.Error("failed to update last login at", err.Error())
+		m.server.Logger.Error(err.Error())
 	}
 
 	accessToken, err := jwtoken.NewAccessJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
-		m.server.Logger.Error("failed to create jwt access token", err.Error())
+		m.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
@@ -69,7 +69,7 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 
 	refreshToken, err := jwtoken.NewRefreshJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
-		m.server.Logger.Error("failed to create jwt refresh token", err.Error())
+		m.server.Logger.Error(err.Error())
 	}
 
 	c.Response().Header().Set("authorization", fmt.Sprintf("Bearer %s", accessToken))

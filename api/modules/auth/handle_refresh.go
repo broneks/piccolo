@@ -32,7 +32,7 @@ func (m *AuthModule) refreshHandler(c echo.Context) error {
 
 	accessToken, err := jwtoken.NewAccessJwt(userId, userEmail).GenerateToken()
 	if err != nil {
-		m.server.Logger.Error("failed to create jwt access token", err.Error())
+		m.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
