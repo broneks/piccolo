@@ -41,16 +41,16 @@ func Start() {
 
 	db, err := pg.NewClient(context.Background())
 	if err != nil {
-		logger.Error(fmt.Sprintf("Cannot load postgres db: %v", err))
-		return
+		logger.Error(fmt.Sprintf("Cannot load postgres db: %v", err.Error()))
+		os.Exit(1)
 	}
 
 	redis := redis.NewClient()
 
 	wasabi, err := wasabi.NewClient(context.Background())
 	if err != nil {
-		logger.Error(fmt.Sprintf("Cannot load wasabi db: %v", err))
-		return
+		logger.Error(fmt.Sprintf("Cannot load wasabi db: %v", err.Error()))
+		os.Exit(1)
 	}
 
 	server := &shared.Server{
