@@ -12,10 +12,16 @@ import (
 )
 
 func Logger() echo.MiddlewareFunc {
+	env := os.Getenv("ENV")
 	w := os.Stderr
 
+	level := slog.LevelInfo
+	if env == "local" {
+		level = slog.LevelDebug
+	}
+
 	logger := slog.New(tint.NewHandler(w, &tint.Options{
-		Level:      slog.LevelDebug,
+		Level:      level,
 		TimeFormat: time.Kitchen,
 		AddSource:  true,
 	}))
