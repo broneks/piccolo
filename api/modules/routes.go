@@ -12,6 +12,8 @@ import (
 )
 
 func Routes(g *echo.Group, server *shared.Server) {
+	g.GET("/health", handleHealth(server))
+
 	v1 := g.Group("/v1")
 
 	userRepo := repo.NewUserRepo(server.DB)

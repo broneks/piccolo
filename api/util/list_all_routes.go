@@ -15,14 +15,6 @@ func ListAllRoutes(e *echo.Echo) {
 	routes := append([]*echo.Route(nil), e.Routes()...)
 
 	sort.Slice(routes, func(i, j int) bool {
-		// force auth routes to list first
-		if strings.Contains(routes[i].Path, "/auth/") {
-			return true
-		}
-		if strings.Contains(routes[j].Path, "/auth/") {
-			return false
-		}
-
 		return routes[i].Path < routes[j].Path
 	})
 

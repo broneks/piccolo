@@ -28,12 +28,14 @@ type ServerDB interface {
 
 type ServerCache interface {
 	Get(ctx context.Context, key string) (string, error)
+	Ping(ctx context.Context) error
 	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
 	SetForever(ctx context.Context, key string, value interface{}) error
 }
 
 type ServerObjectStorage interface {
 	GetPresignedUrl(ctx context.Context, key string) (string, time.Duration)
+	Ping(ctx context.Context) error
 	UploadFile(ctx context.Context, filename string, file multipart.File) (string, error)
 }
 
