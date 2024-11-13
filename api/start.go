@@ -35,7 +35,7 @@ func Start() {
 	e.Use(echoMiddleware.RequestID())
 	e.Use(echoMiddleware.Secure())
 
-	e.Static("/", "public")
+	e.Static("/static", "static")
 
 	logger := slog.Default()
 

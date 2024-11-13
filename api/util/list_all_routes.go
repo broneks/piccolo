@@ -9,6 +9,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const staticRoute = "/static*"
+
 func ListAllRoutes(e *echo.Echo) {
 	routes := append([]*echo.Route(nil), e.Routes()...)
 
@@ -27,7 +29,7 @@ func ListAllRoutes(e *echo.Echo) {
 	fmt.Println()
 
 	for _, route := range routes {
-		if route.Method != "echo_route_not_found" && route.Path != "/*" {
+		if route.Method != "echo_route_not_found" && route.Path != staticRoute {
 			method := route.Method
 
 			switch method {
