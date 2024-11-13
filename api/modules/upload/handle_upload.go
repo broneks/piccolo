@@ -18,35 +18,6 @@ type PhotoRes struct {
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
-func (m *UploadModule) getUploadsHandler(c echo.Context) error {
-	ctx := c.Request().Context()
-	userId := c.Get("userId").(string)
-
-	photos, _ := m.photoRepo.GetAll(ctx, userId)
-
-	if len(photos) == 0 {
-		return c.JSON(http.StatusOK, []any{})
-	}
-
-	var photoResList []PhotoRes
-
-	for _, photo := range photos {
-		url := photo.GetUrl(ctx, m.server)
-
-		photoResList = append(photoResList, PhotoRes{
-			Id:          photo.Id.String,
-			UserId:      photo.UserId.String,
-			Filename:    photo.Filename.String,
-			FileSize:    int(photo.FileSize.Int32),
-			Url:         url,
-			ContentType: photo.ContentType.String,
-			CreatedAt:   photo.CreatedAt.Time,
-		})
-	}
-
-	return c.JSON(http.StatusOK, photoResList)
-}
-
 func (m *UploadModule) postUploadHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
