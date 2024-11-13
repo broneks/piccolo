@@ -17,7 +17,7 @@ func NewPhotoRepo(db shared.ServerDB) *PhotoRepo {
 	return &PhotoRepo{db: db}
 }
 
-// Get photos uploaded by the user
+// Get photo uploaded by the user
 func (r *PhotoRepo) GetById(ctx context.Context, photoId, userId string) (*model.Photo, error) {
 	var err error
 
@@ -58,7 +58,7 @@ func (r *PhotoRepo) GetById(ctx context.Context, photoId, userId string) (*model
 	return &photo, nil
 }
 
-// Get all photo uploaded by the user
+// Get all photos uploaded by the user
 func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, error) {
 	query := `select
 		id,
@@ -135,5 +135,21 @@ func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 		return fmt.Errorf("unable to insert row: %w", err)
 	}
 
+	return nil
+}
+
+// TODO
+func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo) error {
+	return nil
+}
+
+// TODO
+func (r *PhotoRepo) Update(ctx context.Context, photo model.Photo, userId string) error {
+	return nil
+}
+
+// TODO
+// remove photos uploaded by user
+func (r *PhotoRepo) RemoveMany(ctx context.Context, photoIds []string, userId string) error {
 	return nil
 }

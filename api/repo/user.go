@@ -114,6 +114,11 @@ func (r *UserRepo) InsertOne(ctx context.Context, user model.User) error {
 	return nil
 }
 
+// TODO
+func (r *UserRepo) Update(ctx context.Context, user model.User) error {
+	return nil
+}
+
 func (r *UserRepo) UpdateLastLoginAt(ctx context.Context, userId string) error {
 	query := `update users set last_login_at = now() where id = $1`
 

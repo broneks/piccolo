@@ -296,9 +296,39 @@ func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 	return nil
 }
 
+// TODO: control which fields can be updated
+// Checks for write access
+func (r *AlbumRepo) Update(ctx context.Context, album model.Album, userId string) error {
+	return nil
+}
+
 // TODO
 // Checks for write access
-func (r *AlbumRepo) AddPhotos(ctx context.Context, photoIds []string) error {
+func (r *AlbumRepo) InsertUsers(ctx context.Context, userIdsToInsert []string, userId string) error {
+	return nil
+}
+
+// TODO
+// Checks for write access
+func (r *AlbumRepo) UpdateUsers(ctx context.Context, usersToUpdate []model.AlbumUser, userId string) error {
+	return nil
+}
+
+// TODO
+// Checks for write access
+func (r *AlbumRepo) RemoveUsers(ctx context.Context, userIdsToRemove []string, userId string) error {
+	return nil
+}
+
+// TODO
+// Checks for write access
+func (r *AlbumRepo) InsertPhotos(ctx context.Context, photoIds []string, userId string) error {
+	return nil
+}
+
+// TODO
+// Checks for write access
+func (r *AlbumRepo) RemovePhotos(ctx context.Context, photoIds []string, userId string) error {
 	return nil
 }
 
