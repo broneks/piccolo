@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"piccolo/api/model"
 	"piccolo/api/shared"
+	"piccolo/api/util"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -52,11 +53,20 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 		HashedAt: pgtype.Timestamptz{Time: time.Now(), Valid: true},
 	})
 	if err != nil {
-		m.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
-			Success: false,
-			Message: "Unexpected error",
-		})
+		switch util.CheckSqlError(err) {
+		case "unique-violation":
+			return c.JSON(http.StatusBadRequest, shared.SuccessRes{
+				Success: false,
+				Message: "Email is taken",
+			})
+
+		default:
+			m.server.Logger.Error(err.Error())
+			return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
+				Success: false,
+				Message: "Unexpected error",
+			})
+		}
 	}
 
 	return c.JSON(http.StatusOK, shared.SuccessRes{
