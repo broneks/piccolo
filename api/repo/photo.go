@@ -22,15 +22,15 @@ func (r *PhotoRepo) GetById(ctx context.Context, photoId, userId string) (*model
 	var err error
 
 	query := `select
-							id,
-							user_id,
-							location,
-							filename,
-							file_size,
-							content_type,
-							created_at,
-							updated_at
-						from photos where id = @photoId and user_id = @userId`
+		id,
+		user_id,
+		location,
+		filename,
+		file_size,
+		content_type,
+		created_at,
+		updated_at
+	from photos where id = @photoId and user_id = @userId`
 
 	var photo model.Photo
 
@@ -61,15 +61,15 @@ func (r *PhotoRepo) GetById(ctx context.Context, photoId, userId string) (*model
 // Get all photo uploaded by the user
 func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, error) {
 	query := `select
-							id,
-							user_id,
-							name,
-							description,
-							cover_photo_id,
-							read_access_hash,
-							created_at,
-							updated_at
-						from photos where user_id = $1`
+		id,
+		user_id,
+		name,
+		description,
+		cover_photo_id,
+		read_access_hash,
+		created_at,
+		updated_at
+	from photos where user_id = $1`
 
 	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
@@ -82,18 +82,18 @@ func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, e
 
 func (r *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([]model.Album, error) {
 	query := `select
-							a.id,
-							a.user_id,
-							a.name,
-							a.description,
-							a.cover_photo_id,
-							a.read_access_hash,
-							a.created_at,
-							a.updated_at
-						from albums a
-						join album_photos ap on a.id = ap.album_id
-						where ap.photo_id = @photoId
-						and ap.user_id = @userId`
+		a.id,
+		a.user_id,
+		a.name,
+		a.description,
+		a.cover_photo_id,
+		a.read_access_hash,
+		a.created_at,
+		a.updated_at
+	from albums a
+	join album_photos ap on a.id = ap.album_id
+	where ap.photo_id = @photoId
+	and ap.user_id = @userId`
 
 	args := pgx.NamedArgs{
 		"photoId": photoId,

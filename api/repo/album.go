@@ -22,10 +22,10 @@ func NewAlbumRepo(db shared.ServerDB) *AlbumRepo {
 // - album user with any role
 func (r *AlbumRepo) CanReadAlbum(ctx context.Context, albumId, userId string) (bool, error) {
 	query := `select exists (
-		          select 1 from albums where id = @albumId and user_id = @userId
-							union
-							select 1 from album_users where album_id = @albumId and user_id = @userId
-						) as can`
+		select 1 from albums where id = @albumId and user_id = @userId
+		union
+		select 1 from album_users where album_id = @albumId and user_id = @userId
+	) as can`
 
 	var can bool
 
@@ -49,10 +49,10 @@ func (r *AlbumRepo) CanReadAlbum(ctx context.Context, albumId, userId string) (b
 // - album user with editor role
 func (r *AlbumRepo) CanWriteAlbum(ctx context.Context, albumId, userId string) (bool, error) {
 	query := `select exists (
-		          select 1 from albums where id = @albumId and user_id = @userId
-							union
-							select 1 from album_users where album_id = @albumId and user_id = @userId and role in ('editor')
-						) as can`
+		select 1 from albums where id = @albumId and user_id = @userId
+		union
+		select 1 from album_users where album_id = @albumId and user_id = @userId and role in ('editor')
+	) as can`
 
 	var can bool
 
@@ -84,15 +84,15 @@ func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model
 	}
 
 	query := `select
-							id,
-							user_id,
-							name,
-							description,
-							cover_photo_id,
-							read_access_hash,
-							created_at,
-							updated_at
-						from albums where id = $1`
+		id,
+		user_id,
+		name,
+		description,
+		cover_photo_id,
+		read_access_hash,
+		created_at,
+		updated_at
+	from albums where id = $1`
 
 	var album model.Album
 
@@ -119,26 +119,26 @@ func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model
 // Get all albums irrespective of if the user is the owner or just a member
 func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, error) {
 	query := `select
-							id,
-							user_id,
-							name,
-							description,
-							cover_photo_id,
-							read_access_hash,
-							created_at,
-							updated_at
-						from albums a1 where user_id = $1
-					  union
-						select
-							a.id,
-							a.user_id,
-							a.name,
-							a.description,
-							a.cover_photo_id,
-							a.read_access_hash,
-							a.created_at,
-							a.updated_at
-						from albums a join album_users au on a.id = au.album_id where au.user_id = $1`
+		id,
+		user_id,
+		name,
+		description,
+		cover_photo_id,
+		read_access_hash,
+		created_at,
+		updated_at
+	from albums a1 where user_id = $1
+	union
+	select
+		a.id,
+		a.user_id,
+		a.name,
+		a.description,
+		a.cover_photo_id,
+		a.read_access_hash,
+		a.created_at,
+		a.updated_at
+	from albums a join album_users au on a.id = au.album_id where au.user_id = $1`
 
 	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
@@ -182,21 +182,21 @@ func (r *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]mod
 	}
 
 	query := `select
-							au.album_id,
-							au.user_id,
-							au.role,
-							au.created_at,
-							u.id,
-							u.username,
-							u.email,
-							u.hash,
-							u.hashed_at,
-							u.last_login_at,
-							u.created_at,
-							u.updated_at
-						from users u
-						join album_users au on u.id = au.user_id
-						where au.album_id = $1`
+		au.album_id,
+		au.user_id,
+		au.role,
+		au.created_at,
+		u.id,
+		u.username,
+		u.email,
+		u.hash,
+		u.hashed_at,
+		u.last_login_at,
+		u.created_at,
+		u.updated_at
+	from users u
+	join album_users au on u.id = au.user_id
+	where au.album_id = $1`
 
 	var albumUsers []model.AlbumUserWithUser
 
@@ -248,17 +248,17 @@ func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]mo
 	}
 
 	query := `select
-							p.id,
-							p.user_id,
-							p.location,
-							p.filename,
-							p.file_size,
-							p.content_type,
-							p.created_at,
-							p.updated_at
-						from photos p
-						join album_photos ap on p.id = ap.photo_id
-						where ap.album_id = $1`
+		p.id,
+		p.user_id,
+		p.location,
+		p.filename,
+		p.file_size,
+		p.content_type,
+		p.created_at,
+		p.updated_at
+	from photos p
+	join album_photos ap on p.id = ap.photo_id
+	where ap.album_id = $1`
 
 	rows, err := r.db.Query(ctx, query, albumId)
 	if err != nil {
