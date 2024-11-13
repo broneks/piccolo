@@ -3,6 +3,7 @@ package jwtoken
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -48,7 +49,7 @@ func getClaims(tokenString string) *JwtClaims {
 
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		log.Println("Secret is missing")
+		log.Fatalf("JWT secret is missing")
 		return nil
 	}
 
@@ -60,7 +61,7 @@ func getClaims(tokenString string) *JwtClaims {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 	if err != nil {
-		log.Printf("Error parsing token: %v", err.Error())
+		slog.Info(fmt.Sprintf("Error parsing token: %v", err.Error()))
 		return nil
 	}
 

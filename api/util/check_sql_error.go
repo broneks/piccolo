@@ -2,7 +2,8 @@ package util
 
 import (
 	"errors"
-	"log"
+	"fmt"
+	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -22,7 +23,7 @@ func CheckSqlError(err error) string {
 			return pgErr.Message
 		}
 	} else {
-		log.Println("Unexpected non-sql error:", err.Error())
+		slog.Info(fmt.Sprintf("Unexpected non-sql error: %v", err.Error()))
 	}
 
 	return ""

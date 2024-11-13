@@ -1,7 +1,8 @@
 package middleware
 
 import (
-	"log"
+	"fmt"
+	"log/slog"
 	"piccolo/api/jwtoken"
 
 	"github.com/labstack/echo/v4"
@@ -17,7 +18,7 @@ func SetUserData() echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			tokenString, err := jwtoken.ExtractTokenString(c.Request().Header.Get("Authorization"))
 			if err != nil {
-				log.Println("error setting user data", err.Error())
+				slog.Error(fmt.Sprintf("error setting user data: %v", err.Error()))
 			}
 
 			if tokenString != "" {

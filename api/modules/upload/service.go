@@ -2,7 +2,6 @@ package upload
 
 import (
 	"context"
-	"log"
 	"mime/multipart"
 	"piccolo/api/model"
 
@@ -16,7 +15,7 @@ func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeade
 	var fileSize = int(file.Size)
 	var contentType = file.Header.Get("Content-Type")
 
-	log.Printf("uploading file: %s", filename)
+	m.server.Logger.Debug("uploading file: %s", filename)
 
 	src, err := file.Open()
 	if err != nil {
@@ -29,7 +28,7 @@ func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeade
 		return err
 	}
 
-	log.Printf("File uploaded successfully: %s\n", location)
+	m.server.Logger.Debug("File uploaded successfully: %s\n", location)
 
 	photo := model.Photo{
 		UserId:      pgtype.Text{String: userId, Valid: true},

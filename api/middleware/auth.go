@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"piccolo/api/jwtoken"
 	"piccolo/api/shared"
@@ -16,7 +16,7 @@ func Auth() echo.MiddlewareFunc {
 
 			tokenString, err := jwtoken.ExtractTokenString(authHeader)
 			if err != nil {
-				log.Println(err.Error())
+				slog.Error(err.Error())
 			}
 
 			isAuthenticated := jwtoken.VerifyToken(tokenString)
