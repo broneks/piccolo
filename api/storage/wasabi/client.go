@@ -48,8 +48,7 @@ func NewClient(ctx context.Context) (*WasabiClient, error) {
 		),
 	)
 	if err != nil {
-		log.Println("Configuration error:", err.Error())
-		panic(err)
+		log.Fatalf("cannot create wasabi connection: %v", err)
 	}
 
 	s3Client := s3.NewFromConfig(cfg)

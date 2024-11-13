@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"log"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -16,7 +17,7 @@ func NewClient(ctx context.Context) (*PostgresClient, error) {
 
 	db, err := pgxpool.New(ctx, os.Getenv("DB_URL"))
 	if err != nil {
-		panic(err)
+		log.Fatalf("cannot create database connection: %v", err)
 	}
 
 	err = db.Ping(ctx)

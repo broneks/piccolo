@@ -41,7 +41,7 @@ func Start() {
 
 	db, err := pg.NewClient(context.Background())
 	if err != nil {
-		logger.Error(fmt.Sprintf("Cannot load postgres db: %v", err.Error()))
+		logger.Error(fmt.Sprintf("Cannot create database client: %v", err.Error()))
 		os.Exit(1)
 	}
 
@@ -49,7 +49,7 @@ func Start() {
 
 	wasabi, err := wasabi.NewClient(context.Background())
 	if err != nil {
-		logger.Error(fmt.Sprintf("Cannot load wasabi db: %v", err.Error()))
+		logger.Error(fmt.Sprintf("Cannot create wasabi client: %v", err.Error()))
 		os.Exit(1)
 	}
 
