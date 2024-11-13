@@ -19,7 +19,6 @@ func (m *PhotosModule) getPhotoHandler(c echo.Context) error {
 
 	photo, err := m.photoRepo.GetById(ctx, photoId, userId)
 	if err != nil {
-		m.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusNotFound, shared.SuccessRes{
 			Success: false,
 			Message: "Not found",
