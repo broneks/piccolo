@@ -26,7 +26,7 @@ func (m *AlbumsModule) getAlbumUsersHandler(c echo.Context) error {
 	}
 
 	if len(albumUsers) == 0 {
-		return c.JSON(http.StatusOK, shared.EmptySlice{})
+		return c.JSON(http.StatusOK, []any{})
 	}
 
 	return c.JSON(http.StatusOK, albumUsers)

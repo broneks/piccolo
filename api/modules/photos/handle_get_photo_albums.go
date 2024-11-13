@@ -26,7 +26,7 @@ func (m *PhotosModule) getPhotoAlbumsHandler(c echo.Context) error {
 	}
 
 	if len(albums) == 0 {
-		return c.JSON(http.StatusOK, shared.EmptySlice{})
+		return c.JSON(http.StatusOK, []any{})
 	}
 
 	return c.JSON(http.StatusOK, albums)

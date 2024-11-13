@@ -2,7 +2,6 @@ package albums
 
 import (
 	"net/http"
-	"piccolo/api/shared"
 
 	"github.com/labstack/echo/v4"
 )
@@ -14,7 +13,7 @@ func (m *AlbumsModule) getAlbumsHandler(c echo.Context) error {
 	albums, _ := m.albumRepo.GetAll(ctx, userId)
 
 	if len(albums) == 0 {
-		return c.JSON(http.StatusOK, shared.EmptySlice{})
+		return c.JSON(http.StatusOK, []any{})
 	}
 
 	return c.JSON(http.StatusOK, albums)

@@ -37,7 +37,7 @@ func (m *AlbumsModule) getAlbumPhotosHandler(c echo.Context) error {
 	}
 
 	if len(photos) == 0 {
-		return c.JSON(http.StatusOK, shared.EmptySlice{})
+		return c.JSON(http.StatusOK, []any{})
 	}
 
 	var photoResList []PhotoRes

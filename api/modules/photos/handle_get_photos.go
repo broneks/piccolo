@@ -2,7 +2,6 @@ package photos
 
 import (
 	"net/http"
-	"piccolo/api/shared"
 
 	"github.com/labstack/echo/v4"
 )
@@ -14,7 +13,7 @@ func (m *PhotosModule) getPhotosHandler(c echo.Context) error {
 	photos, _ := m.photoRepo.GetAll(ctx, userId)
 
 	if len(photos) == 0 {
-		return c.JSON(http.StatusOK, shared.EmptySlice{})
+		return c.JSON(http.StatusOK, []any{})
 	}
 
 	var photoResList []PhotoRes
