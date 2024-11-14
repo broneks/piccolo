@@ -2,14 +2,13 @@ package backblaze
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"mime/multipart"
 )
 
 func (b *BackblazeClient) UploadFile(ctx context.Context, file multipart.File, filename, userId string) (string, error) {
-	dst := fmt.Sprintf("%s/%s", userId, filename)
-	obj := b.bucket.Object(dst)
+	name := newObjectName(filename, userId)
+	obj := b.bucket.Object(name)
 
 	w := obj.NewWriter(ctx)
 	if _, err := io.Copy(w, file); err != nil {
@@ -17,6 +16,7 @@ func (b *BackblazeClient) UploadFile(ctx context.Context, file multipart.File, f
 		return "", err
 	}
 
-	// TODO: get location
-	return "", w.Close()
+	location := obj.URL()
+
+	return location, w.Close()
 }

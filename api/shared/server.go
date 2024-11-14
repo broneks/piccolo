@@ -34,7 +34,7 @@ type ServerCache interface {
 }
 
 type ServerObjectStorage interface {
-	GetPresignedUrl(ctx context.Context, key string) (string, time.Duration)
+	GetPresignedUrl(ctx context.Context, filename, userId string) (string, time.Duration)
 	Ping(ctx context.Context) error
 	UploadFile(ctx context.Context, file multipart.File, filename, userId string) (string, error)
 }

@@ -3,7 +3,6 @@ package model
 import (
 	"context"
 	"piccolo/api/shared"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -31,9 +30,9 @@ func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
 	if val != "" {
 		return val
 	} else {
-		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), p.Filename.String)
+		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), p.Filename.String, p.UserId.String)
 
-		err := server.Cache.Set(ctx, key, url, expirationDuration-(time.Minute*5))
+		err := server.Cache.Set(ctx, key, url, expirationDuration)
 		if err != nil {
 			server.Logger.Error(err.Error())
 		}
