@@ -5,26 +5,31 @@ import (
 	"fmt"
 	"mime/multipart"
 	"piccolo/api/model"
+	"piccolo/api/types"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func (m *UploadModule) UploadFile(ctx context.Context, file *multipart.FileHeader, userId string) error {
+func (m *UploadModule) UploadFile(ctx context.Context, fileHeader *multipart.FileHeader, userId string) error {
 	var err error
 
-	var filename = file.Filename
-	var fileSize = int(file.Size)
-	var contentType = file.Header.Get("Content-Type")
+	var filename = fileHeader.Filename
+	var fileSize = int(fileHeader.Size)
+	var contentType = fileHeader.Header.Get("Content-Type")
 
 	m.server.Logger.Debug(fmt.Sprintf("uploading file: %s", filename))
 
-	src, err := file.Open()
+	file, err := fileHeader.Open()
 	if err != nil {
 		return err
 	}
-	defer src.Close()
+	defer file.Close()
 
-	location, err := m.server.ObjectStorage.UploadFile(ctx, src, filename, userId)
+	location, err := m.server.ObjectStorage.UploadFile(ctx, types.FileUpload{
+		File:     &file,
+		Filename: filename,
+		UserId:   userId,
+	})
 	if err != nil {
 		return err
 	}

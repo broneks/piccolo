@@ -1,8 +1,7 @@
-package shared
+package types
 
 import (
 	"context"
-	"piccolo/api/types"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -36,7 +35,7 @@ type ServerCache interface {
 type ServerObjectStorage interface {
 	GetPresignedUrl(ctx context.Context, filename, userId string) (string, time.Duration)
 	Ping(ctx context.Context) error
-	UploadFile(ctx context.Context, fileUpload types.FileUpload) (string, error)
+	UploadFile(ctx context.Context, fileUpload FileUpload) (string, error)
 }
 
 type Server struct {

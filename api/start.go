@@ -7,10 +7,10 @@ import (
 	"os"
 	"piccolo/api/middleware"
 	"piccolo/api/modules"
-	"piccolo/api/shared"
 	"piccolo/api/storage/backblaze"
 	"piccolo/api/storage/pg"
 	"piccolo/api/storage/redis"
+	"piccolo/api/types"
 	"piccolo/api/util"
 
 	"github.com/labstack/echo/v4"
@@ -53,7 +53,7 @@ func Start() {
 		os.Exit(1)
 	}
 
-	server := &shared.Server{
+	server := &types.Server{
 		Logger:        logger,
 		DB:            dbClient,
 		Cache:         redisClient,

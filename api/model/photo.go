@@ -2,7 +2,7 @@ package model
 
 import (
 	"context"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -18,7 +18,7 @@ type Photo struct {
 	UpdatedAt   pgtype.Timestamptz `json:"-"`
 }
 
-func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
+func (p *Photo) GetUrl(ctx context.Context, server *types.Server) string {
 	key := p.Id.String
 
 	val, err := server.Cache.Get(ctx, key)

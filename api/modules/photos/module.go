@@ -2,15 +2,15 @@ package photos
 
 import (
 	"piccolo/api/repo"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 )
 
 type PhotosModule struct {
-	server    *shared.Server
+	server    *types.Server
 	photoRepo *repo.PhotoRepo
 }
 
-func New(server *shared.Server, photoRepo *repo.PhotoRepo) *PhotosModule {
+func New(server *types.Server, photoRepo *repo.PhotoRepo) *PhotosModule {
 	return &PhotosModule{
 		server:    server,
 		photoRepo: photoRepo,

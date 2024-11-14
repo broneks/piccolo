@@ -4,16 +4,16 @@ import (
 	"context"
 	"fmt"
 	"piccolo/api/model"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 
 	"github.com/jackc/pgx/v5"
 )
 
 type UserRepo struct {
-	db shared.ServerDB
+	db types.ServerDB
 }
 
-func NewUserRepo(db shared.ServerDB) *UserRepo {
+func NewUserRepo(db types.ServerDB) *UserRepo {
 	return &UserRepo{db: db}
 }
 
