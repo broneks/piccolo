@@ -25,7 +25,7 @@ func handleHealth(server *types.Server) echo.HandlerFunc {
 		}
 
 		if err = server.ObjectStorage.Ping(ctx); err != nil {
-			server.Logger.Error(fmt.Sprintf("wasabi ping failed: %v", err.Error()))
+			server.Logger.Error(fmt.Sprintf("backblaze ping failed: %v", err.Error()))
 			return c.NoContent(http.StatusServiceUnavailable)
 		}
 
