@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"piccolo/api/jwtoken"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
 )
@@ -13,7 +13,7 @@ func (m *AuthModule) refreshHandler(c echo.Context) error {
 	refreshToken := c.Request().Header.Get("x-refresh-token")
 
 	if refreshToken == "" {
-		return c.JSON(http.StatusBadRequest, shared.SuccessRes{
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Token is missing.",
 		})
@@ -21,7 +21,7 @@ func (m *AuthModule) refreshHandler(c echo.Context) error {
 
 	isValid := jwtoken.VerifyToken(refreshToken)
 	if !isValid {
-		return c.JSON(http.StatusBadRequest, shared.SuccessRes{
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Token is invalid or expired.",
 		})
@@ -33,7 +33,7 @@ func (m *AuthModule) refreshHandler(c echo.Context) error {
 	accessToken, err := jwtoken.NewAccessJwt(userId, userEmail).GenerateToken()
 	if err != nil {
 		m.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
+		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
 		})
@@ -41,7 +41,7 @@ func (m *AuthModule) refreshHandler(c echo.Context) error {
 
 	c.Response().Header().Set("authorization", fmt.Sprintf("Bearer %s", accessToken))
 
-	return c.JSON(http.StatusOK, shared.SuccessRes{
+	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,
 		Message: "Token refreshed",
 	})

@@ -2,7 +2,7 @@ package photos
 
 import (
 	"net/http"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 	"piccolo/api/util"
 
 	"github.com/labstack/echo/v4"
@@ -19,7 +19,7 @@ func (m *PhotosModule) getPhotoHandler(c echo.Context) error {
 
 	photo, err := m.photoRepo.GetById(ctx, photoId, userId)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, shared.SuccessRes{
+		return c.JSON(http.StatusNotFound, types.SuccessRes{
 			Success: false,
 			Message: "Not found",
 		})

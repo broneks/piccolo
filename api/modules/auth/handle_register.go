@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 	"piccolo/api/model"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 	"piccolo/api/util"
 	"time"
 
@@ -24,14 +24,14 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 
 	if err = c.Bind(req); err != nil {
 		m.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusBadRequest, shared.SuccessRes{
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid input",
 		})
 	}
 
 	if err = c.Validate(req); err != nil {
-		return c.JSON(http.StatusBadRequest, shared.SuccessRes{
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: err.Error(),
 		})
@@ -40,7 +40,7 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 	hash, err := hashPassword(req.Password)
 	if err != nil {
 		m.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
+		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
 		})
@@ -55,21 +55,21 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 	if err != nil {
 		switch util.CheckSqlError(err) {
 		case "unique-violation":
-			return c.JSON(http.StatusBadRequest, shared.SuccessRes{
+			return c.JSON(http.StatusBadRequest, types.SuccessRes{
 				Success: false,
 				Message: "Email is taken",
 			})
 
 		default:
 			m.server.Logger.Error(err.Error())
-			return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
+			return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 				Success: false,
 				Message: "Unexpected error",
 			})
 		}
 	}
 
-	return c.JSON(http.StatusOK, shared.SuccessRes{
+	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,
 		Message: "User created",
 	})

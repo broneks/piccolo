@@ -7,10 +7,10 @@ import (
 	"os"
 	"piccolo/api/middleware"
 	"piccolo/api/modules"
-	"piccolo/api/shared"
+	"piccolo/api/storage/backblaze"
 	"piccolo/api/storage/pg"
 	"piccolo/api/storage/redis"
-	"piccolo/api/storage/wasabi"
+	"piccolo/api/types"
 	"piccolo/api/util"
 
 	"github.com/labstack/echo/v4"
@@ -24,7 +24,7 @@ func Start() {
 
 	e := echo.New()
 
-	e.Validator = shared.NewValidator()
+	e.Validator = util.NewValidator()
 
 	// custom
 	e.Use(middleware.Logger())
@@ -35,29 +35,29 @@ func Start() {
 	e.Use(echoMiddleware.RequestID())
 	e.Use(echoMiddleware.Secure())
 
-	e.Static("/static", "static")
+	e.Static("/", "static")
 
 	logger := slog.Default()
 
-	db, err := pg.NewClient(context.Background())
+	dbClient, err := pg.NewClient(context.Background())
 	if err != nil {
 		logger.Error(fmt.Sprintf("Cannot create database client: %v", err.Error()))
 		os.Exit(1)
 	}
 
-	redis := redis.NewClient()
+	redisClient := redis.NewClient()
 
-	wasabi, err := wasabi.NewClient(context.Background())
+	backblazeClient, err := backblaze.NewClient(context.Background())
 	if err != nil {
-		logger.Error(fmt.Sprintf("Cannot create wasabi client: %v", err.Error()))
+		logger.Error(fmt.Sprintf("Cannot create backblaze client: %v", err.Error()))
 		os.Exit(1)
 	}
 
-	server := &shared.Server{
+	server := &types.Server{
 		Logger:        logger,
-		DB:            db,
-		Cache:         redis,
-		ObjectStorage: wasabi,
+		DB:            dbClient,
+		Cache:         redisClient,
+		ObjectStorage: backblazeClient,
 	}
 
 	g := e.Group("/api")

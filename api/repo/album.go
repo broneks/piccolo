@@ -4,16 +4,16 @@ import (
 	"context"
 	"fmt"
 	"piccolo/api/model"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 
 	"github.com/jackc/pgx/v5"
 )
 
 type AlbumRepo struct {
-	db shared.ServerDB
+	db types.ServerDB
 }
 
-func NewAlbumRepo(db shared.ServerDB) *AlbumRepo {
+func NewAlbumRepo(db types.ServerDB) *AlbumRepo {
 	return &AlbumRepo{db: db}
 }
 

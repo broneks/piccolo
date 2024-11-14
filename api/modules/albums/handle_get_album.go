@@ -2,7 +2,7 @@ package albums
 
 import (
 	"net/http"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 	"piccolo/api/util"
 
 	"github.com/labstack/echo/v4"
@@ -19,7 +19,7 @@ func (m *AlbumsModule) getAlbumHandler(c echo.Context) error {
 
 	album, err := m.albumRepo.GetById(ctx, albumId, userId)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, shared.SuccessRes{
+		return c.JSON(http.StatusNotFound, types.SuccessRes{
 			Success: false,
 			Message: "Not found",
 		})

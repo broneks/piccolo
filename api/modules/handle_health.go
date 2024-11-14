@@ -3,12 +3,12 @@ package modules
 import (
 	"fmt"
 	"net/http"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
 )
 
-func handleHealth(server *shared.Server) echo.HandlerFunc {
+func handleHealth(server *types.Server) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
 
@@ -25,7 +25,7 @@ func handleHealth(server *shared.Server) echo.HandlerFunc {
 		}
 
 		if err = server.ObjectStorage.Ping(ctx); err != nil {
-			server.Logger.Error(fmt.Sprintf("wasabi ping failed: %v", err.Error()))
+			server.Logger.Error(fmt.Sprintf("backblaze ping failed: %v", err.Error()))
 			return c.NoContent(http.StatusServiceUnavailable)
 		}
 

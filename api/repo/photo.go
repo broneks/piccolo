@@ -4,16 +4,16 @@ import (
 	"context"
 	"fmt"
 	"piccolo/api/model"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 
 	"github.com/jackc/pgx/v5"
 )
 
 type PhotoRepo struct {
-	db shared.ServerDB
+	db types.ServerDB
 }
 
-func NewPhotoRepo(db shared.ServerDB) *PhotoRepo {
+func NewPhotoRepo(db types.ServerDB) *PhotoRepo {
 	return &PhotoRepo{db: db}
 }
 

@@ -2,8 +2,7 @@ package model
 
 import (
 	"context"
-	"piccolo/api/shared"
-	"time"
+	"piccolo/api/types"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -19,7 +18,7 @@ type Photo struct {
 	UpdatedAt   pgtype.Timestamptz `json:"-"`
 }
 
-func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
+func (p *Photo) GetUrl(ctx context.Context, server *types.Server) string {
 	key := p.Id.String
 
 	val, err := server.Cache.Get(ctx, key)
@@ -31,9 +30,9 @@ func (p *Photo) GetUrl(ctx context.Context, server *shared.Server) string {
 	if val != "" {
 		return val
 	} else {
-		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), p.Filename.String)
+		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), p.Filename.String, p.UserId.String)
 
-		err := server.Cache.Set(ctx, key, url, expirationDuration-(time.Minute*5))
+		err := server.Cache.Set(ctx, key, url, expirationDuration)
 		if err != nil {
 			server.Logger.Error(err.Error())
 		}

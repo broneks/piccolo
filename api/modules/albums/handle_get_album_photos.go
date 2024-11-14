@@ -2,7 +2,7 @@ package albums
 
 import (
 	"net/http"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 	"piccolo/api/util"
 	"time"
 
@@ -30,7 +30,7 @@ func (m *AlbumsModule) getAlbumPhotosHandler(c echo.Context) error {
 
 	photos, err := m.albumRepo.GetPhotos(ctx, albumId, userId)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, shared.SuccessRes{
+		return c.JSON(http.StatusNotFound, types.SuccessRes{
 			Success: false,
 			Message: "Not found",
 		})

@@ -6,12 +6,12 @@ import (
 	"piccolo/api/modules/photos"
 	"piccolo/api/modules/upload"
 	"piccolo/api/repo"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
 )
 
-func Routes(g *echo.Group, server *shared.Server) {
+func Routes(g *echo.Group, server *types.Server) {
 	g.GET("/health", handleHealth(server))
 
 	v1 := g.Group("/v1")
