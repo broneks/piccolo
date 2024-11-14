@@ -24,7 +24,7 @@ func Start() {
 
 	e := echo.New()
 
-	e.Validator = shared.NewValidator()
+	e.Validator = util.NewValidator()
 
 	// custom
 	e.Use(middleware.Logger())

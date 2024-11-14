@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"piccolo/api/jwtoken"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
 )
@@ -21,7 +21,7 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 	var err error
 
 	if err = c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, shared.SuccessRes{
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: err.Error(),
 		})
@@ -34,21 +34,21 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 	user, err := m.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
 		m.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
+		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
 		})
 	}
 
 	if user == nil {
-		return c.JSON(http.StatusBadRequest, shared.SuccessRes{
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid email or password.",
 		})
 	}
 
 	if !user.CheckPassword(req.Password) {
-		return c.JSON(http.StatusBadRequest, shared.SuccessRes{
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid email or password.",
 		})
@@ -61,7 +61,7 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 	accessToken, err := jwtoken.NewAccessJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
 		m.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, shared.SuccessRes{
+		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
 		})
@@ -75,7 +75,7 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 	c.Response().Header().Set("authorization", fmt.Sprintf("Bearer %s", accessToken))
 	c.Response().Header().Set("x-refresh-token", refreshToken)
 
-	return c.JSON(http.StatusOK, shared.SuccessRes{
+	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,
 		Message: "Logged in",
 	})

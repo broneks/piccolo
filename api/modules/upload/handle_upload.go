@@ -2,7 +2,7 @@ package upload
 
 import (
 	"net/http"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -26,7 +26,7 @@ func (m *UploadModule) postUploadHandler(c echo.Context) error {
 	if err != nil {
 		return c.JSON(
 			http.StatusBadRequest,
-			shared.SuccessRes{
+			types.SuccessRes{
 				Success: false,
 				Message: "File is required",
 			},
@@ -38,7 +38,7 @@ func (m *UploadModule) postUploadHandler(c echo.Context) error {
 		m.server.Logger.Error(err.Error())
 		return c.JSON(
 			http.StatusBadRequest,
-			shared.SuccessRes{
+			types.SuccessRes{
 				Success: false,
 				Message: "Unexpected error",
 			},
@@ -47,7 +47,7 @@ func (m *UploadModule) postUploadHandler(c echo.Context) error {
 
 	return c.JSON(
 		http.StatusOK,
-		shared.SuccessRes{
+		types.SuccessRes{
 			Success: true,
 			Message: "File uploaded",
 		},

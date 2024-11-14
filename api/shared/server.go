@@ -2,7 +2,7 @@ package shared
 
 import (
 	"context"
-	"mime/multipart"
+	"piccolo/api/types"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -36,7 +36,7 @@ type ServerCache interface {
 type ServerObjectStorage interface {
 	GetPresignedUrl(ctx context.Context, filename, userId string) (string, time.Duration)
 	Ping(ctx context.Context) error
-	UploadFile(ctx context.Context, file multipart.File, filename, userId string) (string, error)
+	UploadFile(ctx context.Context, fileUpload types.FileUpload) (string, error)
 }
 
 type Server struct {

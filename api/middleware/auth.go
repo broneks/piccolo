@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"piccolo/api/jwtoken"
-	"piccolo/api/shared"
+	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
 )
@@ -21,7 +21,7 @@ func Auth() echo.MiddlewareFunc {
 
 			isAuthenticated := jwtoken.VerifyToken(tokenString)
 			if !isAuthenticated {
-				return c.JSON(http.StatusUnauthorized, shared.SuccessRes{
+				return c.JSON(http.StatusUnauthorized, types.SuccessRes{
 					Success: false,
 					Message: "Unauthenticated: Please login to continue.",
 				})
