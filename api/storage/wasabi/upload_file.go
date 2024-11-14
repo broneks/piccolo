@@ -10,7 +10,7 @@ import (
 )
 
 // TODO: organize by folder that namespaces to user id
-func (wc *WasabiClient) UploadFile(ctx context.Context, filename string, file multipart.File) (string, error) {
+func (wc *WasabiClient) UploadFile(ctx context.Context, file multipart.File, filename, userId string) (string, error) {
 	result, err := wc.uploader.Upload(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(wc.config.bucket),
 		Key:    aws.String(filepath.Base(filename)),

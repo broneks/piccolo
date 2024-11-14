@@ -8,9 +8,9 @@ import (
 	"piccolo/api/middleware"
 	"piccolo/api/modules"
 	"piccolo/api/shared"
+	"piccolo/api/storage/backblaze"
 	"piccolo/api/storage/pg"
 	"piccolo/api/storage/redis"
-	"piccolo/api/storage/wasabi"
 	"piccolo/api/util"
 
 	"github.com/labstack/echo/v4"
@@ -39,25 +39,25 @@ func Start() {
 
 	logger := slog.Default()
 
-	db, err := pg.NewClient(context.Background())
+	dbClient, err := pg.NewClient(context.Background())
 	if err != nil {
 		logger.Error(fmt.Sprintf("Cannot create database client: %v", err.Error()))
 		os.Exit(1)
 	}
 
-	redis := redis.NewClient()
+	redisClient := redis.NewClient()
 
-	wasabi, err := wasabi.NewClient(context.Background())
+	backblazeClient, err := backblaze.NewClient(context.Background())
 	if err != nil {
-		logger.Error(fmt.Sprintf("Cannot create wasabi client: %v", err.Error()))
+		logger.Error(fmt.Sprintf("Cannot create backblaze client: %v", err.Error()))
 		os.Exit(1)
 	}
 
 	server := &shared.Server{
 		Logger:        logger,
-		DB:            db,
-		Cache:         redis,
-		ObjectStorage: wasabi,
+		DB:            dbClient,
+		Cache:         redisClient,
+		ObjectStorage: backblazeClient,
 	}
 
 	g := e.Group("/api")

@@ -5,7 +5,7 @@ import (
 )
 
 func (b *BackblazeClient) Ping(ctx context.Context) error {
-	if _, err := b.client.ListBuckets(ctx); err != nil {
+	if _, err := b.client.Bucket(ctx, b.bucket.Name()); err != nil {
 		return err
 	}
 
