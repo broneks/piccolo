@@ -12,7 +12,10 @@ const EXPIRATION_DURATION = time.Hour * 24
 func (b *BackblazeClient) GetPresignedUrl(ctx context.Context, filename, userId string) (string, time.Duration) {
 	name := newObjectName(filename, userId)
 
-	url, err := b.bucket.Object(name).AuthURL(ctx, EXPIRATION_DURATION, "")
+	// TODO: check if object exists
+	obj := b.bucket.Object(name)
+
+	url, err := obj.AuthURL(ctx, EXPIRATION_DURATION, "")
 	if err != nil {
 		slog.Error(fmt.Sprintf("failed to get presigned url: %v", err))
 		return "", 0
