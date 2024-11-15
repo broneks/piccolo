@@ -3,8 +3,10 @@ package repo
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"piccolo/api/model"
 	"piccolo/api/types"
+	"piccolo/api/util"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -206,7 +208,7 @@ func (r *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]mod
 	}
 
 	for rows.Next() {
-		albumUser := model.NewAlbumUserWithUser()
+		albumUser := new(model.AlbumUserWithUser)
 
 		err = rows.Scan(
 			&albumUser.AlbumId,
@@ -302,9 +304,54 @@ func (r *AlbumRepo) Update(ctx context.Context, album model.Album, userId string
 	return nil
 }
 
-// TODO
 // Checks for write access
-func (r *AlbumRepo) InsertUsers(ctx context.Context, userIdsToInsert []string, userId string) error {
+func (r *AlbumRepo) InsertUsers(ctx context.Context, albumId string, albumUsers []model.AlbumUser, userId string) error {
+	var err error
+
+	canWrite, err := r.CanWriteAlbum(ctx, albumId, userId)
+	if err != nil {
+		return err
+	}
+	if !canWrite {
+		return fmt.Errorf("unauthorized")
+	}
+
+	query := `insert into album_users (
+		album_id,
+		user_id,
+		role
+	) values (
+		@albumId,
+		@userId,
+		@role
+	)`
+
+	batch := &pgx.Batch{}
+
+	for _, albumUser := range albumUsers {
+		args := pgx.NamedArgs{
+			"albumId": albumId,
+			"userId":  albumUser.UserId,
+			"role":    albumUser.Role,
+		}
+		batch.Queue(query, args)
+	}
+
+	results := r.db.SendBatch(ctx, batch)
+	defer results.Close()
+
+	for _, albumUser := range albumUsers {
+		_, err := results.Exec()
+		if err != nil {
+			if sqlErr := util.CheckSqlError(err); sqlErr == "unique-violation" {
+				slog.Debug(fmt.Sprintf("album user \"%s\" already exists", albumUser.UserId.String))
+				continue
+			}
+
+			return fmt.Errorf("unable to insert album user: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -320,9 +367,54 @@ func (r *AlbumRepo) RemoveUsers(ctx context.Context, userIdsToRemove []string, u
 	return nil
 }
 
-// TODO
 // Checks for write access
-func (r *AlbumRepo) InsertPhotos(ctx context.Context, photoIds []string, userId string) error {
+func (r *AlbumRepo) InsertPhotos(ctx context.Context, albumId string, photoIds []string, userId string) error {
+	var err error
+
+	canWrite, err := r.CanWriteAlbum(ctx, albumId, userId)
+	if err != nil {
+		return err
+	}
+	if !canWrite {
+		return fmt.Errorf("unauthorized")
+	}
+
+	query := `insert into album_photos (
+		album_id,
+		photo_id,
+		user_id
+	) values (
+		@albumId,
+		@photoId,
+		@userId
+	)`
+
+	batch := &pgx.Batch{}
+
+	for _, photoId := range photoIds {
+		args := pgx.NamedArgs{
+			"albumId": albumId,
+			"photoId": photoId,
+			"userId":  userId,
+		}
+		batch.Queue(query, args)
+	}
+
+	results := r.db.SendBatch(ctx, batch)
+	defer results.Close()
+
+	for _, photoId := range photoIds {
+		_, err := results.Exec()
+		if err != nil {
+			if sqlErr := util.CheckSqlError(err); sqlErr == "unique-violation" {
+				slog.Debug(fmt.Sprintf("photo \"%s\" already exists", photoId))
+				continue
+			}
+
+			return fmt.Errorf("unable to insert album photo: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -331,27 +423,3 @@ func (r *AlbumRepo) InsertPhotos(ctx context.Context, photoIds []string, userId 
 func (r *AlbumRepo) RemovePhotos(ctx context.Context, photoIds []string, userId string) error {
 	return nil
 }
-
-/*
-func InsertManyWithCopy(ctx context.Context, conn *pgx.Conn, users []User) error {
-	// Prepare data for bulk insert
-	rows := make([][]interface{}, len(users))
-	for i, user := range users {
-		rows[i] = []interface{}{user.Username, user.Email, user.Hash}
-	}
-
-	// Perform bulk insert using CopyFrom
-	// CopyFromRows
-	_, err := conn.CopyFrom(
-		ctx,
-		pgx.Identifier{"users"}, // Table name
-		[]string{"username", "email", "hash"}, // Columns to insert
-		pgx.CopyFromRows(rows), // Data to insert
-	)
-	if err != nil {
-		return fmt.Errorf("failed to bulk insert users: %w", err)
-	}
-
-	return nil
-}
-*/

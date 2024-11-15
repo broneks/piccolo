@@ -2,6 +2,7 @@ package photos
 
 import (
 	"net/http"
+	"piccolo/api/model"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,21 +17,7 @@ func (m *PhotosModule) getPhotosHandler(c echo.Context) error {
 		return c.JSON(http.StatusOK, []any{})
 	}
 
-	var photoResList []PhotoRes
+	photosWithUrl := model.NewPhotosWithUrl(ctx, m.server, photos)
 
-	for _, photo := range photos {
-		url := photo.GetUrl(ctx, m.server)
-
-		photoResList = append(photoResList, PhotoRes{
-			Id:          photo.Id.String,
-			UserId:      photo.UserId.String,
-			Filename:    photo.Filename.String,
-			FileSize:    int(photo.FileSize.Int32),
-			Url:         url,
-			ContentType: photo.ContentType.String,
-			CreatedAt:   photo.CreatedAt.Time,
-		})
-	}
-
-	return c.JSON(http.StatusOK, photoResList)
+	return c.JSON(http.StatusOK, photosWithUrl)
 }

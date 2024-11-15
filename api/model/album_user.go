@@ -18,9 +18,3 @@ type AlbumUserWithUser struct {
 	CreatedAt pgtype.Timestamptz `json:"createdAt"`
 	User      `json:"user"`
 }
-
-func NewAlbumUserWithUser() *AlbumUserWithUser {
-	return &AlbumUserWithUser{
-		User: User{},
-	}
-}

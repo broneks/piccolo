@@ -2,6 +2,7 @@ package photos
 
 import (
 	"net/http"
+	"piccolo/api/model"
 	"piccolo/api/types"
 	"piccolo/api/util"
 
@@ -25,17 +26,7 @@ func (m *PhotosModule) getPhotoHandler(c echo.Context) error {
 		})
 	}
 
-	url := photo.GetUrl(ctx, m.server)
+	photoWithUrl := model.NewPhotoWithUrl(ctx, m.server, photo)
 
-	photoRes := PhotoRes{
-		Id:          photo.Id.String,
-		UserId:      photo.UserId.String,
-		Filename:    photo.Filename.String,
-		FileSize:    int(photo.FileSize.Int32),
-		Url:         url,
-		ContentType: photo.ContentType.String,
-		CreatedAt:   photo.CreatedAt.Time,
-	}
-
-	return c.JSON(http.StatusOK, photoRes)
+	return c.JSON(http.StatusOK, photoWithUrl)
 }

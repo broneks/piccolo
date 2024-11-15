@@ -138,13 +138,55 @@ func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 	return nil
 }
 
-// TODO
 func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo) error {
+	query := `insert into photos (
+		user_id,
+		location,
+		filename,
+		file_size,
+		content_type
+	) values (
+		@userId,
+		@location,
+		@filename,
+		@fileSize,
+		@contentType
+	)`
+
+	batch := &pgx.Batch{}
+
+	for _, photo := range photos {
+		args := pgx.NamedArgs{
+			"userId":      photo.UserId,
+			"location":    photo.Location,
+			"filename":    photo.Filename,
+			"fileSize":    photo.FileSize,
+			"contentType": photo.ContentType,
+		}
+		batch.Queue(query, args)
+	}
+
+	results := r.db.SendBatch(ctx, batch)
+	defer results.Close()
+
+	for _, photo := range photos {
+		_, err := results.Exec()
+		if err != nil {
+			return fmt.Errorf("unable to insert photo \"%s\": %w", photo.Filename.String, err)
+		}
+	}
+
 	return nil
 }
 
 // TODO
 func (r *PhotoRepo) Update(ctx context.Context, photo model.Photo, userId string) error {
+	return nil
+}
+
+// TODO
+// remove photo uploaded by user
+func (r *PhotoRepo) RemoveOne(ctx context.Context, photoId, userId string) error {
 	return nil
 }
 
