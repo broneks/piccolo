@@ -138,7 +138,7 @@ func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 	return nil
 }
 
-func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, userId string) error {
+func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, userId string) ([]string, error) {
 	query := `insert into photos (
 		user_id,
 		location,
@@ -151,7 +151,7 @@ func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, userId
 		@filename,
 		@fileSize,
 		@contentType
-	)`
+	) returning id`
 
 	batch := &pgx.Batch{}
 
@@ -169,14 +169,19 @@ func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, userId
 	results := r.db.SendBatch(ctx, batch)
 	defer results.Close()
 
+	var ids []string
+
 	for _, photo := range photos {
-		_, err := results.Exec()
-		if err != nil {
-			return fmt.Errorf("unable to insert photo \"%s\": %w", photo.Filename.String, err)
+		var id string
+
+		if err := results.QueryRow().Scan(&id); err != nil {
+			return nil, fmt.Errorf("unable to fetch inserted id for photo \"%s\": %w", photo.Filename.String, err)
 		}
+
+		ids = append(ids, id)
 	}
 
-	return nil
+	return ids, nil
 }
 
 // TODO

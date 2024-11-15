@@ -1,4 +1,4 @@
-package photos
+package service
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func (m *PhotosModule) handleFileUpload(ctx context.Context, fileHeader *multipart.FileHeader, userId string, resultCh chan<- *model.Photo) {
+func (m *PhotosService) handleFileUpload(ctx context.Context, fileHeader *multipart.FileHeader, userId string, resultCh chan<- model.Photo) {
 	fileSize := int32(fileHeader.Size)
 
 	file, err := fileHeader.Open()
@@ -36,7 +36,7 @@ func (m *PhotosModule) handleFileUpload(ctx context.Context, fileHeader *multipa
 
 	m.server.Logger.Debug(fmt.Sprintf("File uploaded successfully: %s\n", location))
 
-	photo := &model.Photo{
+	photo := model.Photo{
 		Location:    pgtype.Text{String: location, Valid: true},
 		Filename:    pgtype.Text{String: fileHeader.Filename, Valid: true},
 		FileSize:    pgtype.Int4{Int32: fileSize, Valid: true},
@@ -47,17 +47,22 @@ func (m *PhotosModule) handleFileUpload(ctx context.Context, fileHeader *multipa
 }
 
 // TODO: batch upload
-func (m *PhotosModule) UploadFiles(ctx context.Context, fileHeaders []*multipart.FileHeader, userId string) error {
+func (m *PhotosService) UploadFiles(ctx context.Context, fileHeaders []*multipart.FileHeader, userId string) ([]string, error) {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var photos []model.Photo
 
-	resultCh := make(chan *model.Photo, len(fileHeaders))
+	resultCh := make(chan model.Photo, len(fileHeaders))
 
 	for _, fileHeader := range fileHeaders {
+		if fileHeader == nil {
+			m.server.Logger.Debug("received nil fileHeader")
+			continue
+		}
+
 		wg.Add(1)
 
-		go func(fileHeader *multipart.FileHeader) {
+		go func(fh *multipart.FileHeader) {
 			defer wg.Done()
 			m.handleFileUpload(ctx, fileHeader, userId, resultCh)
 		}(fileHeader)
@@ -69,16 +74,18 @@ func (m *PhotosModule) UploadFiles(ctx context.Context, fileHeaders []*multipart
 
 	for photo := range resultCh {
 		mu.Lock()
-		photos = append(photos, *photo)
+		photos = append(photos, photo)
 		mu.Unlock()
 	}
 
-	if len(photos) > 0 {
-		err := m.photoRepo.InsertMany(ctx, photos, userId)
-		if err != nil {
-			return fmt.Errorf("failed to insert photos: %v", err)
-		}
+	if len(photos) == 0 {
+		return nil, nil
 	}
 
-	return nil
+	ids, err := m.photoRepo.InsertMany(ctx, photos, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert photos: %v", err)
+	}
+
+	return ids, nil
 }

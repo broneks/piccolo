@@ -4,6 +4,7 @@ import (
 	"piccolo/api/modules/albums"
 	"piccolo/api/modules/auth"
 	"piccolo/api/modules/photos"
+	photosservice "piccolo/api/modules/photos/service"
 	"piccolo/api/repo"
 	"piccolo/api/types"
 
@@ -19,12 +20,14 @@ func Routes(g *echo.Group, server *types.Server) {
 	photoRepo := repo.NewPhotoRepo(server.DB)
 	albumRepo := repo.NewAlbumRepo(server.DB)
 
+	photosService := photosservice.New(server, photoRepo)
+
 	authModule := auth.New(server, userRepo)
 	authModule.Routes(v1)
 
-	photosModule := photos.New(server, photoRepo)
+	photosModule := photos.New(server, photoRepo, photosService)
 	photosModule.Routes(v1)
 
-	albumsModule := albums.New(server, albumRepo)
+	albumsModule := albums.New(server, albumRepo, photosService)
 	albumsModule.Routes(v1)
 }
