@@ -138,7 +138,7 @@ func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 	return nil
 }
 
-func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo) error {
+func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, userId string) error {
 	query := `insert into photos (
 		user_id,
 		location,
@@ -157,7 +157,7 @@ func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo) error 
 
 	for _, photo := range photos {
 		args := pgx.NamedArgs{
-			"userId":      photo.UserId,
+			"userId":      userId,
 			"location":    photo.Location,
 			"filename":    photo.Filename,
 			"fileSize":    photo.FileSize,
