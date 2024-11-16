@@ -10,6 +10,7 @@ func (m *AlbumsModule) Routes(g *echo.Group) {
 	albums := g.Group("/albums", middleware.Auth())
 
 	albums.GET("", m.getAlbumsHandler)
+	albums.POST("", m.postAlbumsCreateHandler)
 
 	album := albums.Group("/:id")
 

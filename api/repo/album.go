@@ -91,6 +91,7 @@ func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model
 		name,
 		description,
 		cover_photo_id,
+		is_share_link_enabled,
 		read_access_hash,
 		created_at,
 		updated_at
@@ -104,6 +105,7 @@ func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model
 		&album.Name,
 		&album.Description,
 		&album.CoverPhotoId,
+		&album.IsShareLinkEnabled,
 		&album.ReadAccessHash,
 		&album.CreatedAt,
 		&album.UpdatedAt,
@@ -126,6 +128,7 @@ func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, e
 		name,
 		description,
 		cover_photo_id,
+		is_share_link_enabled,
 		read_access_hash,
 		created_at,
 		updated_at
@@ -137,6 +140,7 @@ func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, e
 		a.name,
 		a.description,
 		a.cover_photo_id,
+		a.is_share_link_enabled,
 		a.read_access_hash,
 		a.created_at,
 		a.updated_at
@@ -144,6 +148,7 @@ func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, e
 
 	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
+		slog.Debug(err.Error())
 		return nil, fmt.Errorf("unable to query albums: %v", err)
 	}
 	defer rows.Close()
@@ -162,6 +167,7 @@ func (r *AlbumRepo) GetUserRole(ctx context.Context, albumId, userId string) (st
 	}
 	err := r.db.QueryRow(ctx, query, args).Scan(&role)
 	if err != nil {
+		slog.Debug(err.Error())
 		if err == pgx.ErrNoRows {
 			return "", fmt.Errorf("no rows found for album id '%s' and user id '%s'", albumId, userId)
 		}
@@ -204,6 +210,7 @@ func (r *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]mod
 
 	rows, err := r.db.Query(ctx, query, albumId)
 	if err != nil {
+		slog.Debug(err.Error())
 		return nil, fmt.Errorf("unable to query users or album users: %v", err)
 	}
 
@@ -225,12 +232,14 @@ func (r *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]mod
 			&albumUser.User.UpdatedAt,
 		)
 		if err != nil {
+			slog.Debug(err.Error())
 			return nil, fmt.Errorf("row scan failed: %w", err)
 		}
 
 		albumUsers = append(albumUsers, *albumUser)
 	}
 	if err = rows.Err(); err != nil {
+		slog.Debug(err.Error())
 		return nil, fmt.Errorf("iteration error: %w", err)
 	}
 
@@ -264,6 +273,7 @@ func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]mo
 
 	rows, err := r.db.Query(ctx, query, albumId)
 	if err != nil {
+		slog.Debug(err.Error())
 		return nil, fmt.Errorf("unable to query photos: %v", err)
 	}
 	defer rows.Close()
@@ -276,22 +286,26 @@ func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 		user_id,
 		name,
 		description,
-		cover_photo_id
+		cover_photo_id,
+		is_share_link_enabled
 	) values (
 		@userId,
 		@name,
 		@description,
-		@coverPhotoId
+		@coverPhotoId,
+		@isShareLinkEnabled
 	)`
 
 	args := pgx.NamedArgs{
-		"userId":       album.UserId,
-		"name":         album.Name,
-		"description":  album.Description,
-		"coverPhotoId": album.CoverPhotoId,
+		"userId":             album.UserId,
+		"name":               album.Name,
+		"description":        album.Description,
+		"coverPhotoId":       album.CoverPhotoId,
+		"isShareLinkEnabled": album.IsShareLinkEnabled,
 	}
 	_, err := r.db.Exec(ctx, query, args)
 	if err != nil {
+		slog.Debug(err.Error())
 		return fmt.Errorf("unable to insert row: %w", err)
 	}
 
@@ -348,6 +362,7 @@ func (r *AlbumRepo) InsertUsers(ctx context.Context, albumId string, albumUsers 
 				continue
 			}
 
+			slog.Debug(err.Error())
 			return fmt.Errorf("unable to insert album user: %w", err)
 		}
 	}
@@ -411,6 +426,7 @@ func (r *AlbumRepo) InsertPhotos(ctx context.Context, albumId string, photoIds [
 				continue
 			}
 
+			slog.Debug(err.Error())
 			return fmt.Errorf("unable to insert album photo: %w", err)
 		}
 	}

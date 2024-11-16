@@ -67,7 +67,7 @@ func (m *AlbumsModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 		http.StatusOK,
 		types.SuccessRes{
 			Success: true,
-			Message: "Photos uploaded",
+			Message: "Album photos uploaded",
 		},
 	)
 }

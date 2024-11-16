@@ -87,6 +87,7 @@ func (r *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([]mo
 		a.name,
 		a.description,
 		a.cover_photo_id,
+		a.is_share_link_enabled,
 		a.read_access_hash,
 		a.created_at,
 		a.updated_at
