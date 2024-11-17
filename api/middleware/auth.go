@@ -9,12 +9,32 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func getAccesssTokenString(c echo.Context) (string, error) {
+	var err error
+
+	// first try getting the jwt via an http-only cookie
+	tokenCookie, err := c.Cookie("piccolo-access-token")
+	if err != nil {
+		slog.Debug(err.Error())
+	}
+	if tokenCookie != nil {
+		return tokenCookie.Value, nil
+	}
+
+	// fallback to using the auth header
+	tokenString, err := jwtoken.ExtractTokenString(c.Request().Header.Get("Authorization"))
+	if err != nil {
+		slog.Debug(err.Error())
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
 func Auth() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			authHeader := c.Request().Header.Get("Authorization")
-
-			tokenString, err := jwtoken.ExtractTokenString(authHeader)
+			tokenString, err := getAccesssTokenString(c)
 			if err != nil {
 				slog.Error(err.Error())
 			}

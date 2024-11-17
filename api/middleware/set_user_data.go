@@ -16,7 +16,7 @@ type UserData struct {
 func SetUserData() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			tokenString, err := jwtoken.ExtractTokenString(c.Request().Header.Get("Authorization"))
+			tokenString, err := getAccesssTokenString(c)
 			if err != nil {
 				slog.Error(fmt.Sprintf("error setting user data: %v", err.Error()))
 			}

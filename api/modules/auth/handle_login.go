@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"net/http"
 	"piccolo/api/jwtoken"
 	"piccolo/api/types"
@@ -72,8 +71,12 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 		m.server.Logger.Error(err.Error())
 	}
 
-	c.Response().Header().Set("authorization", fmt.Sprintf("Bearer %s", accessToken))
-	c.Response().Header().Set("x-refresh-token", refreshToken)
+	// TODO is this needed?
+	// c.Response().Header().Set("authorization", fmt.Sprintf("Bearer %s", accessToken))
+	// c.Response().Header().Set("x-refresh-token", refreshToken)
+
+	setAccessTokenCookie(c, accessToken)
+	setRefreshTokenCookie(c, refreshToken)
 
 	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,
