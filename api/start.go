@@ -7,6 +7,7 @@ import (
 	"os"
 	"piccolo/api/middleware"
 	"piccolo/api/modules"
+	"piccolo/api/pages"
 	"piccolo/api/storage/backblaze"
 	"piccolo/api/storage/pg"
 	"piccolo/api/storage/redis"
@@ -63,7 +64,7 @@ func Start() {
 
 	server := newServer(context.Background())
 
-	modules.Pages(e, server)
+	pages.Routes(e, server)
 
 	g := e.Group("/api")
 	modules.Routes(g, server)
