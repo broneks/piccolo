@@ -1,16 +1,17 @@
 package pages
 
 import (
-	"net/http"
+	"piccolo/api/middleware"
+	"piccolo/api/repo"
 	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
 )
 
 func Routes(e *echo.Echo, server *types.Server) {
-	e.GET("/test", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "test.html", map[string]string{
-			"name": "World!",
-		})
-	})
+	sharedAlbumRepo := repo.NewSharedAlbumRepo(server.DB)
+
+	album := e.Group("/albums/:id", middleware.CanReadSharedAlbum(sharedAlbumRepo))
+
+	album.GET("", handleSharedAlbumPage(sharedAlbumRepo))
 }

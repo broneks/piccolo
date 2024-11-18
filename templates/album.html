@@ -1,0 +1,15 @@
+<div style="max-width: 600px; margin: 10% auto 0; padding: 16px;">
+  <header>
+    <h1>{{.Album.Name}}</h1>
+    <time>{{.Album.CreatedAt}}</time>
+  </header>
+
+  <h3>Test List:</h3>
+  <ul>
+    {{range .List}}
+    <li>{{.Name}}</li>
+    {{end}}
+  </ul>
+</div>
+
+
