@@ -290,13 +290,15 @@ func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 		name,
 		description,
 		cover_photo_id,
-		is_share_link_enabled
+		is_share_link_enabled,
+		read_access_hash
 	) values (
 		@userId,
 		@name,
 		@description,
 		@coverPhotoId,
-		@isShareLinkEnabled
+		@isShareLinkEnabled,
+		@readAccessHash
 	)`
 
 	args := pgx.NamedArgs{
@@ -305,6 +307,7 @@ func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 		"description":        album.Description,
 		"coverPhotoId":       album.CoverPhotoId,
 		"isShareLinkEnabled": album.IsShareLinkEnabled,
+		"readAccessHash":     album.ReadAccessHash,
 	}
 	_, err := r.db.Exec(ctx, query, args)
 	if err != nil {
