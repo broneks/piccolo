@@ -114,8 +114,8 @@ func (r *SharedAlbumRepo) GetPhoto(ctx context.Context, albumId, photoId string)
 		p.updated_at
 	from photos p
 	join album_photos ap on p.id = ap.photo_id
-	where ap.album_id = $albumId
-	and ap.photo_id = $photoId`
+	where ap.album_id = @albumId
+	and ap.photo_id = @photoId`
 
 	var err error
 	var photo model.Photo
