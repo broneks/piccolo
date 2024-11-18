@@ -6,6 +6,7 @@ import (
 	"piccolo/api/repo"
 	"piccolo/api/types"
 	"piccolo/api/util"
+	"sync"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,13 +23,26 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlb
 
 		albumId := util.GetIdParam(c)
 
-		album, err := sharedAlbumRepo.GetById(ctx, albumId)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError)
-		}
+		var wg sync.WaitGroup
+		wg.Add(2)
 
-		photos, err := sharedAlbumRepo.GetPhotos(ctx, albumId)
-		if err != nil {
+		var album *model.Album
+		var photos []model.Photo
+		var albumErr, photosErr error
+
+		go func() {
+			defer wg.Done()
+			album, albumErr = sharedAlbumRepo.GetById(ctx, albumId)
+		}()
+
+		go func() {
+			defer wg.Done()
+			photos, photosErr = sharedAlbumRepo.GetPhotos(ctx, albumId)
+		}()
+
+		wg.Wait()
+
+		if albumErr != nil || photosErr != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError)
 		}
 
