@@ -1,13 +1,13 @@
 <div style="max-width: 600px; margin: 10% auto 0; padding: 16px;">
   <header>
-    <h1>{{.Album.Name}}</h1>
-    <time>{{.Album.CreatedAt}}</time>
+    <h1>{{.Album.Name.String}}</h1>
+    <time>{{.Album.CreatedAt.Time}}</time>
   </header>
 
-  <h3>Test List:</h3>
+  <h3>Photos:</h3>
   <ul>
-    {{range .List}}
-    <li>{{.Name}}</li>
+    {{range .Photos}}
+      <img src="{{.Url}}" alt="{{.Filename}}" style="max-width: 600px;" loading="lazy" draggable="false" />
     {{end}}
   </ul>
 </div>

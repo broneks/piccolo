@@ -13,5 +13,5 @@ func Routes(e *echo.Echo, server *types.Server) {
 
 	album := e.Group("/albums/:id", middleware.CanReadSharedAlbum(sharedAlbumRepo))
 
-	album.GET("", handleSharedAlbumPage(sharedAlbumRepo))
+	album.GET("", handleSharedAlbumPage(server, sharedAlbumRepo))
 }

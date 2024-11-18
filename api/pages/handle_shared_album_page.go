@@ -2,29 +2,20 @@ package pages
 
 import (
 	"net/http"
+	"piccolo/api/model"
 	"piccolo/api/repo"
+	"piccolo/api/types"
 	"piccolo/api/util"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
 
-type Album struct {
-	Name        string
-	Description string
-	CreatedAt   time.Time
-}
-
-type Test struct {
-	Name string
-}
-
 type Payload struct {
-	Album
-	List []Test
+	*model.Album
+	Photos []*model.PhotoWithUrl
 }
 
-func handleSharedAlbumPage(sharedAlbumRepo *repo.SharedAlbumRepo) echo.HandlerFunc {
+func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlbumRepo) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
 
@@ -34,17 +25,16 @@ func handleSharedAlbumPage(sharedAlbumRepo *repo.SharedAlbumRepo) echo.HandlerFu
 			return echo.NewHTTPError(http.StatusInternalServerError)
 		}
 
+		photos, err := sharedAlbumRepo.GetPhotos(ctx, albumId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError)
+		}
+
+		photosWithUrl := model.NewPhotosWithUrl(ctx, server, photos)
+
 		return c.Render(http.StatusOK, "album.html", &Payload{
-			Album: Album{
-				Name:        album.Name.String,
-				Description: album.Name.String,
-				CreatedAt:   album.CreatedAt.Time,
-			},
-			List: []Test{
-				{Name: "foo"},
-				{Name: "bar"},
-				{Name: "baz"},
-			},
+			Album:  album,
+			Photos: photosWithUrl,
 		})
 	}
 }
