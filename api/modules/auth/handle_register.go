@@ -69,7 +69,7 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, types.SuccessRes{
+	return c.JSON(http.StatusCreated, types.SuccessRes{
 		Success: true,
 		Message: "User created",
 	})

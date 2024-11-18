@@ -46,7 +46,7 @@ func (m *PhotosModule) postPhotosUploadHandler(c echo.Context) error {
 	}
 
 	return c.JSON(
-		http.StatusOK,
+		http.StatusCreated,
 		types.SuccessRes{
 			Success: true,
 			Message: "Photos uploaded",

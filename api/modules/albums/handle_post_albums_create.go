@@ -55,7 +55,7 @@ func (m *AlbumsModule) postAlbumsCreateHandler(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, types.SuccessRes{
+	return c.JSON(http.StatusCreated, types.SuccessRes{
 		Success: true,
 		Message: "Album created",
 	})
