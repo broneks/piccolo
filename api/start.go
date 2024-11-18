@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"os"
 	"piccolo/api/middleware"
 	"piccolo/api/modules"
@@ -60,12 +59,7 @@ func Start() {
 		ObjectStorage: backblazeClient,
 	}
 
-	// TODO remove
-	e.GET("/test", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "test.html", map[string]any{
-			"name": "Dolly!",
-		})
-	})
+	modules.Pages(e, server)
 
 	g := e.Group("/api")
 	modules.Routes(g, server)
