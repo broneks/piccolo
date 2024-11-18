@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"piccolo/api/middleware"
 	"piccolo/api/modules/albums"
 	"piccolo/api/modules/auth"
 	"piccolo/api/modules/photos"
@@ -15,6 +16,8 @@ func Routes(g *echo.Group, server *types.Server) {
 	g.GET("/health", handleHealth(server))
 
 	v1 := g.Group("/v1")
+
+	v1.Use(middleware.SetUserData())
 
 	userRepo := repo.NewUserRepo(server.DB)
 	photoRepo := repo.NewPhotoRepo(server.DB)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"piccolo/api/middleware"
 	"piccolo/api/modules"
@@ -28,7 +29,6 @@ func Start() {
 
 	// custom
 	e.Use(middleware.Logger())
-	e.Use(middleware.SetUserData())
 
 	// echo built-in
 	e.Use(echoMiddleware.Recover())
@@ -36,6 +36,8 @@ func Start() {
 	e.Use(echoMiddleware.Secure())
 
 	e.Static("/", "static")
+
+	e.Renderer = util.NewTemplateRenderer("templates/*.html")
 
 	logger := slog.Default()
 
@@ -59,6 +61,13 @@ func Start() {
 		Cache:         redisClient,
 		ObjectStorage: backblazeClient,
 	}
+
+	// TODO remove
+	e.GET("/test", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "test.html", map[string]any{
+			"name": "Dolly!",
+		})
+	})
 
 	g := e.Group("/api")
 	modules.Routes(g, server)
