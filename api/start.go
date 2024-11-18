@@ -25,6 +25,7 @@ func Start() {
 
 	e := echo.New()
 
+	e.IPExtractor = echo.ExtractIPDirect()
 	e.Validator = util.NewValidator()
 
 	// custom
@@ -36,7 +37,6 @@ func Start() {
 	e.Use(echoMiddleware.Secure())
 
 	e.Static("/", "static")
-
 	e.Renderer = util.NewTemplateRenderer("templates/*.html")
 
 	logger := slog.Default()
