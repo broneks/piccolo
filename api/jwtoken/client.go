@@ -17,17 +17,18 @@ type JwtClient struct {
 	claims JwtClaims
 }
 
-const AccessExpirationDuration = time.Hour * 4          // 4 hours
-const RefreshExpirationDuration = time.Hour * (24 * 14) // 14 days
+const AccessExpirationDuration = time.Hour * 4           // 4 hours
+const RefreshExpirationDuration = time.Hour * (24 * 14)  // 14 days
+const ResetPasswordExpirationDuration = time.Minute * 30 // 30 minutes
 
-func New(userId, email string, expirationDuration time.Duration) *JwtClient {
+func New(subject, email string, expirationDuration time.Duration) *JwtClient {
 	now := time.Now()
 
 	client := &JwtClient{
 		claims: JwtClaims{
 			RegisteredClaims: jwt.RegisteredClaims{
 				Issuer:    os.Getenv("JWT_ISS"),
-				Subject:   userId,
+				Subject:   subject,
 				Audience:  jwt.ClaimStrings{os.Getenv("JWT_AUD")},
 				ExpiresAt: jwt.NewNumericDate(now.Add(expirationDuration)),
 				NotBefore: jwt.NewNumericDate(now),
@@ -47,4 +48,8 @@ func NewAccessJwt(userId, email string) *JwtClient {
 
 func NewRefreshJwt(userId, email string) *JwtClient {
 	return New(userId, email, RefreshExpirationDuration)
+}
+
+func NewResetPasswordJwt(email string) *JwtClient {
+	return New(email, email, ResetPasswordExpirationDuration)
 }
