@@ -28,18 +28,16 @@ func Start() {
 	e.IPExtractor = echo.ExtractIPDirect()
 	e.Validator = util.NewValidator()
 
-	// custom
 	e.Use(middleware.Logger())
-
-	// echo built-in
 	e.Use(echoMiddleware.Recover())
 	e.Use(echoMiddleware.RequestID())
 	e.Use(echoMiddleware.Secure())
 
+	logger := slog.Default()
+
 	e.Static("/", "static")
 	e.Renderer = util.NewTemplateRenderer("templates/*.html")
-
-	logger := slog.Default()
+	e.HTTPErrorHandler = httpErrorHandler
 
 	dbClient, err := pg.NewClient(context.Background())
 	if err != nil {
