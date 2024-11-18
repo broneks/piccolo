@@ -1,6 +1,6 @@
 # Piccolo
 
-Private photos manager
+Private photos manager API
 
 ### Dev Setup
 
