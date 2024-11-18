@@ -144,7 +144,8 @@ func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, e
 		a.read_access_hash,
 		a.created_at,
 		a.updated_at
-	from albums a join album_users au on a.id = au.album_id where au.user_id = $1`
+	from albums a join album_users au on a.id = au.album_id where au.user_id = $1
+	order by created_at desc`
 
 	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
@@ -204,7 +205,8 @@ func (r *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]mod
 		u.updated_at
 	from users u
 	join album_users au on u.id = au.user_id
-	where au.album_id = $1`
+	where au.album_id = $1
+	order by u.created_at des`
 
 	var albumUsers []model.AlbumUserWithUser
 
@@ -269,7 +271,8 @@ func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]mo
 		p.updated_at
 	from photos p
 	join album_photos ap on p.id = ap.photo_id
-	where ap.album_id = $1`
+	where ap.album_id = $1
+	order by p.created_at desc`
 
 	rows, err := r.db.Query(ctx, query, albumId)
 	if err != nil {

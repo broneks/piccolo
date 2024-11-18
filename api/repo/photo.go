@@ -69,7 +69,8 @@ func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, e
 		content_type,
 		created_at,
 		updated_at
-	from photos where user_id = $1`
+	from photos where user_id = $1
+	order by created_at desc`
 
 	rows, err := r.db.Query(ctx, query, userId)
 	if err != nil {
@@ -94,7 +95,8 @@ func (r *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([]mo
 	from albums a
 	join album_photos ap on a.id = ap.album_id
 	where ap.photo_id = @photoId
-	and ap.user_id = @userId`
+	and ap.user_id = @userId
+	order by a.created_at desc`
 
 	args := pgx.NamedArgs{
 		"photoId": photoId,
