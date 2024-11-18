@@ -53,8 +53,6 @@ func (r *SharedAlbumRepo) GetById(ctx context.Context, albumId string) (*model.A
 		name,
 		description,
 		cover_photo_id,
-		is_share_link_enabled,
-		read_access_hash,
 		created_at,
 		updated_at
 	from albums where id = $1`
@@ -67,8 +65,6 @@ func (r *SharedAlbumRepo) GetById(ctx context.Context, albumId string) (*model.A
 		&album.Name,
 		&album.Description,
 		&album.CoverPhotoId,
-		&album.IsShareLinkEnabled,
-		&album.ReadAccessHash,
 		&album.CreatedAt,
 		&album.UpdatedAt,
 	)

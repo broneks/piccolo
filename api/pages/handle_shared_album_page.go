@@ -32,7 +32,7 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlb
 
 		photosWithUrl := model.NewPhotosWithUrl(ctx, server, photos)
 
-		return c.Render(http.StatusOK, "album.html", &Payload{
+		return c.Render(http.StatusOK, "shared_album.html", &Payload{
 			Album:  album,
 			Photos: photosWithUrl,
 		})
