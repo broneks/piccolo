@@ -45,8 +45,6 @@ func (r *SharedAlbumRepo) CanReadSharedAlbum(ctx context.Context, albumId, readA
 }
 
 func (r *SharedAlbumRepo) GetById(ctx context.Context, albumId string) (*model.Album, error) {
-	var err error
-
 	query := `select
 		id,
 		user_id,
@@ -57,6 +55,7 @@ func (r *SharedAlbumRepo) GetById(ctx context.Context, albumId string) (*model.A
 		updated_at
 	from albums where id = $1`
 
+	var err error
 	var album model.Album
 
 	err = r.db.QueryRow(ctx, query, albumId).Scan(
@@ -101,4 +100,47 @@ func (r *SharedAlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]mode
 	defer rows.Close()
 
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Photo])
+}
+
+func (r *SharedAlbumRepo) GetPhoto(ctx context.Context, albumId, photoId string) (*model.Photo, error) {
+	query := `select
+		p.id,
+		p.user_id,
+		p.location,
+		p.filename,
+		p.file_size,
+		p.content_type,
+		p.created_at,
+		p.updated_at
+	from photos p
+	join album_photos ap on p.id = ap.photo_id
+	where ap.album_id = $albumId
+	and ap.photo_id = $photoId`
+
+	var err error
+	var photo model.Photo
+
+	args := pgx.NamedArgs{
+		"albumId": albumId,
+		"photoId": photoId,
+	}
+
+	err = r.db.QueryRow(ctx, query, args).Scan(
+		&photo.Id,
+		&photo.UserId,
+		&photo.Location,
+		&photo.Filename,
+		&photo.FileSize,
+		&photo.ContentType,
+		&photo.CreatedAt,
+		&photo.UpdatedAt,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, fmt.Errorf("photo with id %s not found", photoId)
+		}
+		return nil, fmt.Errorf("query error: %v", err)
+	}
+
+	return &photo, nil
 }

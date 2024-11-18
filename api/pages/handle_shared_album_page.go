@@ -12,7 +12,8 @@ import (
 
 type Payload struct {
 	*model.Album
-	Photos []*model.PhotoWithUrl
+	CoverPhoto *model.PhotoWithUrl
+	Photos     []*model.PhotoWithUrl
 }
 
 func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlbumRepo) echo.HandlerFunc {
@@ -20,6 +21,7 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlb
 		ctx := c.Request().Context()
 
 		albumId := util.GetIdParam(c)
+
 		album, err := sharedAlbumRepo.GetById(ctx, albumId)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError)
@@ -32,9 +34,21 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlb
 
 		photosWithUrl := model.NewPhotosWithUrl(ctx, server, photos)
 
+		var coverPhoto *model.PhotoWithUrl
+
+		if album.CoverPhotoId.String != "" {
+			photo, err := sharedAlbumRepo.GetPhoto(ctx, albumId, album.CoverPhotoId.String)
+			if err != nil {
+				server.Logger.Debug(err.Error())
+			} else {
+				coverPhoto = model.NewPhotoWithUrl(ctx, server, photo)
+			}
+		}
+
 		return c.Render(http.StatusOK, "shared_album.html", &Payload{
-			Album:  album,
-			Photos: photosWithUrl,
+			Album:      album,
+			CoverPhoto: coverPhoto,
+			Photos:     photosWithUrl,
 		})
 	}
 }

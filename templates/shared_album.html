@@ -2,6 +2,7 @@
   <header>
     <h1>{{.Album.Name.String}}</h1>
     <time>{{.Album.CreatedAt.Time}}</time>
+    <img src="{{.Album.CoverPhoto.Url}}" alt="{{.Album.CoverPhoto.Filename}}" style="max-width: 600px;" loading="lazy" draggable="false" />
   </header>
 
   <h3>Photos:</h3>
