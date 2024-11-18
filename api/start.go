@@ -17,28 +17,12 @@ import (
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
-func Start() {
-	env := os.Getenv("ENV")
-
+func newServer(ctx context.Context) *types.Server {
 	var err error
-
-	e := echo.New()
-
-	e.IPExtractor = echo.ExtractIPDirect()
-	e.Validator = util.NewValidator()
-
-	e.Use(middleware.Logger())
-	e.Use(echoMiddleware.Recover())
-	e.Use(echoMiddleware.RequestID())
-	e.Use(echoMiddleware.Secure())
 
 	logger := slog.Default()
 
-	e.Static("/", "static")
-	e.Renderer = util.NewTemplateRenderer("templates/*.html")
-	e.HTTPErrorHandler = httpErrorHandler
-
-	dbClient, err := pg.NewClient(context.Background())
+	dbClient, err := pg.NewClient(ctx)
 	if err != nil {
 		logger.Error(fmt.Sprintf("Cannot create database client: %v", err.Error()))
 		os.Exit(1)
@@ -46,18 +30,38 @@ func Start() {
 
 	redisClient := redis.NewClient()
 
-	backblazeClient, err := backblaze.NewClient(context.Background())
+	backblazeClient, err := backblaze.NewClient(ctx)
 	if err != nil {
 		logger.Error(fmt.Sprintf("Cannot create backblaze client: %v", err.Error()))
 		os.Exit(1)
 	}
 
-	server := &types.Server{
+	return &types.Server{
 		Logger:        logger,
 		DB:            dbClient,
 		Cache:         redisClient,
 		ObjectStorage: backblazeClient,
 	}
+}
+
+func Start() {
+	env := os.Getenv("ENV")
+
+	e := echo.New()
+
+	e.Use(middleware.Logger())
+	e.Use(echoMiddleware.Recover())
+	e.Use(echoMiddleware.RequestID())
+	e.Use(echoMiddleware.Secure())
+
+	e.Static("/", "static")
+
+	e.IPExtractor = echo.ExtractIPDirect()
+	e.Validator = util.NewValidator()
+	e.Renderer = util.NewTemplateRenderer("templates/*.html")
+	e.HTTPErrorHandler = httpErrorHandler
+
+	server := newServer(context.Background())
 
 	modules.Pages(e, server)
 
