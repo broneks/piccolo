@@ -1,4 +1,4 @@
-package albums
+package album
 
 import (
 	"piccolo/api/repo"
@@ -6,14 +6,14 @@ import (
 	"piccolo/api/types"
 )
 
-type AlbumsModule struct {
+type AlbumModule struct {
 	server       *types.Server
 	albumRepo    *repo.AlbumRepo
 	photoService *service.PhotoService
 }
 
-func New(server *types.Server, albumRepo *repo.AlbumRepo, photoService *service.PhotoService) *AlbumsModule {
-	return &AlbumsModule{
+func New(server *types.Server, albumRepo *repo.AlbumRepo, photoService *service.PhotoService) *AlbumModule {
+	return &AlbumModule{
 		server:       server,
 		albumRepo:    albumRepo,
 		photoService: photoService,

@@ -1,4 +1,4 @@
-package albums
+package album
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *AlbumsModule) postAlbumPhotosUploadHandler(c echo.Context) error {
+func (m *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 

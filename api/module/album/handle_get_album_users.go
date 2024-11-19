@@ -1,24 +1,23 @@
-package photos
+package album
 
 import (
 	"net/http"
-	"piccolo/api/model"
 	"piccolo/api/types"
 	"piccolo/api/util"
 
 	"github.com/labstack/echo/v4"
 )
 
-func (m *PhotosModule) getPhotoHandler(c echo.Context) error {
+func (m *AlbumModule) getAlbumUsersHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
-	photoId := util.GetIdParam(c)
-	if photoId == "" {
+	albumId := util.GetIdParam(c)
+	if albumId == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
 	}
 
-	photo, err := m.photoRepo.GetById(ctx, photoId, userId)
+	albumUsers, err := m.albumRepo.GetUsers(ctx, albumId, userId)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, types.SuccessRes{
 			Success: false,
@@ -26,7 +25,9 @@ func (m *PhotosModule) getPhotoHandler(c echo.Context) error {
 		})
 	}
 
-	photoWithUrl := model.NewPhotoWithUrl(ctx, m.server, photo)
+	if len(albumUsers) == 0 {
+		return c.JSON(http.StatusOK, []any{})
+	}
 
-	return c.JSON(http.StatusOK, photoWithUrl)
+	return c.JSON(http.StatusOK, albumUsers)
 }

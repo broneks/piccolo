@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"os"
 	"piccolo/api/middleware"
-	"piccolo/api/modules"
-	"piccolo/api/pages"
+	"piccolo/api/module"
+	"piccolo/api/page"
 	"piccolo/api/storage/backblaze"
 	"piccolo/api/storage/pg"
 	"piccolo/api/storage/redis"
@@ -64,10 +64,9 @@ func Start() {
 
 	server := newServer(context.Background())
 
-	pages.Routes(e, server)
+	page.Routes(e, server)
 
-	g := e.Group("/api")
-	modules.Routes(g, server)
+	module.Routes(e.Group("/api"), server)
 
 	if env == "local" {
 		util.ListAllRoutes(e)

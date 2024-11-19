@@ -1,4 +1,4 @@
-package photos
+package photo
 
 import (
 	"piccolo/api/middleware"
@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *PhotosModule) Routes(g *echo.Group) {
+func (m *PhotoModule) Routes(g *echo.Group) {
 	photos := g.Group("/photos", middleware.Auth())
 
 	photos.GET("", m.getPhotosHandler)

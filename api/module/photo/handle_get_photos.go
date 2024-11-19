@@ -1,4 +1,4 @@
-package photos
+package photo
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *PhotosModule) getPhotosHandler(c echo.Context) error {
+func (m *PhotoModule) getPhotosHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 

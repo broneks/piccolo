@@ -1,4 +1,4 @@
-package albums
+package album
 
 import (
 	"net/http"
@@ -16,7 +16,7 @@ type CreateAlbumReq struct {
 	IsShareLinkEnabled *bool   `json:"isShareLinkEnabled"`
 }
 
-func (m *AlbumsModule) postAlbumsCreateHandler(c echo.Context) error {
+func (m *AlbumModule) postAlbumsCreateHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 

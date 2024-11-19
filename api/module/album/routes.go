@@ -1,4 +1,4 @@
-package albums
+package album
 
 import (
 	"piccolo/api/middleware"
@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *AlbumsModule) Routes(g *echo.Group) {
+func (m *AlbumModule) Routes(g *echo.Group) {
 	albums := g.Group("/albums", middleware.Auth())
 
 	albums.GET("", m.getAlbumsHandler)

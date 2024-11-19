@@ -1,4 +1,4 @@
-package photos
+package photo
 
 import (
 	"piccolo/api/repo"
@@ -6,14 +6,14 @@ import (
 	"piccolo/api/types"
 )
 
-type PhotosModule struct {
+type PhotoModule struct {
 	server       *types.Server
 	photoRepo    *repo.PhotoRepo
 	photoService *service.PhotoService
 }
 
-func New(server *types.Server, photoRepo *repo.PhotoRepo, photoService *service.PhotoService) *PhotosModule {
-	return &PhotosModule{
+func New(server *types.Server, photoRepo *repo.PhotoRepo, photoService *service.PhotoService) *PhotoModule {
+	return &PhotoModule{
 		server:       server,
 		photoRepo:    photoRepo,
 		photoService: photoService,
