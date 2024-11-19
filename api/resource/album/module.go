@@ -12,7 +12,7 @@ type AlbumModule struct {
 	photoService *service.PhotoService
 }
 
-func New(server *types.Server, albumRepo *repo.AlbumRepo, photoService *service.PhotoService) *AlbumModule {
+func NewModule(server *types.Server, albumRepo *repo.AlbumRepo, photoService *service.PhotoService) *AlbumModule {
 	return &AlbumModule{
 		server:       server,
 		albumRepo:    albumRepo,

@@ -12,7 +12,7 @@ type PhotoModule struct {
 	photoService *service.PhotoService
 }
 
-func New(server *types.Server, photoRepo *repo.PhotoRepo, photoService *service.PhotoService) *PhotoModule {
+func NewModule(server *types.Server, photoRepo *repo.PhotoRepo, photoService *service.PhotoService) *PhotoModule {
 	return &PhotoModule{
 		server:       server,
 		photoRepo:    photoRepo,

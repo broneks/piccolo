@@ -10,7 +10,7 @@ type AuthModule struct {
 	userRepo *repo.UserRepo
 }
 
-func New(server *types.Server, userRepo *repo.UserRepo) *AuthModule {
+func NewModule(server *types.Server, userRepo *repo.UserRepo) *AuthModule {
 	return &AuthModule{
 		server:   server,
 		userRepo: userRepo,

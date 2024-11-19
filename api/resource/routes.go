@@ -1,11 +1,11 @@
-package module
+package resource
 
 import (
 	"piccolo/api/middleware"
-	"piccolo/api/module/album"
-	"piccolo/api/module/auth"
-	"piccolo/api/module/photo"
 	"piccolo/api/repo"
+	"piccolo/api/resource/album"
+	"piccolo/api/resource/auth"
+	"piccolo/api/resource/photo"
 	"piccolo/api/service"
 	"piccolo/api/types"
 
@@ -25,12 +25,12 @@ func Routes(g *echo.Group, server *types.Server) {
 
 	photoService := service.NewPhotoService(server, photoRepo)
 
-	authModule := auth.New(server, userRepo)
+	authModule := auth.NewModule(server, userRepo)
 	authModule.Routes(v1)
 
-	photoModule := photo.New(server, photoRepo, photoService)
+	photoModule := photo.NewModule(server, photoRepo, photoService)
 	photoModule.Routes(v1)
 
-	albumModule := album.New(server, albumRepo, photoService)
+	albumModule := album.NewModule(server, albumRepo, photoService)
 	albumModule.Routes(v1)
 }
