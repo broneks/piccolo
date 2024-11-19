@@ -17,7 +17,7 @@ func NewUserRepo(db types.ServerDB) *UserRepo {
 	return &UserRepo{db: db}
 }
 
-func (r *UserRepo) GetById(ctx context.Context, id string) (*model.User, error) {
+func (repo *UserRepo) GetById(ctx context.Context, id string) (*model.User, error) {
 	query := `select
 		id,
 		username,
@@ -31,7 +31,7 @@ func (r *UserRepo) GetById(ctx context.Context, id string) (*model.User, error) 
 
 	var user model.User
 
-	err := r.db.QueryRow(ctx, query, id).Scan(
+	err := repo.db.QueryRow(ctx, query, id).Scan(
 		&user.Id,
 		&user.Username,
 		&user.Email,
@@ -52,7 +52,7 @@ func (r *UserRepo) GetById(ctx context.Context, id string) (*model.User, error) 
 	return &user, nil
 }
 
-func (r *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+func (repo *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User, error) {
 	query := `select
 		id,
 		username,
@@ -66,7 +66,7 @@ func (r *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User, e
 
 	var user model.User
 
-	err := r.db.QueryRow(context.Background(), query, email).Scan(
+	err := repo.db.QueryRow(context.Background(), query, email).Scan(
 		&user.Id,
 		&user.Username,
 		&user.Email,
@@ -87,7 +87,7 @@ func (r *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User, e
 	return &user, nil
 }
 
-func (r *UserRepo) InsertOne(ctx context.Context, user model.User) error {
+func (repo *UserRepo) InsertOne(ctx context.Context, user model.User) error {
 	query := `insert into users (
 		username,
 		email,
@@ -106,7 +106,7 @@ func (r *UserRepo) InsertOne(ctx context.Context, user model.User) error {
 		"hash":     user.Hash,
 		"hashedAt": user.HashedAt,
 	}
-	_, err := r.db.Exec(ctx, query, args)
+	_, err := repo.db.Exec(ctx, query, args)
 	if err != nil {
 		return fmt.Errorf("unable to insert row: %w", err)
 	}
@@ -115,14 +115,14 @@ func (r *UserRepo) InsertOne(ctx context.Context, user model.User) error {
 }
 
 // TODO
-func (r *UserRepo) Update(ctx context.Context, user model.User) error {
+func (repo *UserRepo) Update(ctx context.Context, user model.User) error {
 	return nil
 }
 
-func (r *UserRepo) UpdateLastLoginAt(ctx context.Context, userId string) error {
+func (repo *UserRepo) UpdateLastLoginAt(ctx context.Context, userId string) error {
 	query := `update users set last_login_at = now() where id = $1`
 
-	_, err := r.db.Exec(ctx, query, userId)
+	_, err := repo.db.Exec(ctx, query, userId)
 	if err != nil {
 		return fmt.Errorf("unable to update row: %w", err)
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *PhotoModule) getPhotoHandler(c echo.Context) error {
+func (mod *PhotoModule) getPhotoHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
@@ -18,7 +18,7 @@ func (m *PhotoModule) getPhotoHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
 	}
 
-	photo, err := m.photoRepo.GetById(ctx, photoId, userId)
+	photo, err := mod.photoRepo.GetById(ctx, photoId, userId)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, types.SuccessRes{
 			Success: false,
@@ -26,7 +26,7 @@ func (m *PhotoModule) getPhotoHandler(c echo.Context) error {
 		})
 	}
 
-	photoWithUrl := model.NewPhotoWithUrl(ctx, m.server, photo)
+	photoWithUrl := model.NewPhotoWithUrl(ctx, mod.server, photo)
 
 	return c.JSON(http.StatusOK, photoWithUrl)
 }

@@ -7,13 +7,13 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *PhotoModule) postPhotosUploadHandler(c echo.Context) error {
+func (mod *PhotoModule) postPhotosUploadHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
 	form, err := c.MultipartForm()
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
@@ -34,8 +34,8 @@ func (m *PhotoModule) postPhotosUploadHandler(c echo.Context) error {
 		)
 	}
 
-	if _, err = m.photoService.UploadFiles(ctx, files, userId); err != nil {
-		m.server.Logger.Error(err.Error())
+	if _, err = mod.photoService.UploadFiles(ctx, files, userId); err != nil {
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{

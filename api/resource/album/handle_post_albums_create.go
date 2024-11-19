@@ -16,7 +16,7 @@ type CreateAlbumReq struct {
 	IsShareLinkEnabled *bool   `json:"isShareLinkEnabled"`
 }
 
-func (m *AlbumModule) postAlbumsCreateHandler(c echo.Context) error {
+func (mod *AlbumModule) postAlbumsCreateHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
@@ -25,7 +25,7 @@ func (m *AlbumModule) postAlbumsCreateHandler(c echo.Context) error {
 	var err error
 
 	if err = c.Bind(req); err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid input",
@@ -57,9 +57,9 @@ func (m *AlbumModule) postAlbumsCreateHandler(c echo.Context) error {
 		album.SetReadAccessHash()
 	}
 
-	err = m.albumRepo.InsertOne(ctx, album)
+	err = mod.albumRepo.InsertOne(ctx, album)
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",

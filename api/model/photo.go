@@ -23,8 +23,8 @@ type PhotoWithUrl struct {
 	Url string `json:"url"`
 }
 
-func (p *Photo) GetUrl(ctx context.Context, server *types.Server) string {
-	key := p.Id.String
+func (photo *Photo) GetUrl(ctx context.Context, server *types.Server) string {
+	key := photo.Id.String
 
 	val, err := server.Cache.Get(ctx, key)
 	if err != nil {
@@ -35,7 +35,7 @@ func (p *Photo) GetUrl(ctx context.Context, server *types.Server) string {
 	if val != "" {
 		return val
 	} else {
-		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), p.Filename.String, p.UserId.String)
+		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), photo.Filename.String, photo.UserId.String)
 
 		err := server.Cache.Set(ctx, key, url, expirationDuration)
 		if err != nil {

@@ -18,7 +18,7 @@ func NewPhotoRepo(db types.ServerDB) *PhotoRepo {
 }
 
 // Get photo uploaded by the user
-func (r *PhotoRepo) GetById(ctx context.Context, photoId, userId string) (*model.Photo, error) {
+func (repo *PhotoRepo) GetById(ctx context.Context, photoId, userId string) (*model.Photo, error) {
 	var err error
 
 	query := `select
@@ -38,7 +38,7 @@ func (r *PhotoRepo) GetById(ctx context.Context, photoId, userId string) (*model
 		"photoId": photoId,
 		"userId":  userId,
 	}
-	err = r.db.QueryRow(ctx, query, args).Scan(
+	err = repo.db.QueryRow(ctx, query, args).Scan(
 		&photo.Id,
 		&photo.UserId,
 		&photo.Location,
@@ -59,7 +59,7 @@ func (r *PhotoRepo) GetById(ctx context.Context, photoId, userId string) (*model
 }
 
 // Get all photos uploaded by the user
-func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, error) {
+func (repo *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, error) {
 	query := `select
 		id,
 		user_id,
@@ -72,7 +72,7 @@ func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, e
 	from photos where user_id = $1
 	order by created_at desc`
 
-	rows, err := r.db.Query(ctx, query, userId)
+	rows, err := repo.db.Query(ctx, query, userId)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query users: %v", err)
 	}
@@ -81,7 +81,7 @@ func (r *PhotoRepo) GetAll(ctx context.Context, userId string) ([]model.Photo, e
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Photo])
 }
 
-func (r *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([]model.Album, error) {
+func (repo *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([]model.Album, error) {
 	query := `select
 		a.id,
 		a.user_id,
@@ -102,7 +102,7 @@ func (r *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([]mo
 		"photoId": photoId,
 		"userId":  userId,
 	}
-	rows, err := r.db.Query(ctx, query, args)
+	rows, err := repo.db.Query(ctx, query, args)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query albums: %v", err)
 	}
@@ -111,7 +111,7 @@ func (r *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([]mo
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Album])
 }
 
-func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
+func (repo *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 	query := `insert into photos (
 		user_id,
 		location,
@@ -133,7 +133,7 @@ func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 		"fileSize":    photo.FileSize,
 		"contentType": photo.ContentType,
 	}
-	_, err := r.db.Exec(ctx, query, args)
+	_, err := repo.db.Exec(ctx, query, args)
 	if err != nil {
 		return fmt.Errorf("unable to insert row: %w", err)
 	}
@@ -141,7 +141,7 @@ func (r *PhotoRepo) InsertOne(ctx context.Context, photo model.Photo) error {
 	return nil
 }
 
-func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, userId string) ([]string, error) {
+func (repo *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, userId string) ([]string, error) {
 	query := `insert into photos (
 		user_id,
 		location,
@@ -169,7 +169,7 @@ func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, userId
 		batch.Queue(query, args)
 	}
 
-	results := r.db.SendBatch(ctx, batch)
+	results := repo.db.SendBatch(ctx, batch)
 	defer results.Close()
 
 	var ids []string
@@ -188,18 +188,18 @@ func (r *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, userId
 }
 
 // TODO
-func (r *PhotoRepo) Update(ctx context.Context, photo model.Photo, userId string) error {
+func (repo *PhotoRepo) Update(ctx context.Context, photo model.Photo, userId string) error {
 	return nil
 }
 
 // TODO
 // remove photo uploaded by user
-func (r *PhotoRepo) RemoveOne(ctx context.Context, photoId, userId string) error {
+func (repo *PhotoRepo) RemoveOne(ctx context.Context, photoId, userId string) error {
 	return nil
 }
 
 // TODO
 // remove photos uploaded by user
-func (r *PhotoRepo) RemoveMany(ctx context.Context, photoIds []string, userId string) error {
+func (repo *PhotoRepo) RemoveMany(ctx context.Context, photoIds []string, userId string) error {
 	return nil
 }

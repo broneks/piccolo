@@ -6,14 +6,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *PhotoModule) Routes(g *echo.Group) {
+func (mod *PhotoModule) Routes(g *echo.Group) {
 	photos := g.Group("/photos", middleware.Auth())
 
-	photos.GET("", m.getPhotosHandler)
-	photos.POST("/upload", m.postPhotosUploadHandler)
+	photos.GET("", mod.getPhotosHandler)
+	photos.POST("/upload", mod.postPhotosUploadHandler)
 
 	photo := photos.Group("/:id")
 
-	photo.GET("", m.getPhotoHandler)
-	photo.GET("/albums", m.getPhotoAlbumsHandler)
+	photo.GET("", mod.getPhotoHandler)
+	photo.GET("/albums", mod.getPhotoAlbumsHandler)
 }

@@ -6,16 +6,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *AlbumModule) Routes(g *echo.Group) {
+func (mod *AlbumModule) Routes(g *echo.Group) {
 	albums := g.Group("/albums", middleware.Auth())
 
-	albums.GET("", m.getAlbumsHandler)
-	albums.POST("", m.postAlbumsCreateHandler)
+	albums.GET("", mod.getAlbumsHandler)
+	albums.POST("", mod.postAlbumsCreateHandler)
 
 	album := albums.Group("/:id")
 
-	album.GET("", m.getAlbumHandler)
-	album.GET("/users", m.getAlbumUsersHandler)
-	album.GET("/photos", m.getAlbumPhotosHandler)
-	album.POST("/upload", m.postAlbumPhotosUploadHandler)
+	album.GET("", mod.getAlbumHandler)
+	album.GET("/users", mod.getAlbumUsersHandler)
+	album.GET("/photos", mod.getAlbumPhotosHandler)
+	album.POST("/upload", mod.postAlbumPhotosUploadHandler)
 }

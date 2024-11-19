@@ -20,7 +20,7 @@ func NewSharedAlbumRepo(db types.ServerDB) *SharedAlbumRepo {
 
 // Permits:
 // - non-users with a valid album read access hash for an album that has sharing enabled
-func (r *SharedAlbumRepo) CanReadSharedAlbum(ctx context.Context, albumId, readAccessHash string) (bool, error) {
+func (repo *SharedAlbumRepo) CanReadSharedAlbum(ctx context.Context, albumId, readAccessHash string) (bool, error) {
 	query := `select exists (
 		select 1 from albums
 		where id = @albumId and is_share_link_enabled = true and read_access_hash = @readAccessHash
@@ -33,7 +33,7 @@ func (r *SharedAlbumRepo) CanReadSharedAlbum(ctx context.Context, albumId, readA
 		"readAccessHash": readAccessHash,
 	}
 
-	err := r.db.QueryRow(ctx, query, args).Scan(&can)
+	err := repo.db.QueryRow(ctx, query, args).Scan(&can)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return false, fmt.Errorf("no rows found for album id '%s'", albumId)
@@ -44,7 +44,7 @@ func (r *SharedAlbumRepo) CanReadSharedAlbum(ctx context.Context, albumId, readA
 	return can, nil
 }
 
-func (r *SharedAlbumRepo) GetById(ctx context.Context, albumId string) (*model.Album, error) {
+func (repo *SharedAlbumRepo) GetById(ctx context.Context, albumId string) (*model.Album, error) {
 	query := `select
 		id,
 		user_id,
@@ -58,7 +58,7 @@ func (r *SharedAlbumRepo) GetById(ctx context.Context, albumId string) (*model.A
 	var err error
 	var album model.Album
 
-	err = r.db.QueryRow(ctx, query, albumId).Scan(
+	err = repo.db.QueryRow(ctx, query, albumId).Scan(
 		&album.Id,
 		&album.UserId,
 		&album.Name,
@@ -77,7 +77,7 @@ func (r *SharedAlbumRepo) GetById(ctx context.Context, albumId string) (*model.A
 	return &album, nil
 }
 
-func (r *SharedAlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]model.Photo, error) {
+func (repo *SharedAlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]model.Photo, error) {
 	query := `select
 		p.id,
 		p.user_id,
@@ -92,7 +92,7 @@ func (r *SharedAlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]mode
 	where ap.album_id = $1
 	order by p.created_at desc`
 
-	rows, err := r.db.Query(ctx, query, albumId)
+	rows, err := repo.db.Query(ctx, query, albumId)
 	if err != nil {
 		slog.Debug(err.Error())
 		return nil, fmt.Errorf("unable to query photos: %v", err)
@@ -102,7 +102,7 @@ func (r *SharedAlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]mode
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Photo])
 }
 
-func (r *SharedAlbumRepo) GetPhoto(ctx context.Context, albumId, photoId string) (*model.Photo, error) {
+func (repo *SharedAlbumRepo) GetPhoto(ctx context.Context, albumId, photoId string) (*model.Photo, error) {
 	query := `select
 		p.id,
 		p.user_id,
@@ -125,7 +125,7 @@ func (r *SharedAlbumRepo) GetPhoto(ctx context.Context, albumId, photoId string)
 		"photoId": photoId,
 	}
 
-	err = r.db.QueryRow(ctx, query, args).Scan(
+	err = repo.db.QueryRow(ctx, query, args).Scan(
 		&photo.Id,
 		&photo.UserId,
 		&photo.Location,

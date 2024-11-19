@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
+func (mod *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
@@ -19,7 +19,7 @@ func (m *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 
 	form, err := c.MultipartForm()
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
@@ -40,9 +40,9 @@ func (m *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 		)
 	}
 
-	photoIds, err := m.photoService.UploadFiles(ctx, files, userId)
+	photoIds, err := mod.photoService.UploadFiles(ctx, files, userId)
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
@@ -52,8 +52,8 @@ func (m *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 		)
 	}
 
-	if err = m.albumRepo.InsertPhotos(ctx, albumId, photoIds, userId); err != nil {
-		m.server.Logger.Error(err.Error())
+	if err = mod.albumRepo.InsertPhotos(ctx, albumId, photoIds, userId); err != nil {
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{

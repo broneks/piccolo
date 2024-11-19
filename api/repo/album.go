@@ -22,7 +22,7 @@ func NewAlbumRepo(db types.ServerDB) *AlbumRepo {
 // Permits:
 // - album owner
 // - album user with any role
-func (r *AlbumRepo) CanReadAlbum(ctx context.Context, albumId, userId string) (bool, error) {
+func (repo *AlbumRepo) CanReadAlbum(ctx context.Context, albumId, userId string) (bool, error) {
 	query := `select exists (
 		select 1 from albums where id = @albumId and user_id = @userId
 		union
@@ -35,7 +35,7 @@ func (r *AlbumRepo) CanReadAlbum(ctx context.Context, albumId, userId string) (b
 		"albumId": albumId,
 		"userId":  userId,
 	}
-	err := r.db.QueryRow(ctx, query, args).Scan(&can)
+	err := repo.db.QueryRow(ctx, query, args).Scan(&can)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return false, fmt.Errorf("no rows found for album id '%s' and user id '%s'", albumId, userId)
@@ -49,7 +49,7 @@ func (r *AlbumRepo) CanReadAlbum(ctx context.Context, albumId, userId string) (b
 // Permits:
 // - album owner
 // - album user with editor role
-func (r *AlbumRepo) CanWriteAlbum(ctx context.Context, albumId, userId string) (bool, error) {
+func (repo *AlbumRepo) CanWriteAlbum(ctx context.Context, albumId, userId string) (bool, error) {
 	query := `select exists (
 		select 1 from albums where id = @albumId and user_id = @userId
 		union
@@ -62,7 +62,7 @@ func (r *AlbumRepo) CanWriteAlbum(ctx context.Context, albumId, userId string) (
 		"albumId": albumId,
 		"userId":  userId,
 	}
-	err := r.db.QueryRow(ctx, query, args).Scan(&can)
+	err := repo.db.QueryRow(ctx, query, args).Scan(&can)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return false, fmt.Errorf("no rows found for album id '%s' and user id '%s'", albumId, userId)
@@ -74,10 +74,10 @@ func (r *AlbumRepo) CanWriteAlbum(ctx context.Context, albumId, userId string) (
 }
 
 // Checks for read access
-func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model.Album, error) {
+func (repo *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model.Album, error) {
 	var err error
 
-	canRead, err := r.CanReadAlbum(ctx, albumId, userId)
+	canRead, err := repo.CanReadAlbum(ctx, albumId, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model
 
 	var album model.Album
 
-	err = r.db.QueryRow(ctx, query, albumId).Scan(
+	err = repo.db.QueryRow(ctx, query, albumId).Scan(
 		&album.Id,
 		&album.UserId,
 		&album.Name,
@@ -121,7 +121,7 @@ func (r *AlbumRepo) GetById(ctx context.Context, albumId, userId string) (*model
 }
 
 // Get all albums irrespective of if the user is the owner or just a member
-func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, error) {
+func (repo *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, error) {
 	query := `select
 		id,
 		user_id,
@@ -147,7 +147,7 @@ func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, e
 	from albums a join album_users au on a.id = au.album_id where au.user_id = $1
 	order by created_at desc`
 
-	rows, err := r.db.Query(ctx, query, userId)
+	rows, err := repo.db.Query(ctx, query, userId)
 	if err != nil {
 		slog.Debug(err.Error())
 		return nil, fmt.Errorf("unable to query albums: %v", err)
@@ -157,7 +157,7 @@ func (r *AlbumRepo) GetAll(ctx context.Context, userId string) ([]model.Album, e
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Album])
 }
 
-func (r *AlbumRepo) GetUserRole(ctx context.Context, albumId, userId string) (string, error) {
+func (repo *AlbumRepo) GetUserRole(ctx context.Context, albumId, userId string) (string, error) {
 	query := `select role from album_users where album_id = @albumId and user_id = @userId`
 
 	var role string
@@ -166,7 +166,7 @@ func (r *AlbumRepo) GetUserRole(ctx context.Context, albumId, userId string) (st
 		"albumId": albumId,
 		"userId":  userId,
 	}
-	err := r.db.QueryRow(ctx, query, args).Scan(&role)
+	err := repo.db.QueryRow(ctx, query, args).Scan(&role)
 	if err != nil {
 		slog.Debug(err.Error())
 		if err == pgx.ErrNoRows {
@@ -179,10 +179,10 @@ func (r *AlbumRepo) GetUserRole(ctx context.Context, albumId, userId string) (st
 }
 
 // Checks for read access
-func (r *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]model.AlbumUserWithUser, error) {
+func (repo *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]model.AlbumUserWithUser, error) {
 	var err error
 
-	canRead, err := r.CanReadAlbum(ctx, albumId, userId)
+	canRead, err := repo.CanReadAlbum(ctx, albumId, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +210,7 @@ func (r *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]mod
 
 	var albumUsers []model.AlbumUserWithUser
 
-	rows, err := r.db.Query(ctx, query, albumId)
+	rows, err := repo.db.Query(ctx, query, albumId)
 	if err != nil {
 		slog.Debug(err.Error())
 		return nil, fmt.Errorf("unable to query users or album users: %v", err)
@@ -249,10 +249,10 @@ func (r *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]mod
 }
 
 // Checks for read access
-func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]model.Photo, error) {
+func (repo *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]model.Photo, error) {
 	var err error
 
-	canRead, err := r.CanReadAlbum(ctx, albumId, userId)
+	canRead, err := repo.CanReadAlbum(ctx, albumId, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]mo
 	where ap.album_id = $1
 	order by p.created_at desc`
 
-	rows, err := r.db.Query(ctx, query, albumId)
+	rows, err := repo.db.Query(ctx, query, albumId)
 	if err != nil {
 		slog.Debug(err.Error())
 		return nil, fmt.Errorf("unable to query photos: %v", err)
@@ -284,7 +284,7 @@ func (r *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]mo
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Photo])
 }
 
-func (r *AlbumRepo) GetPhoto(ctx context.Context, albumId, userId, photoId string) (*model.Photo, error) {
+func (repo *AlbumRepo) GetPhoto(ctx context.Context, albumId, userId, photoId string) (*model.Photo, error) {
 	query := `select
 		p.id,
 		p.user_id,
@@ -307,7 +307,7 @@ func (r *AlbumRepo) GetPhoto(ctx context.Context, albumId, userId, photoId strin
 		"photoId": photoId,
 	}
 
-	err = r.db.QueryRow(ctx, query, args).Scan(
+	err = repo.db.QueryRow(ctx, query, args).Scan(
 		&photo.Id,
 		&photo.UserId,
 		&photo.Location,
@@ -327,7 +327,7 @@ func (r *AlbumRepo) GetPhoto(ctx context.Context, albumId, userId, photoId strin
 	return &photo, nil
 }
 
-func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
+func (repo *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 	query := `insert into albums (
 		user_id,
 		name,
@@ -352,7 +352,7 @@ func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 		"isShareLinkEnabled": album.IsShareLinkEnabled,
 		"readAccessHash":     album.ReadAccessHash,
 	}
-	_, err := r.db.Exec(ctx, query, args)
+	_, err := repo.db.Exec(ctx, query, args)
 	if err != nil {
 		slog.Debug(err.Error())
 		return fmt.Errorf("unable to insert row: %w", err)
@@ -363,15 +363,15 @@ func (r *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 
 // TODO: control which fields can be updated
 // Checks for write access
-func (r *AlbumRepo) Update(ctx context.Context, album model.Album, userId string) error {
+func (repo *AlbumRepo) Update(ctx context.Context, album model.Album, userId string) error {
 	return nil
 }
 
 // Checks for write access
-func (r *AlbumRepo) InsertUsers(ctx context.Context, albumId string, albumUsers []model.AlbumUser, userId string) error {
+func (repo *AlbumRepo) InsertUsers(ctx context.Context, albumId string, albumUsers []model.AlbumUser, userId string) error {
 	var err error
 
-	canWrite, err := r.CanWriteAlbum(ctx, albumId, userId)
+	canWrite, err := repo.CanWriteAlbum(ctx, albumId, userId)
 	if err != nil {
 		return err
 	}
@@ -400,7 +400,7 @@ func (r *AlbumRepo) InsertUsers(ctx context.Context, albumId string, albumUsers 
 		batch.Queue(query, args)
 	}
 
-	results := r.db.SendBatch(ctx, batch)
+	results := repo.db.SendBatch(ctx, batch)
 	defer results.Close()
 
 	for _, albumUser := range albumUsers {
@@ -421,21 +421,21 @@ func (r *AlbumRepo) InsertUsers(ctx context.Context, albumId string, albumUsers 
 
 // TODO
 // Checks for write access
-func (r *AlbumRepo) UpdateUsers(ctx context.Context, usersToUpdate []model.AlbumUser, userId string) error {
+func (repo *AlbumRepo) UpdateUsers(ctx context.Context, usersToUpdate []model.AlbumUser, userId string) error {
 	return nil
 }
 
 // TODO
 // Checks for write access
-func (r *AlbumRepo) RemoveUsers(ctx context.Context, userIdsToRemove []string, userId string) error {
+func (repo *AlbumRepo) RemoveUsers(ctx context.Context, userIdsToRemove []string, userId string) error {
 	return nil
 }
 
 // Checks for write access
-func (r *AlbumRepo) InsertPhotos(ctx context.Context, albumId string, photoIds []string, userId string) error {
+func (repo *AlbumRepo) InsertPhotos(ctx context.Context, albumId string, photoIds []string, userId string) error {
 	var err error
 
-	canWrite, err := r.CanWriteAlbum(ctx, albumId, userId)
+	canWrite, err := repo.CanWriteAlbum(ctx, albumId, userId)
 	if err != nil {
 		return err
 	}
@@ -464,7 +464,7 @@ func (r *AlbumRepo) InsertPhotos(ctx context.Context, albumId string, photoIds [
 		batch.Queue(query, args)
 	}
 
-	results := r.db.SendBatch(ctx, batch)
+	results := repo.db.SendBatch(ctx, batch)
 	defer results.Close()
 
 	for _, photoId := range photoIds {
@@ -485,6 +485,6 @@ func (r *AlbumRepo) InsertPhotos(ctx context.Context, albumId string, photoIds [
 
 // TODO
 // Checks for write access
-func (r *AlbumRepo) RemovePhotos(ctx context.Context, photoIds []string, userId string) error {
+func (repo *AlbumRepo) RemovePhotos(ctx context.Context, photoIds []string, userId string) error {
 	return nil
 }

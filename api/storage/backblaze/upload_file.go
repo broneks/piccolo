@@ -20,9 +20,9 @@ func getConcurrentUploads(bytes int32) int {
 	return 1
 }
 
-func (b *BackblazeClient) UploadFile(ctx context.Context, fileUpload types.FileUpload) (string, error) {
+func (bc *BackblazeClient) UploadFile(ctx context.Context, fileUpload types.FileUpload) (string, error) {
 	name := newObjectName(fileUpload.Filename, fileUpload.UserId)
-	obj := b.bucket.Object(name)
+	obj := bc.bucket.Object(name)
 
 	w := obj.NewWriter(ctx)
 

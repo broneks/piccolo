@@ -16,14 +16,14 @@ type RegisterReq struct {
 	Password string `json:"password" validate:"required,min=14"`
 }
 
-func (m *AuthModule) registerHandler(c echo.Context) error {
+func (mod *AuthModule) registerHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	req := new(RegisterReq)
 
 	var err error
 
 	if err = c.Bind(req); err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid input",
@@ -39,14 +39,14 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 
 	hash, err := hashPassword(req.Password)
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
 		})
 	}
 
-	err = m.userRepo.InsertOne(ctx, model.User{
+	err = mod.userRepo.InsertOne(ctx, model.User{
 		Username: pgtype.Text{String: req.Email, Valid: true},
 		Email:    pgtype.Text{String: req.Email, Valid: true},
 		Hash:     pgtype.Text{String: hash, Valid: true},
@@ -61,7 +61,7 @@ func (m *AuthModule) registerHandler(c echo.Context) error {
 			})
 
 		default:
-			m.server.Logger.Error(err.Error())
+			mod.server.Logger.Error(err.Error())
 			return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 				Success: false,
 				Message: "Unexpected error",

@@ -10,6 +10,6 @@ func NewValidator() *Validator {
 	return &Validator{validator.New(validator.WithRequiredStructEnabled())}
 }
 
-func (v *Validator) Validate(i interface{}) error {
-	return v.validator.Struct(i)
+func (va *Validator) Validate(i interface{}) error {
+	return va.validator.Struct(i)
 }

@@ -9,12 +9,12 @@ import (
 	"github.com/Backblaze/blazer/b2"
 )
 
-func (b *BackblazeClient) doesObjectExist(ctx context.Context, filename, userId string) bool {
+func (bc *BackblazeClient) doesObjectExist(ctx context.Context, filename, userId string) bool {
 	if filename == "" {
 		return false
 	}
 
-	iterator := b.bucket.List(ctx, b2.ListPrefix(userId))
+	iterator := bc.bucket.List(ctx, b2.ListPrefix(userId))
 
 	for iterator.Next() {
 		obj := iterator.Object()

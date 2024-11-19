@@ -13,7 +13,7 @@ type LoginReq struct {
 	Password string `json:"password" validate:"required"`
 }
 
-func (m *AuthModule) loginHandler(c echo.Context) error {
+func (mod *AuthModule) loginHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	req := new(LoginReq)
 
@@ -30,9 +30,9 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	user, err := m.userRepo.GetByEmail(ctx, req.Email)
+	user, err := mod.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
@@ -53,13 +53,13 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 		})
 	}
 
-	if err = m.userRepo.UpdateLastLoginAt(ctx, user.Id.String); err != nil {
-		m.server.Logger.Error(err.Error())
+	if err = mod.userRepo.UpdateLastLoginAt(ctx, user.Id.String); err != nil {
+		mod.server.Logger.Error(err.Error())
 	}
 
 	accessToken, err := jwtoken.NewAccessJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
@@ -68,7 +68,7 @@ func (m *AuthModule) loginHandler(c echo.Context) error {
 
 	refreshToken, err := jwtoken.NewRefreshJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 	}
 
 	// TODO is this needed?

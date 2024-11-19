@@ -16,7 +16,7 @@ type User struct {
 	UpdatedAt   pgtype.Timestamptz `json:"-"`
 }
 
-func (u *User) CheckPassword(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Hash.String), []byte(password))
+func (user *User) CheckPassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(user.Hash.String), []byte(password))
 	return err == nil
 }

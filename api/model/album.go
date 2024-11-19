@@ -18,10 +18,10 @@ type Album struct {
 	UpdatedAt          pgtype.Timestamptz `json:"-"`
 }
 
-func (a *Album) SetReadAccessHash() {
-	if a.IsShareLinkEnabled.Bool {
-		a.ReadAccessHash = pgtype.Text{String: util.GenerateRandomHash(), Valid: true}
+func (album *Album) SetReadAccessHash() {
+	if album.IsShareLinkEnabled.Bool {
+		album.ReadAccessHash = pgtype.Text{String: util.GenerateRandomHash(), Valid: true}
 	} else {
-		a.ReadAccessHash = pgtype.Text{Valid: false} // nil
+		album.ReadAccessHash = pgtype.Text{Valid: false} // nil
 	}
 }

@@ -4,10 +4,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *AuthModule) Routes(g *echo.Group) {
+func (mod *AuthModule) Routes(g *echo.Group) {
 	auth := g.Group("/auth")
 
-	auth.POST("/register", m.registerHandler)
-	auth.POST("/login", m.loginHandler)
-	auth.POST("/refresh", m.refreshHandler)
+	auth.POST("/register", mod.registerHandler)
+	auth.POST("/login", mod.loginHandler)
+	auth.POST("/refresh", mod.refreshHandler)
 }

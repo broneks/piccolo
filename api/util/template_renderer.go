@@ -11,12 +11,12 @@ type TemplateRenderer struct {
 	templates *template.Template
 }
 
-func (t *TemplateRenderer) Render(w io.Writer, name string, data any, c echo.Context) error {
+func (tr *TemplateRenderer) Render(w io.Writer, name string, data any, c echo.Context) error {
 	if viewContext, isMap := data.(map[string]any); isMap {
 		viewContext["reverse"] = c.Echo().Reverse
 	}
 
-	return t.templates.ExecuteTemplate(w, name, data)
+	return tr.templates.ExecuteTemplate(w, name, data)
 }
 
 func NewTemplateRenderer(dirPath string) *TemplateRenderer {

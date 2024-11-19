@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (m *PhotoModule) getPhotoAlbumsHandler(c echo.Context) error {
+func (mod *PhotoModule) getPhotoAlbumsHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
@@ -17,7 +17,7 @@ func (m *PhotoModule) getPhotoAlbumsHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
 	}
 
-	albums, err := m.photoRepo.GetAlbums(ctx, photoId, userId)
+	albums, err := mod.photoRepo.GetAlbums(ctx, photoId, userId)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, types.SuccessRes{
 			Success: false,

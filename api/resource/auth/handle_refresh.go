@@ -30,10 +30,10 @@ func getRefreshTokenString(c echo.Context) (string, error) {
 	return tokenString, nil
 }
 
-func (m *AuthModule) refreshHandler(c echo.Context) error {
+func (mod *AuthModule) refreshHandler(c echo.Context) error {
 	refreshToken, err := getRefreshTokenString(c)
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
@@ -63,7 +63,7 @@ func (m *AuthModule) refreshHandler(c echo.Context) error {
 
 	accessToken, err := jwtoken.NewAccessJwt(userId, userEmail).GenerateToken()
 	if err != nil {
-		m.server.Logger.Error(err.Error())
+		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
