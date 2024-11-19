@@ -2,8 +2,8 @@ package album
 
 import (
 	"net/http"
+	"piccolo/api/helper"
 	"piccolo/api/types"
-	"piccolo/api/util"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,7 +12,7 @@ func (mod *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
-	albumId := util.GetIdParam(c)
+	albumId := helper.GetIdParam(c)
 	if albumId == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
 	}

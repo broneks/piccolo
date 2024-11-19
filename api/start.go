@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"piccolo/api/helper"
 	"piccolo/api/middleware"
 	"piccolo/api/page"
 	"piccolo/api/resource"
+	"piccolo/api/service"
 	"piccolo/api/storage/backblaze"
 	"piccolo/api/storage/pg"
 	"piccolo/api/storage/redis"
 	"piccolo/api/types"
-	"piccolo/api/util"
 
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
@@ -58,8 +59,8 @@ func Start() {
 	e.Static("/", "static")
 
 	e.IPExtractor = echo.ExtractIPDirect()
-	e.Validator = util.NewValidator()
-	e.Renderer = util.NewTemplateRenderer("templates/*.html")
+	e.Validator = service.NewValidator()
+	e.Renderer = service.NewTemplateRenderer("templates/*.html")
 	e.HTTPErrorHandler = httpErrorHandler
 
 	server := newServer(context.Background())
@@ -68,7 +69,7 @@ func Start() {
 	resource.Routes(e.Group("/api"), server)
 
 	if env == "local" {
-		util.ListAllRoutes(e)
+		helper.ListAllRoutes(e)
 	}
 
 	e.HideBanner = true

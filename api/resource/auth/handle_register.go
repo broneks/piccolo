@@ -2,9 +2,9 @@ package auth
 
 import (
 	"net/http"
+	"piccolo/api/helper"
 	"piccolo/api/model"
 	"piccolo/api/types"
-	"piccolo/api/util"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -53,7 +53,7 @@ func (mod *AuthModule) registerHandler(c echo.Context) error {
 		HashedAt: pgtype.Timestamptz{Time: time.Now(), Valid: true},
 	})
 	if err != nil {
-		switch util.CheckSqlError(err) {
+		switch helper.CheckSqlError(err) {
 		case "unique-violation":
 			return c.JSON(http.StatusBadRequest, types.SuccessRes{
 				Success: false,

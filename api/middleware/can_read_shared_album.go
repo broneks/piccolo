@@ -3,8 +3,8 @@ package middleware
 import (
 	"log/slog"
 	"net/http"
+	"piccolo/api/helper"
 	"piccolo/api/repo"
-	"piccolo/api/util"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,7 +12,7 @@ import (
 func CanReadSharedAlbum(sharedAlbumRepo *repo.SharedAlbumRepo) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			albumId := util.GetIdParam(c)
+			albumId := helper.GetIdParam(c)
 			if albumId == "" {
 				return echo.NewHTTPError(http.StatusNotFound)
 			}

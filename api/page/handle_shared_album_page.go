@@ -2,10 +2,10 @@ package page
 
 import (
 	"net/http"
+	"piccolo/api/helper"
 	"piccolo/api/model"
 	"piccolo/api/repo"
 	"piccolo/api/types"
-	"piccolo/api/util"
 	"sync"
 
 	"github.com/labstack/echo/v4"
@@ -21,7 +21,7 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlb
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
 
-		albumId := util.GetIdParam(c)
+		albumId := helper.GetIdParam(c)
 
 		var wg sync.WaitGroup
 		wg.Add(2)

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"piccolo/api/helper"
 	"piccolo/api/model"
 	"piccolo/api/types"
-	"piccolo/api/util"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -406,7 +406,7 @@ func (repo *AlbumRepo) InsertUsers(ctx context.Context, albumId string, albumUse
 	for _, albumUser := range albumUsers {
 		_, err := results.Exec()
 		if err != nil {
-			if sqlErr := util.CheckSqlError(err); sqlErr == "unique-violation" {
+			if sqlErr := helper.CheckSqlError(err); sqlErr == "unique-violation" {
 				slog.Debug(fmt.Sprintf("album user \"%s\" already exists", albumUser.UserId.String))
 				continue
 			}
@@ -470,7 +470,7 @@ func (repo *AlbumRepo) InsertPhotos(ctx context.Context, albumId string, photoId
 	for _, photoId := range photoIds {
 		_, err := results.Exec()
 		if err != nil {
-			if sqlErr := util.CheckSqlError(err); sqlErr == "unique-violation" {
+			if sqlErr := helper.CheckSqlError(err); sqlErr == "unique-violation" {
 				slog.Debug(fmt.Sprintf("photo \"%s\" already exists", photoId))
 				continue
 			}
