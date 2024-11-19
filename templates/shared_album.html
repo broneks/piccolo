@@ -1,0 +1,19 @@
+<div style="max-width: 600px; margin: 10% auto 0; padding: 16px;">
+  <header>
+    <h1>{{.Album.Name.String}}</h1>
+    <time>{{.Album.CreatedAt.Time}}</time>
+
+    {{if .CoverPhoto}}
+    <img src="{{.CoverPhoto.Url}}" alt="" style="max-width: 600px;" loading="lazy" draggable="false" />
+    {{end}}
+  </header>
+
+  <h3>Photos:</h3>
+  <ul>
+    {{range .Photos}}
+    <li><img src="{{.Url}}" alt="{{.Filename}}" style="max-width: 600px;" loading="lazy" draggable="false" /></li>
+    {{end}}
+  </ul>
+</div>
+
+

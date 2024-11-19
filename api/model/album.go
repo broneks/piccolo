@@ -19,5 +19,9 @@ type Album struct {
 }
 
 func (a *Album) SetReadAccessHash() {
-	a.ReadAccessHash = pgtype.Text{String: util.GenerateRandomHash(), Valid: true}
+	if a.IsShareLinkEnabled.Bool {
+		a.ReadAccessHash = pgtype.Text{String: util.GenerateRandomHash(), Valid: true}
+	} else {
+		a.ReadAccessHash = pgtype.Text{Valid: false} // nil
+	}
 }

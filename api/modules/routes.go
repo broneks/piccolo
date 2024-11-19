@@ -13,11 +13,11 @@ import (
 )
 
 func Routes(g *echo.Group, server *types.Server) {
+	g.RouteNotFound("/*", handleNotFound)
+
 	g.GET("/health", handleHealth(server))
 
-	v1 := g.Group("/v1")
-
-	v1.Use(middleware.SetUserData())
+	v1 := g.Group("/v1", middleware.SetUserData())
 
 	userRepo := repo.NewUserRepo(server.DB)
 	photoRepo := repo.NewPhotoRepo(server.DB)

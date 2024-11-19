@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"os"
 	"piccolo/api/middleware"
 	"piccolo/api/modules"
+	"piccolo/api/pages"
 	"piccolo/api/storage/backblaze"
 	"piccolo/api/storage/pg"
 	"piccolo/api/storage/redis"
@@ -18,30 +18,12 @@ import (
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
-func Start() {
-	env := os.Getenv("ENV")
-
+func newServer(ctx context.Context) *types.Server {
 	var err error
-
-	e := echo.New()
-
-	e.IPExtractor = echo.ExtractIPDirect()
-	e.Validator = util.NewValidator()
-
-	// custom
-	e.Use(middleware.Logger())
-
-	// echo built-in
-	e.Use(echoMiddleware.Recover())
-	e.Use(echoMiddleware.RequestID())
-	e.Use(echoMiddleware.Secure())
-
-	e.Static("/", "static")
-	e.Renderer = util.NewTemplateRenderer("templates/*.html")
 
 	logger := slog.Default()
 
-	dbClient, err := pg.NewClient(context.Background())
+	dbClient, err := pg.NewClient(ctx)
 	if err != nil {
 		logger.Error(fmt.Sprintf("Cannot create database client: %v", err.Error()))
 		os.Exit(1)
@@ -49,25 +31,40 @@ func Start() {
 
 	redisClient := redis.NewClient()
 
-	backblazeClient, err := backblaze.NewClient(context.Background())
+	backblazeClient, err := backblaze.NewClient(ctx)
 	if err != nil {
 		logger.Error(fmt.Sprintf("Cannot create backblaze client: %v", err.Error()))
 		os.Exit(1)
 	}
 
-	server := &types.Server{
+	return &types.Server{
 		Logger:        logger,
 		DB:            dbClient,
 		Cache:         redisClient,
 		ObjectStorage: backblazeClient,
 	}
+}
 
-	// TODO remove
-	e.GET("/test", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "test.html", map[string]any{
-			"name": "Dolly!",
-		})
-	})
+func Start() {
+	env := os.Getenv("ENV")
+
+	e := echo.New()
+
+	e.Use(middleware.Logger())
+	e.Use(echoMiddleware.Recover())
+	e.Use(echoMiddleware.RequestID())
+	e.Use(echoMiddleware.Secure())
+
+	e.Static("/", "static")
+
+	e.IPExtractor = echo.ExtractIPDirect()
+	e.Validator = util.NewValidator()
+	e.Renderer = util.NewTemplateRenderer("templates/*.html")
+	e.HTTPErrorHandler = httpErrorHandler
+
+	server := newServer(context.Background())
+
+	pages.Routes(e, server)
 
 	g := e.Group("/api")
 	modules.Routes(g, server)
