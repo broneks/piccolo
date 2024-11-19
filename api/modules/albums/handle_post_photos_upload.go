@@ -40,7 +40,7 @@ func (m *AlbumsModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 		)
 	}
 
-	photoIds, err := m.photosService.UploadFiles(ctx, files, userId)
+	photoIds, err := m.photoService.UploadFiles(ctx, files, userId)
 	if err != nil {
 		m.server.Logger.Error(err.Error())
 		return c.JSON(

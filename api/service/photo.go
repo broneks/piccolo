@@ -5,36 +5,49 @@ import (
 	"fmt"
 	"mime/multipart"
 	"piccolo/api/model"
+	"piccolo/api/repo"
 	"piccolo/api/types"
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func (m *PhotosService) handleFileUpload(ctx context.Context, fileHeader *multipart.FileHeader, userId string, resultCh chan<- model.Photo) {
+type PhotoService struct {
+	server    *types.Server
+	photoRepo *repo.PhotoRepo
+}
+
+func NewPhotoService(server *types.Server, photoRepo *repo.PhotoRepo) *PhotoService {
+	return &PhotoService{
+		server:    server,
+		photoRepo: photoRepo,
+	}
+}
+
+func (s *PhotoService) handleFileUpload(ctx context.Context, fileHeader *multipart.FileHeader, userId string, resultCh chan<- model.Photo) {
 	fileSize := int32(fileHeader.Size)
 
 	file, err := fileHeader.Open()
 	if err != nil {
-		m.server.Logger.Error(fmt.Sprintf("Error opening file %s: %v", fileHeader.Filename, err))
+		s.server.Logger.Error(fmt.Sprintf("Error opening file %s: %v", fileHeader.Filename, err))
 		return
 	}
 	defer file.Close()
 
-	m.server.Logger.Debug(fmt.Sprintf("Uploading file: %s", fileHeader.Filename))
+	s.server.Logger.Debug(fmt.Sprintf("Uploading file: %s", fileHeader.Filename))
 
-	location, err := m.server.ObjectStorage.UploadFile(ctx, types.FileUpload{
+	location, err := s.server.ObjectStorage.UploadFile(ctx, types.FileUpload{
 		File:     &file,
 		Filename: fileHeader.Filename,
 		FileSize: fileSize,
 		UserId:   userId,
 	})
 	if err != nil {
-		m.server.Logger.Error(fmt.Sprintf("Error uploading file \"%s\": %v", fileHeader.Filename, err))
+		s.server.Logger.Error(fmt.Sprintf("Error uploading file \"%s\": %v", fileHeader.Filename, err))
 		return
 	}
 
-	m.server.Logger.Debug(fmt.Sprintf("File uploaded successfully: %s\n", location))
+	s.server.Logger.Debug(fmt.Sprintf("File uploaded successfully: %s\n", location))
 
 	photo := model.Photo{
 		Location:    pgtype.Text{String: location, Valid: true},
@@ -47,7 +60,7 @@ func (m *PhotosService) handleFileUpload(ctx context.Context, fileHeader *multip
 }
 
 // TODO: batch upload
-func (m *PhotosService) UploadFiles(ctx context.Context, fileHeaders []*multipart.FileHeader, userId string) ([]string, error) {
+func (s *PhotoService) UploadFiles(ctx context.Context, fileHeaders []*multipart.FileHeader, userId string) ([]string, error) {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var photos []model.Photo
@@ -56,7 +69,7 @@ func (m *PhotosService) UploadFiles(ctx context.Context, fileHeaders []*multipar
 
 	for _, fileHeader := range fileHeaders {
 		if fileHeader == nil {
-			m.server.Logger.Debug("received nil fileHeader")
+			s.server.Logger.Debug("received nil fileHeader")
 			continue
 		}
 
@@ -64,7 +77,7 @@ func (m *PhotosService) UploadFiles(ctx context.Context, fileHeaders []*multipar
 
 		go func(fh *multipart.FileHeader) {
 			defer wg.Done()
-			m.handleFileUpload(ctx, fileHeader, userId, resultCh)
+			s.handleFileUpload(ctx, fileHeader, userId, resultCh)
 		}(fileHeader)
 	}
 
@@ -82,7 +95,7 @@ func (m *PhotosService) UploadFiles(ctx context.Context, fileHeaders []*multipar
 		return nil, nil
 	}
 
-	ids, err := m.photoRepo.InsertMany(ctx, photos, userId)
+	ids, err := s.photoRepo.InsertMany(ctx, photos, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert photos: %v", err)
 	}

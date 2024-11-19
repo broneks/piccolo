@@ -5,8 +5,8 @@ import (
 	"piccolo/api/modules/albums"
 	"piccolo/api/modules/auth"
 	"piccolo/api/modules/photos"
-	photosservice "piccolo/api/modules/photos/service"
 	"piccolo/api/repo"
+	"piccolo/api/service"
 	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
@@ -23,14 +23,14 @@ func Routes(g *echo.Group, server *types.Server) {
 	photoRepo := repo.NewPhotoRepo(server.DB)
 	albumRepo := repo.NewAlbumRepo(server.DB)
 
-	photosService := photosservice.New(server, photoRepo)
+	photoService := service.NewPhotoService(server, photoRepo)
 
 	authModule := auth.New(server, userRepo)
 	authModule.Routes(v1)
 
-	photosModule := photos.New(server, photoRepo, photosService)
+	photosModule := photos.New(server, photoRepo, photoService)
 	photosModule.Routes(v1)
 
-	albumsModule := albums.New(server, albumRepo, photosService)
+	albumsModule := albums.New(server, albumRepo, photoService)
 	albumsModule.Routes(v1)
 }

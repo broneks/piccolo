@@ -34,7 +34,7 @@ func (m *PhotosModule) postPhotosUploadHandler(c echo.Context) error {
 		)
 	}
 
-	if _, err = m.photosService.UploadFiles(ctx, files, userId); err != nil {
+	if _, err = m.photoService.UploadFiles(ctx, files, userId); err != nil {
 		m.server.Logger.Error(err.Error())
 		return c.JSON(
 			http.StatusBadRequest,
