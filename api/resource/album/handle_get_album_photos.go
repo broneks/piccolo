@@ -15,7 +15,10 @@ func (mod *AlbumModule) getAlbumPhotosHandler(c echo.Context) error {
 
 	albumId := helper.GetIdParam(c)
 	if albumId == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: "Invalid id param.",
+		})
 	}
 
 	photos, err := mod.albumRepo.GetPhotos(ctx, albumId, userId)
