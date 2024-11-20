@@ -35,16 +35,9 @@ func (mod *AuthModule) forgotPasswordHandler(c echo.Context) error {
 	user, err := mod.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
 		mod.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
+		return c.JSON(http.StatusUnprocessableEntity, types.SuccessRes{
 			Success: false,
-			Message: "Unexpected error",
-		})
-	}
-
-	if user == nil {
-		return c.JSON(http.StatusBadRequest, types.SuccessRes{
-			Success: false,
-			Message: "Invalid email.",
+			Message: "Cannot reset password.",
 		})
 	}
 
@@ -53,9 +46,7 @@ func (mod *AuthModule) forgotPasswordHandler(c echo.Context) error {
 		mod.server.Logger.Error(err.Error())
 	}
 
-	baseUrl := c.Request().URL.String()
-
-	err = mod.server.Mailer.SendResetPassword(ctx, user.Email.String, baseUrl, resetPasswordToken)
+	err = mod.server.Mailer.SendResetPassword(ctx, user.Email.String, resetPasswordToken)
 	if err != nil {
 		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{

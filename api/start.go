@@ -52,6 +52,7 @@ func newServer(ctx context.Context) *types.Server {
 
 func Start() {
 	env := os.Getenv("ENV")
+	appUrl := os.Getenv("APP_BASE_URL")
 
 	e := echo.New()
 
@@ -77,5 +78,5 @@ func Start() {
 	}
 
 	e.HideBanner = true
-	e.Logger.Fatal(e.Start("0.0.0.0:8001"))
+	e.Logger.Fatal(e.Start(appUrl))
 }

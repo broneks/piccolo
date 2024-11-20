@@ -16,7 +16,7 @@ type ServerLogger interface {
 }
 
 type ServerMailer interface {
-	SendResetPassword(ctx context.Context, email, baseUrl, token string) error
+	SendResetPassword(ctx context.Context, email, token string) error
 }
 
 // TODO: remove pg references - use database/sql?
