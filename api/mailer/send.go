@@ -1,24 +1,37 @@
 package mailer
 
 import (
+	"context"
 	"fmt"
-	"net/smtp"
+	"log/slog"
+	"time"
+
+	"github.com/mailersend/mailersend-go"
 )
 
-func (m *Mailer) Send(to, message string) error {
-	if to == "" {
-		return fmt.Errorf("to is required")
-	}
-	if message == "" {
-		return fmt.Errorf("message is required")
+func (mail *Mailer) send(ctx context.Context, templateId, subject string, recipients []mailersend.Recipient, personalizations []mailersend.Personalization) (string, error) {
+	if templateId == "" {
+		return "", fmt.Errorf("template id is required")
 	}
 
-	body := []byte(message)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
 
-	err := smtp.SendMail(fmt.Sprintf("%s:%s", m.host, m.port), m.auth, m.from, []string{to}, body)
+	message := mail.ms.Email.NewMessage()
+
+	message.SetFrom(mail.from)
+	message.SetRecipients(recipients)
+	message.SetSubject(subject)
+	message.SetTemplateID(templateId)
+	message.SetPersonalization(personalizations)
+
+	res, err := mail.ms.Email.Send(ctx, message)
 	if err != nil {
-		return err
+		slog.Error(err.Error())
+		return "", err
 	}
 
-	return nil
+	messageId := res.Header.Get("x-message-id")
+
+	return messageId, nil
 }

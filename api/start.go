@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"piccolo/api/helper"
+	"piccolo/api/mailer"
 	"piccolo/api/middleware"
 	"piccolo/api/page"
 	"piccolo/api/resource"
@@ -38,8 +39,11 @@ func newServer(ctx context.Context) *types.Server {
 		os.Exit(1)
 	}
 
+	mailerClient := mailer.New()
+
 	return &types.Server{
 		Logger:        logger,
+		Mailer:        mailerClient,
 		DB:            dbClient,
 		Cache:         redisClient,
 		ObjectStorage: backblazeClient,

@@ -1,29 +1,26 @@
 package mailer
 
 import (
-	"net/smtp"
 	"os"
+
+	"github.com/mailersend/mailersend-go"
 )
 
 type Mailer struct {
-	auth smtp.Auth
-	host string
-	port string
-	from string
+	ms   *mailersend.Mailersend
+	from mailersend.Recipient
 }
 
 func New() *Mailer {
-	host := os.Getenv("SMTP_HOST")
-	port := os.Getenv("SMTP_PORT")
-	password := os.Getenv("SMTP_PASSWORD")
-	from := os.Getenv("SMTP_FROM_EMAIL")
+	ms := mailersend.NewMailersend(os.Getenv("MAILERSEND_API_KEY"))
 
-	auth := smtp.PlainAuth("", from, password, host)
+	from := mailersend.From{
+		Name:  "Piccolo",
+		Email: os.Getenv("MAILERSEND_FROM_EMAIL"),
+	}
 
 	return &Mailer{
-		auth,
-		host,
-		port,
+		ms,
 		from,
 	}
 }
