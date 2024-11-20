@@ -9,19 +9,20 @@ import (
 )
 
 type JwtClaims struct {
-	Email string `json:"email"`
 	jwt.RegisteredClaims
+	Email  string `json:"email"`
+	Action string `json:"action"`
 }
 
 type JwtClient struct {
 	claims JwtClaims
 }
 
-const AccessExpirationDuration = time.Hour * 4           // 4 hours
-const RefreshExpirationDuration = time.Hour * (24 * 14)  // 14 days
-const ResetPasswordExpirationDuration = time.Minute * 30 // 30 minutes
+const AccessExpirationDuration = time.Hour * 4          // 4 hours
+const RefreshExpirationDuration = time.Hour * (24 * 14) // 14 days
+const ResetPasswordExpirationDuration = time.Hour       // 1 hour
 
-func New(subject, email string, expirationDuration time.Duration) *JwtClient {
+func New(action, subject, email string, expirationDuration time.Duration) *JwtClient {
 	now := time.Now()
 
 	client := &JwtClient{
@@ -36,6 +37,7 @@ func New(subject, email string, expirationDuration time.Duration) *JwtClient {
 				ID:        uuid.NewString(),
 			},
 			Email: email,
+			Action: action,
 		},
 	}
 
@@ -43,13 +45,13 @@ func New(subject, email string, expirationDuration time.Duration) *JwtClient {
 }
 
 func NewAccessJwt(userId, email string) *JwtClient {
-	return New(userId, email, AccessExpirationDuration)
+	return New("access", userId, email, AccessExpirationDuration)
 }
 
 func NewRefreshJwt(userId, email string) *JwtClient {
-	return New(userId, email, RefreshExpirationDuration)
+	return New("refresh", userId, email, RefreshExpirationDuration)
 }
 
 func NewResetPasswordJwt(email string) *JwtClient {
-	return New(email, email, ResetPasswordExpirationDuration)
+	return New("reset-password", email, email, ResetPasswordExpirationDuration)
 }

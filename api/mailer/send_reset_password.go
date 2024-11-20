@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/mailersend/mailersend-go"
 )
 
 const RESET_PASSWORD_TEMPLATE_ID = "pxkjn416wzqgz781"
+const RESET_PASSWORD_ROUTE = "/reset-password"
 
 func (mail *Mailer) SendResetPassword(ctx context.Context, email, token string) error {
 	appUrl := os.Getenv("APP_BASE_URL")
@@ -27,7 +29,7 @@ func (mail *Mailer) SendResetPassword(ctx context.Context, email, token string) 
 		},
 	}
 
-	resetPasswordLink := fmt.Sprintf("%s?token=%s", appUrl, token)
+	resetPasswordLink := fmt.Sprintf("%s?token=%s", path.Join(appUrl, RESET_PASSWORD_ROUTE), token)
 
 	personalization := []mailersend.Personalization{
 		{

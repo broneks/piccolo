@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Payload struct {
+type SharedAlbumPayload struct {
 	*model.Album
 	CoverPhoto *model.PhotoWithUrl
 	Photos     []*model.PhotoWithUrl
@@ -59,7 +59,7 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlb
 			}
 		}
 
-		return c.Render(http.StatusOK, "shared_album.html", &Payload{
+		return c.Render(http.StatusOK, "shared_album.html", &SharedAlbumPayload{
 			Album:      album,
 			CoverPhoto: coverPhoto,
 			Photos:     photosWithUrl,
