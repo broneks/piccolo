@@ -15,7 +15,10 @@ func (mod *PhotoModule) getPhotoHandler(c echo.Context) error {
 
 	photoId := helper.GetIdParam(c)
 	if photoId == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: "Invalid id param.",
+		})
 	}
 
 	photo, err := mod.photoRepo.GetById(ctx, photoId, userId)

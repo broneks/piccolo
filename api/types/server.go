@@ -15,6 +15,10 @@ type ServerLogger interface {
 	Warn(msg string, args ...any)
 }
 
+type ServerMailer interface {
+	SendResetPassword(ctx context.Context, email, token string) error
+}
+
 // TODO: remove pg references - use database/sql?
 type ServerDB interface {
 	Begin(ctx context.Context) (pgx.Tx, error)
@@ -40,6 +44,7 @@ type ServerObjectStorage interface {
 
 type Server struct {
 	Logger        ServerLogger
+	Mailer        ServerMailer
 	DB            ServerDB
 	Cache         ServerCache
 	ObjectStorage ServerObjectStorage

@@ -27,7 +27,10 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 	}
 
 	if err = c.Validate(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: err.Error(),
+		})
 	}
 
 	user, err := mod.userRepo.GetByEmail(ctx, req.Email)

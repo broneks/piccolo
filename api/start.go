@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"piccolo/api/helper"
+	"piccolo/api/mailer"
 	"piccolo/api/middleware"
 	"piccolo/api/page"
 	"piccolo/api/resource"
@@ -38,8 +39,11 @@ func newServer(ctx context.Context) *types.Server {
 		os.Exit(1)
 	}
 
+	mailerClient := mailer.New()
+
 	return &types.Server{
 		Logger:        logger,
+		Mailer:        mailerClient,
 		DB:            dbClient,
 		Cache:         redisClient,
 		ObjectStorage: backblazeClient,
@@ -48,6 +52,7 @@ func newServer(ctx context.Context) *types.Server {
 
 func Start() {
 	env := os.Getenv("ENV")
+	appUrl := os.Getenv("APP_BASE_URL")
 
 	e := echo.New()
 
@@ -73,5 +78,5 @@ func Start() {
 	}
 
 	e.HideBanner = true
-	e.Logger.Fatal(e.Start("0.0.0.0:8001"))
+	e.Logger.Fatal(e.Start(appUrl))
 }

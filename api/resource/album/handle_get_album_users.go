@@ -14,7 +14,10 @@ func (mod *AlbumModule) getAlbumUsersHandler(c echo.Context) error {
 
 	albumId := helper.GetIdParam(c)
 	if albumId == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid id param.")
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: "Invalid id param.",
+		})
 	}
 
 	albumUsers, err := mod.albumRepo.GetUsers(ctx, albumId, userId)

@@ -10,4 +10,5 @@ func (mod *AuthModule) Routes(g *echo.Group) {
 	auth.POST("/register", mod.registerHandler)
 	auth.POST("/login", mod.loginHandler)
 	auth.POST("/refresh", mod.refreshHandler)
+	auth.POST("/forgot-password", mod.forgotPasswordHandler)
 }
