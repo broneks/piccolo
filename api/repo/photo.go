@@ -188,11 +188,6 @@ func (repo *PhotoRepo) InsertMany(ctx context.Context, photos []model.Photo, use
 }
 
 // TODO
-func (repo *PhotoRepo) Update(ctx context.Context, photo model.Photo, userId string) error {
-	return nil
-}
-
-// TODO
 // remove photo uploaded by user
 func (repo *PhotoRepo) RemoveOne(ctx context.Context, photoId, userId string) error {
 	return nil
