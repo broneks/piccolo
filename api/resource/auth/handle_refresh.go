@@ -70,9 +70,6 @@ func (mod *AuthModule) refreshHandler(c echo.Context) error {
 		})
 	}
 
-	// TODO is this needed?
-	// c.Response().Header().Set("authorization", fmt.Sprintf("Bearer %s", accessToken))
-
 	setAccessTokenCookie(c, accessToken)
 
 	return c.JSON(http.StatusOK, types.SuccessRes{
