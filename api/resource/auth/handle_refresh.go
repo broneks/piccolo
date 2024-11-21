@@ -44,17 +44,17 @@ func (mod *AuthModule) refreshHandler(c echo.Context) error {
 	}
 
 	if refreshToken == "" {
-		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+		return c.JSON(http.StatusUnauthorized, types.SuccessRes{
 			Success: false,
-			Message: "Token is missing.",
+			Message: "Unauthorized: Token is invalid.",
 		})
 	}
 
 	isValid := jwtoken.VerifyToken(refreshToken)
 	if !isValid {
-		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+		return c.JSON(http.StatusUnauthorized, types.SuccessRes{
 			Success: false,
-			Message: "Token is invalid or expired.",
+			Message: "Unauthorized: Token is invalid.",
 		})
 	}
 
@@ -69,9 +69,6 @@ func (mod *AuthModule) refreshHandler(c echo.Context) error {
 			Message: "Unexpected error",
 		})
 	}
-
-	// TODO is this needed?
-	// c.Response().Header().Set("authorization", fmt.Sprintf("Bearer %s", accessToken))
 
 	setAccessTokenCookie(c, accessToken)
 
