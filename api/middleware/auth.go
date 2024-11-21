@@ -43,7 +43,7 @@ func Auth() echo.MiddlewareFunc {
 			if !isAuthenticated {
 				return c.JSON(http.StatusUnauthorized, types.SuccessRes{
 					Success: false,
-					Message: "Unauthenticated: Please login to continue.",
+					Message: "Unauthorized: Please login to continue.",
 				})
 			}
 

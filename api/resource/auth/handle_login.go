@@ -74,10 +74,6 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 		mod.server.Logger.Error(err.Error())
 	}
 
-	// TODO is this needed?
-	// c.Response().Header().Set("authorization", fmt.Sprintf("Bearer %s", accessToken))
-	// c.Response().Header().Set("x-refresh-token", refreshToken)
-
 	setAccessTokenCookie(c, accessToken)
 	setRefreshTokenCookie(c, refreshToken)
 

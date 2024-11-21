@@ -18,7 +18,7 @@ type JwtClient struct {
 	claims JwtClaims
 }
 
-const AccessExpirationDuration = time.Hour * 4          // 4 hours
+const AccessExpirationDuration = time.Minute * 15       // 15 minutes
 const RefreshExpirationDuration = time.Hour * (24 * 14) // 14 days
 const ResetPasswordExpirationDuration = time.Hour       // 1 hour
 
@@ -36,7 +36,7 @@ func New(action, subject, email string, expirationDuration time.Duration) *JwtCl
 				IssuedAt:  jwt.NewNumericDate(now),
 				ID:        uuid.NewString(),
 			},
-			Email: email,
+			Email:  email,
 			Action: action,
 		},
 	}
