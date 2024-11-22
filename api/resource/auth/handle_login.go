@@ -49,7 +49,7 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 		})
 	}
 
-	if !user.CheckPassword(req.Password) {
+	if !mod.authService.VerifyPassword(user.Hash.String, req.Password) {
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid email or password.",
@@ -74,8 +74,8 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 		mod.server.Logger.Error(err.Error())
 	}
 
-	setAccessTokenCookie(c, accessToken)
-	setRefreshTokenCookie(c, refreshToken)
+	c.SetCookie(mod.authService.NewAccessTokenCookie(accessToken))
+	c.SetCookie(mod.authService.NewRefreshTokenCookie(refreshToken))
 
 	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,

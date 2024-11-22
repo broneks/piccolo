@@ -32,8 +32,9 @@ type ServerDB interface {
 type ServerCache interface {
 	Get(ctx context.Context, key string) (string, error)
 	Ping(ctx context.Context) error
-	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
-	SetForever(ctx context.Context, key string, value interface{}) error
+	Set(ctx context.Context, key string, value any, expiration time.Duration) error
+	AddListItems(ctx context.Context, key string, value ...any) error
+	IsListItem(ctx context.Context, key string, value any) (bool, error)
 }
 
 type ServerObjectStorage interface {

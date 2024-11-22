@@ -1,3 +1,5 @@
+{{ template "head" . }}
+
 <div style="max-width: 600px; margin: 10% auto 0; padding: 16px;">
   <header>
     <h1>{{.Album.Name.String}}</h1>
@@ -16,4 +18,4 @@
   </ul>
 </div>
 
-
+{{ template "end" . }}

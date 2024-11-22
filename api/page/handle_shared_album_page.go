@@ -12,6 +12,7 @@ import (
 )
 
 type SharedAlbumPayload struct {
+	PageInfo
 	*model.Album
 	CoverPhoto *model.PhotoWithUrl
 	Photos     []*model.PhotoWithUrl
@@ -60,6 +61,9 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlb
 		}
 
 		return c.Render(http.StatusOK, "shared_album.html", &SharedAlbumPayload{
+			PageInfo: PageInfo{
+				Title: album.Name.String,
+			},
 			Album:      album,
 			CoverPhoto: coverPhoto,
 			Photos:     photosWithUrl,

@@ -2,7 +2,6 @@ package auth
 
 import (
 	"net/http"
-	"piccolo/api/jwtoken"
 	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
@@ -33,38 +32,11 @@ func (mod *AuthModule) resetPasswordHandler(c echo.Context) error {
 		})
 	}
 
-	email := jwtoken.GetUserEmail(req.Token)
-	if email == "" {
+	err = mod.authService.UpdateUserPassword(ctx, req.Token, req.NewPassword)
+	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, types.SuccessRes{
 			Success: false,
-			Message: "Cannot reset password.",
-		})
-	}
-
-	user, err := mod.userRepo.GetByEmail(ctx, email)
-	if err != nil {
-		mod.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusUnprocessableEntity, types.SuccessRes{
-			Success: false,
-			Message: "Cannot reset password.",
-		})
-	}
-
-	hash, err := hashPassword(req.NewPassword)
-	if err != nil {
-		mod.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
-			Success: false,
-			Message: "Unexpected error",
-		})
-	}
-
-	err = mod.userRepo.UpdatePassword(ctx, user.Id.String, hash)
-	if err != nil {
-		mod.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
-			Success: false,
-			Message: "Unexpected error",
+			Message: "Cannot reset password",
 		})
 	}
 

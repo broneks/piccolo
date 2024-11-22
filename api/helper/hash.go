@@ -8,9 +8,9 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-func generateRandomSalt(length int) string {
-	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+func generateRandomSalt(length int) string {
 	source := rand.NewSource(time.Now().UnixNano())
 	r := rand.New(source)
 

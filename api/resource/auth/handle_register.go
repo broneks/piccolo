@@ -3,11 +3,8 @@ package auth
 import (
 	"net/http"
 	"piccolo/api/helper"
-	"piccolo/api/model"
 	"piccolo/api/types"
-	"time"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/labstack/echo/v4"
 )
 
@@ -37,21 +34,7 @@ func (mod *AuthModule) registerHandler(c echo.Context) error {
 		})
 	}
 
-	hash, err := hashPassword(req.Password)
-	if err != nil {
-		mod.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
-			Success: false,
-			Message: "Unexpected error",
-		})
-	}
-
-	err = mod.userRepo.InsertOne(ctx, model.User{
-		Username: pgtype.Text{String: req.Email, Valid: true},
-		Email:    pgtype.Text{String: req.Email, Valid: true},
-		Hash:     pgtype.Text{String: hash, Valid: true},
-		HashedAt: pgtype.Timestamptz{Time: time.Now(), Valid: true},
-	})
+	mod.authService.CreateUser(ctx, req.Email, req.Email, req.Password)
 	if err != nil {
 		switch helper.CheckSqlError(err) {
 		case "unique-violation":

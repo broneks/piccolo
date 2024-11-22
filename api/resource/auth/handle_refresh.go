@@ -70,7 +70,7 @@ func (mod *AuthModule) refreshHandler(c echo.Context) error {
 		})
 	}
 
-	setAccessTokenCookie(c, accessToken)
+	c.SetCookie(mod.authService.NewAccessTokenCookie(accessToken))
 
 	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,
