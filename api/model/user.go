@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/jackc/pgx/v5/pgtype"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -14,9 +13,4 @@ type User struct {
 	LastLoginAt pgtype.Timestamptz `json:"-"`
 	CreatedAt   pgtype.Timestamptz `json:"createdAt"`
 	UpdatedAt   pgtype.Timestamptz `json:"-"`
-}
-
-func (user *User) CheckPassword(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(user.Hash.String), []byte(password))
-	return err == nil
 }

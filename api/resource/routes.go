@@ -23,9 +23,10 @@ func Routes(g *echo.Group, server *types.Server) {
 	photoRepo := repo.NewPhotoRepo(server.DB)
 	albumRepo := repo.NewAlbumRepo(server.DB)
 
+	authService := service.NewAuthService(server, userRepo)
 	photoService := service.NewPhotoService(server, photoRepo)
 
-	authModule := auth.NewModule(server, userRepo)
+	authModule := auth.NewModule(server, userRepo, authService)
 	authModule.Routes(v1)
 
 	photoModule := photo.NewModule(server, photoRepo, photoService)

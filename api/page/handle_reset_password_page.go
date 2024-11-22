@@ -2,6 +2,7 @@ package page
 
 import (
 	"net/http"
+	"piccolo/api/service"
 
 	"github.com/labstack/echo/v4"
 )
@@ -30,13 +31,17 @@ func handleGetResetPasswordPage() echo.HandlerFunc {
 	}
 }
 
-func handlePostResetPasswordPage() echo.HandlerFunc {
+func handlePostResetPasswordPage(authService *service.AuthService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token := c.FormValue("token")
 		newPassword := c.FormValue("new-password")
 		confirmPassword := c.FormValue("confirm-password")
 
 		error := "Passwords do not match. Please try again."
+
+		// TODO validate incoming passwords
+
+		// TODO call reset password
 
 		return c.Render(http.StatusOK, "reset_password.html", &ResetPasswordPayload{
 			PageInfo: PageInfo{

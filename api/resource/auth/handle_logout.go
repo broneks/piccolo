@@ -8,8 +8,8 @@ import (
 )
 
 func (mod *AuthModule) logoutHandler(c echo.Context) error {
-	setAccessTokenCookie(c, "")
-	setRefreshTokenCookie(c, "")
+	c.SetCookie(mod.authService.NewAccessTokenCookie(""))
+	c.SetCookie(mod.authService.NewRefreshTokenCookie(""))
 
 	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,
