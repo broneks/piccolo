@@ -1,8 +1,10 @@
 package page
 
 import (
+	"fmt"
 	"net/http"
 	"piccolo/api/service"
+	"unicode/utf8"
 
 	"github.com/labstack/echo/v4"
 )
@@ -10,10 +12,13 @@ import (
 type ResetPasswordPayload struct {
 	PageInfo
 	Token           string
+	Success         bool
 	Error           string
 	NewPassword     string
 	ConfirmPassword string
 }
+
+const MIN_PASSWORD_CHAR_LENGTH = 14
 
 func handleGetResetPasswordPage() echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -24,6 +29,7 @@ func handleGetResetPasswordPage() echo.HandlerFunc {
 				Title: "Reset Password",
 			},
 			Token:           token,
+			Success:         false,
 			Error:           "",
 			NewPassword:     "",
 			ConfirmPassword: "",
@@ -33,21 +39,38 @@ func handleGetResetPasswordPage() echo.HandlerFunc {
 
 func handlePostResetPasswordPage(authService *service.AuthService) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		ctx := c.Request().Context()
 		token := c.FormValue("token")
 		newPassword := c.FormValue("new-password")
 		confirmPassword := c.FormValue("confirm-password")
 
-		error := "Passwords do not match. Please try again."
+		var error string
+		var success bool
 
-		// TODO validate incoming passwords
-
-		// TODO call reset password
+		if newPassword == "" {
+			error = "New password is required."
+		} else if utf8.RuneCountInString(newPassword) < MIN_PASSWORD_CHAR_LENGTH {
+			error = fmt.Sprintf("New password is too short. Must be at least %d characters.", MIN_PASSWORD_CHAR_LENGTH)
+		} else if confirmPassword == "" {
+			error = "Confirm password is required."
+		} else if newPassword != confirmPassword {
+			error = "Passwords do not match."
+		} else {
+			err := authService.UpdateUserPassword(ctx, token, newPassword)
+			if err != nil {
+				error = "An unexpected error occurred."
+			} else {
+				success = true
+				// TODO blacklist token in cache once used
+			}
+		}
 
 		return c.Render(http.StatusOK, "reset_password.html", &ResetPasswordPayload{
 			PageInfo: PageInfo{
 				Title: "Reset Password",
 			},
 			Token:           token,
+			Success:         success,
 			Error:           error,
 			NewPassword:     newPassword,
 			ConfirmPassword: confirmPassword,

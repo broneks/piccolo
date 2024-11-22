@@ -26,10 +26,11 @@ func NewAuthService(server *types.Server, userRepo *repo.UserRepo) *AuthService 
 	}
 }
 
-const COST = bcrypt.DefaultCost + 2
+const PASSWORD_COST = bcrypt.DefaultCost + 2
+const MIN_PASSWORD_CHAR_LENGTH = 14
 
 func (svc *AuthService) hashPassword(password string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), COST)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), PASSWORD_COST)
 	if err != nil {
 		return "", err
 	}
