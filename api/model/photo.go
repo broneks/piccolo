@@ -2,6 +2,8 @@ package model
 
 import (
 	"context"
+	"fmt"
+	"piccolo/api/consts"
 	"piccolo/api/types"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -24,7 +26,7 @@ type PhotoWithUrl struct {
 }
 
 func (photo *Photo) GetUrl(ctx context.Context, server *types.Server) string {
-	key := photo.Id.String
+	key := fmt.Sprintf(consts.PhotoPresignedUrlKeyFormat, photo.Id.String)
 
 	val, err := server.Cache.Get(ctx, key)
 	if err != nil {
