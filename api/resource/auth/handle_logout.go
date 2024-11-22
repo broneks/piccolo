@@ -8,6 +8,21 @@ import (
 )
 
 func (mod *AuthModule) logoutHandler(c echo.Context) error {
+	accessCookie, err := c.Cookie("piccolo-access-token")
+	if err != nil || accessCookie == nil {
+		mod.server.Logger.Debug(err.Error())
+		return c.JSON(http.StatusForbidden, types.SuccessRes{
+			Success: false,
+			Message: "Forbidden",
+		})
+	}
+	if accessCookie.Value == "" {
+		return c.JSON(http.StatusForbidden, types.SuccessRes{
+			Success: false,
+			Message: "Forbidden",
+		})
+	}
+
 	c.SetCookie(mod.authService.NewAccessTokenCookie(""))
 	c.SetCookie(mod.authService.NewRefreshTokenCookie(""))
 

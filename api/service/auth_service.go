@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"piccolo/api/consts"
 	"piccolo/api/jwtoken"
 	"piccolo/api/model"
 	"piccolo/api/repo"
@@ -15,22 +16,23 @@ import (
 )
 
 type AuthService struct {
-	server   *types.Server
-	userRepo *repo.UserRepo
+	server                *types.Server
+	userRepo              *repo.UserRepo
+	MinPasswordCharLength int
 }
 
 func NewAuthService(server *types.Server, userRepo *repo.UserRepo) *AuthService {
 	return &AuthService{
-		server:   server,
-		userRepo: userRepo,
+		server:                server,
+		userRepo:              userRepo,
+		MinPasswordCharLength: 14,
 	}
 }
 
-const PASSWORD_COST = bcrypt.DefaultCost + 2
-const MIN_PASSWORD_CHAR_LENGTH = 14
+const passwordCost = bcrypt.DefaultCost + 2
 
 func (svc *AuthService) hashPassword(password string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), PASSWORD_COST)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), passwordCost)
 	if err != nil {
 		return "", err
 	}
@@ -129,6 +131,8 @@ func (svc *AuthService) UpdateUserPassword(ctx context.Context, token, newPasswo
 		svc.server.Logger.Error(err.Error())
 		return fmt.Errorf("Cannot update user password")
 	}
+
+	err = svc.server.Cache.AddListItems(ctx, consts.ResetPasswordTokenBlacklistKey, token)
 
 	return nil
 }

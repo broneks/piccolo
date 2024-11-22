@@ -18,9 +18,9 @@ type JwtClient struct {
 	claims JwtClaims
 }
 
-const AccessExpirationDuration = time.Minute * 15       // 15 minutes
-const RefreshExpirationDuration = time.Hour * (24 * 14) // 14 days
-const ResetPasswordExpirationDuration = time.Hour       // 1 hour
+const accessExpirationDuration = time.Minute * 15       // 15 minutes
+const refreshExpirationDuration = time.Hour * (24 * 14) // 14 days
+const resetPasswordExpirationDuration = time.Hour       // 1 hour
 
 func New(action, subject, email string, expirationDuration time.Duration) *JwtClient {
 	now := time.Now()
@@ -45,13 +45,13 @@ func New(action, subject, email string, expirationDuration time.Duration) *JwtCl
 }
 
 func NewAccessJwt(userId, email string) *JwtClient {
-	return New("access", userId, email, AccessExpirationDuration)
+	return New("access", userId, email, accessExpirationDuration)
 }
 
 func NewRefreshJwt(userId, email string) *JwtClient {
-	return New("refresh", userId, email, RefreshExpirationDuration)
+	return New("refresh", userId, email, refreshExpirationDuration)
 }
 
 func NewResetPasswordJwt(email string) *JwtClient {
-	return New("reset-password", email, email, ResetPasswordExpirationDuration)
+	return New("reset-password", email, email, resetPasswordExpirationDuration)
 }

@@ -18,8 +18,6 @@ type ResetPasswordPayload struct {
 	ConfirmPassword string
 }
 
-const MIN_PASSWORD_CHAR_LENGTH = 14
-
 func handleGetResetPasswordPage() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token := c.QueryParam("token")
@@ -49,8 +47,8 @@ func handlePostResetPasswordPage(authService *service.AuthService) echo.HandlerF
 
 		if newPassword == "" {
 			error = "New password is required."
-		} else if utf8.RuneCountInString(newPassword) < MIN_PASSWORD_CHAR_LENGTH {
-			error = fmt.Sprintf("New password is too short. Must be at least %d characters.", MIN_PASSWORD_CHAR_LENGTH)
+		} else if utf8.RuneCountInString(newPassword) < authService.MinPasswordCharLength {
+			error = fmt.Sprintf("New password is too short. Must be at least %d characters.", authService.MinPasswordCharLength)
 		} else if confirmPassword == "" {
 			error = "Confirm password is required."
 		} else if newPassword != confirmPassword {
@@ -61,7 +59,6 @@ func handlePostResetPasswordPage(authService *service.AuthService) echo.HandlerF
 				error = "An unexpected error occurred."
 			} else {
 				success = true
-				// TODO blacklist token in cache once used
 			}
 		}
 
