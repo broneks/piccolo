@@ -1,0 +1,25 @@
+{{ define "head" }}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.PageInfo.Title}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'pickle': '#09664e',
+              'pickle-alt': '#074f3c',
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+
+{{ end }}

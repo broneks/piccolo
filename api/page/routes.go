@@ -11,7 +11,8 @@ import (
 func Routes(e *echo.Echo, server *types.Server) {
 	sharedAlbumRepo := repo.NewSharedAlbumRepo(server.DB)
 
-	e.GET("/reset-password", handleResetPasswordPage(), middleware.CanResetPassword())
+	e.GET("/reset-password", handleGetResetPasswordPage(), middleware.CanResetPassword())
+	e.POST("/reset-password", handlePostResetPasswordPage(), middleware.CanResetPassword())
 
 	album := e.Group("/albums/:id", middleware.CanReadSharedAlbum(sharedAlbumRepo))
 

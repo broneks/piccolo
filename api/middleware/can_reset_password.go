@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/jwtoken"
 
@@ -10,7 +11,16 @@ import (
 func CanResetPassword() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			tokenString := c.QueryParam("token")
+			var tokenString string
+
+			tokenString = c.QueryParam("token")
+
+			// retry a different way
+			if tokenString == "" {
+				tokenString = c.FormValue("token")
+			}
+
+			slog.Debug(tokenString)
 
 			isAuthenticated := jwtoken.VerifyToken(tokenString)
 			if !isAuthenticated {

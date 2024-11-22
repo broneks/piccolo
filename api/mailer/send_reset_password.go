@@ -41,7 +41,7 @@ func (mail *Mailer) SendResetPassword(ctx context.Context, email, token string) 
 		},
 	}
 
-	_, err := mail.send(ctx, RESET_PASSWORD_TEMPLATE_ID, "🔒 Reset Password", recipient, personalization)
+	_, err := mail.send(ctx, RESET_PASSWORD_TEMPLATE_ID, "Reset Password", recipient, personalization)
 	if err != nil {
 		return err
 	}
