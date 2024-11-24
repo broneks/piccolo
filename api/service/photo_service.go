@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"mime/multipart"
 	"piccolo/api/model"
-	"piccolo/api/repo"
+	"piccolo/api/repo/photorepo"
 	"piccolo/api/types"
 	"sync"
 
@@ -14,10 +14,10 @@ import (
 
 type PhotoService struct {
 	server    *types.Server
-	photoRepo *repo.PhotoRepo
+	photoRepo *photorepo.PhotoRepo
 }
 
-func NewPhotoService(server *types.Server, photoRepo *repo.PhotoRepo) *PhotoService {
+func NewPhotoService(server *types.Server, photoRepo *photorepo.PhotoRepo) *PhotoService {
 	return &PhotoService{
 		server:    server,
 		photoRepo: photoRepo,

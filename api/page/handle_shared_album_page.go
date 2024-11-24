@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"piccolo/api/helper"
 	"piccolo/api/model"
-	"piccolo/api/repo"
+	"piccolo/api/repo/sharedalbumrepo"
 	"piccolo/api/types"
 	"sync"
 
@@ -18,7 +18,7 @@ type SharedAlbumPayload struct {
 	Photos     []*model.PhotoWithUrl
 }
 
-func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *repo.SharedAlbumRepo) echo.HandlerFunc {
+func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *sharedalbumrepo.SharedAlbumRepo) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
 

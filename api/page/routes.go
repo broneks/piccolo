@@ -2,7 +2,8 @@ package page
 
 import (
 	"piccolo/api/middleware"
-	"piccolo/api/repo"
+	"piccolo/api/repo/sharedalbumrepo"
+	"piccolo/api/repo/userrepo"
 	"piccolo/api/service"
 	"piccolo/api/types"
 
@@ -10,8 +11,8 @@ import (
 )
 
 func Routes(e *echo.Echo, server *types.Server) {
-	userRepo := repo.NewUserRepo(server.DB)
-	sharedAlbumRepo := repo.NewSharedAlbumRepo(server.DB)
+	userRepo := userrepo.New(server.DB)
+	sharedAlbumRepo := sharedalbumrepo.New(server.DB)
 
 	authService := service.NewAuthService(server, userRepo)
 

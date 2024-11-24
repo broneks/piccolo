@@ -1,18 +1,18 @@
 package auth
 
 import (
-	"piccolo/api/repo"
+	"piccolo/api/repo/userrepo"
 	"piccolo/api/service"
 	"piccolo/api/types"
 )
 
 type AuthModule struct {
 	server      *types.Server
-	userRepo    *repo.UserRepo
+	userRepo    *userrepo.UserRepo
 	authService *service.AuthService
 }
 
-func NewModule(server *types.Server, userRepo *repo.UserRepo, authService *service.AuthService) *AuthModule {
+func NewModule(server *types.Server, userRepo *userrepo.UserRepo, authService *service.AuthService) *AuthModule {
 	return &AuthModule{
 		server:      server,
 		userRepo:    userRepo,

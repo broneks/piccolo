@@ -2,7 +2,9 @@ package resource
 
 import (
 	"piccolo/api/middleware"
-	"piccolo/api/repo"
+	"piccolo/api/repo/albumrepo"
+	"piccolo/api/repo/photorepo"
+	"piccolo/api/repo/userrepo"
 	"piccolo/api/resource/album"
 	"piccolo/api/resource/auth"
 	"piccolo/api/resource/photo"
@@ -19,9 +21,9 @@ func Routes(g *echo.Group, server *types.Server) {
 
 	v1 := g.Group("/v1", middleware.SetUserData())
 
-	userRepo := repo.NewUserRepo(server.DB)
-	photoRepo := repo.NewPhotoRepo(server.DB)
-	albumRepo := repo.NewAlbumRepo(server.DB)
+	userRepo := userrepo.New(server.DB)
+	photoRepo := photorepo.New(server.DB)
+	albumRepo := albumrepo.New(server.DB)
 
 	authService := service.NewAuthService(server, userRepo)
 	photoService := service.NewPhotoService(server, photoRepo)

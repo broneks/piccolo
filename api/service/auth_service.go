@@ -7,7 +7,7 @@ import (
 	"piccolo/api/consts"
 	"piccolo/api/jwtoken"
 	"piccolo/api/model"
-	"piccolo/api/repo"
+	"piccolo/api/repo/userrepo"
 	"piccolo/api/types"
 	"time"
 
@@ -17,11 +17,11 @@ import (
 
 type AuthService struct {
 	server                *types.Server
-	userRepo              *repo.UserRepo
+	userRepo              *userrepo.UserRepo
 	MinPasswordCharLength int
 }
 
-func NewAuthService(server *types.Server, userRepo *repo.UserRepo) *AuthService {
+func NewAuthService(server *types.Server, userRepo *userrepo.UserRepo) *AuthService {
 	return &AuthService{
 		server:                server,
 		userRepo:              userRepo,
