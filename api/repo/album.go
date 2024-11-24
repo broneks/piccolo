@@ -284,7 +284,18 @@ func (repo *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([
 	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Photo])
 }
 
-func (repo *AlbumRepo) GetPhoto(ctx context.Context, albumId, userId, photoId string) (*model.Photo, error) {
+// Checks for read access
+func (repo *AlbumRepo) GetPhoto(ctx context.Context, albumId, photoId, userId string) (*model.Photo, error) {
+	var err error
+
+	canRead, err := repo.CanReadAlbum(ctx, albumId, userId)
+	if err != nil {
+		return nil, err
+	}
+	if !canRead {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
 	query := `select
 		p.id,
 		p.user_id,
@@ -299,7 +310,6 @@ func (repo *AlbumRepo) GetPhoto(ctx context.Context, albumId, userId, photoId st
 	where ap.album_id = @albumId
 	and ap.photo_id = @photoId`
 
-	var err error
 	var photo model.Photo
 
 	args := pgx.NamedArgs{
@@ -327,6 +337,76 @@ func (repo *AlbumRepo) GetPhoto(ctx context.Context, albumId, userId, photoId st
 	return &photo, nil
 }
 
+func (repo *AlbumRepo) GetPhotosLikes(ctx context.Context, albumId string, photoIds []string, userId string) ([]model.AlbumPhotoLikes, error) {
+	var err error
+
+	canRead, err := repo.CanReadAlbum(ctx, albumId, userId)
+	if err != nil {
+		return nil, err
+	}
+	if !canRead {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	var query string
+
+	if len(photoIds) > 0 {
+		query = `select photo_id, count(*) as likes
+			from album_photo_likes
+			where album_id = @albumId and photo_id = any(@photoIds)
+			group by photo_id`
+	} else {
+		query = `select photo_id, count(*) as likes
+			from album_photo_likes
+			where album_id = @albumId group by photo_id`
+	}
+
+	args := pgx.NamedArgs{
+		"albumId":  albumId,
+		"photoIds": photoIds,
+	}
+
+	rows, err := repo.db.Query(ctx, query, args)
+	if err != nil {
+		slog.Debug(err.Error())
+		return nil, fmt.Errorf("unable to query album photo likes: %v", err)
+	}
+	defer rows.Close()
+
+	return pgx.CollectRows(rows, pgx.RowToStructByName[model.AlbumPhotoLikes])
+}
+
+func (repo *AlbumRepo) GetPhotosFavourites(ctx context.Context, albumId, userId string) ([]model.AlbumPhotoFavourites, error) {
+	var err error
+
+	canRead, err := repo.CanReadAlbum(ctx, albumId, userId)
+	if err != nil {
+		return nil, err
+	}
+	if !canRead {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	query := `select photo_id, created_at
+		from album_photo_favourites
+		where album_id = @albumId and user_id = @userId`
+
+	args := pgx.NamedArgs{
+		"albumId": albumId,
+		"userId":  userId,
+	}
+
+	rows, err := repo.db.Query(ctx, query, args)
+	if err != nil {
+		slog.Debug(err.Error())
+		return nil, fmt.Errorf("unable to query album photo favourites: %v", err)
+	}
+	defer rows.Close()
+
+	return pgx.CollectRows(rows, pgx.RowToStructByName[model.AlbumPhotoFavourites])
+}
+
+// Permits all users
 func (repo *AlbumRepo) InsertOne(ctx context.Context, album model.Album) error {
 	query := `insert into albums (
 		user_id,
