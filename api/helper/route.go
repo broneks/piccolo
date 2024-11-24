@@ -25,6 +25,16 @@ func GetIdParam(c echo.Context) string {
 	return id
 }
 
+func GetListParam(c echo.Context, name string) []string {
+	param := strings.Trim(c.QueryParam(name), " ")
+
+	if param == "" {
+		return []string{}
+	}
+
+	return strings.Split(param, ",")
+}
+
 const staticRoute = "/static*"
 
 func ListAllRoutes(e *echo.Echo) {

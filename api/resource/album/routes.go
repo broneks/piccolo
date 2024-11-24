@@ -16,6 +16,11 @@ func (mod *AlbumModule) Routes(g *echo.Group) {
 
 	album.GET("", mod.getAlbumHandler)
 	album.GET("/users", mod.getAlbumUsersHandler)
-	album.GET("/photos", mod.getAlbumPhotosHandler)
 	album.POST("/upload", mod.postAlbumPhotosUploadHandler)
+
+	albumPhotos := album.Group("/photos")
+
+	albumPhotos.GET("", mod.getAlbumPhotosHandler)
+	albumPhotos.GET("/likes", mod.getAlbumPhotosLikesHandler)
+	albumPhotos.GET("/favourites", mod.getAlbumPhotosFavouritesHandler)
 }
