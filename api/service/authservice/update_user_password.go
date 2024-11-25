@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"piccolo/api/consts"
-	"piccolo/api/jwtoken"
+	"piccolo/api/service/jwtservice"
 )
 
 func (svc *AuthService) UpdateUserPassword(ctx context.Context, token, newPassword string) error {
@@ -12,7 +12,7 @@ func (svc *AuthService) UpdateUserPassword(ctx context.Context, token, newPasswo
 		return fmt.Errorf("New password is missing")
 	}
 
-	email := jwtoken.GetUserEmail(token)
+	email := jwtservice.GetUserEmail(token)
 	if email == "" {
 		return fmt.Errorf("Invalid token")
 	}

@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 	"piccolo/api/consts"
-	"piccolo/api/jwtoken"
+	"piccolo/api/service/jwtservice"
 	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
@@ -35,7 +35,7 @@ func CanResetPassword(server *types.Server) echo.MiddlewareFunc {
 				return echo.NewHTTPError(http.StatusForbidden)
 			}
 
-			isAuthenticated := jwtoken.VerifyToken(tokenString)
+			isAuthenticated := jwtservice.VerifyToken(tokenString)
 			if !isAuthenticated {
 				return echo.NewHTTPError(http.StatusForbidden)
 			}

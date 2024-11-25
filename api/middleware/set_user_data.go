@@ -3,7 +3,7 @@ package middleware
 import (
 	"fmt"
 	"log/slog"
-	"piccolo/api/jwtoken"
+	"piccolo/api/service/jwtservice"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,8 +22,8 @@ func SetUserData() echo.MiddlewareFunc {
 			}
 
 			if tokenString != "" {
-				userId := jwtoken.GetUserId(tokenString)
-				userEmail := jwtoken.GetUserEmail(tokenString)
+				userId := jwtservice.GetUserId(tokenString)
+				userEmail := jwtservice.GetUserEmail(tokenString)
 
 				c.Set("userId", userId)
 				c.Set("userEmail", userEmail)
