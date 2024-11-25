@@ -3,7 +3,7 @@ package page
 import (
 	"fmt"
 	"net/http"
-	"piccolo/api/service"
+	"piccolo/api/service/authservice"
 	"unicode/utf8"
 
 	"github.com/labstack/echo/v4"
@@ -35,7 +35,7 @@ func handleGetResetPasswordPage() echo.HandlerFunc {
 	}
 }
 
-func handlePostResetPasswordPage(authService *service.AuthService) echo.HandlerFunc {
+func handlePostResetPasswordPage(authService *authservice.AuthService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
 		token := c.FormValue("token")

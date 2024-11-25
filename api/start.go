@@ -10,7 +10,8 @@ import (
 	"piccolo/api/middleware"
 	"piccolo/api/page"
 	"piccolo/api/resource"
-	"piccolo/api/service"
+	"piccolo/api/service/rendererservice"
+	"piccolo/api/service/validatorservice"
 	"piccolo/api/storage/backblaze"
 	"piccolo/api/storage/pg"
 	"piccolo/api/storage/redis"
@@ -64,8 +65,8 @@ func Start() {
 	e.Static("/", "static")
 
 	e.IPExtractor = echo.ExtractIPDirect()
-	e.Validator = service.NewValidator()
-	e.Renderer = service.NewTemplateRenderer("templates/*.html")
+	e.Validator = validatorservice.New()
+	e.Renderer = rendererservice.New("templates/*.html")
 	e.HTTPErrorHandler = httpErrorHandler
 
 	server := newServer(context.Background())
