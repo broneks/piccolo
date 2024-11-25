@@ -1,4 +1,4 @@
-package jwtoken
+package jwtservice
 
 import (
 	"os"
@@ -14,7 +14,7 @@ type JwtClaims struct {
 	Action string `json:"action"`
 }
 
-type JwtClient struct {
+type JwtService struct {
 	claims JwtClaims
 }
 
@@ -22,10 +22,10 @@ const accessExpirationDuration = time.Minute * 15       // 15 minutes
 const refreshExpirationDuration = time.Hour * (24 * 14) // 14 days
 const resetPasswordExpirationDuration = time.Hour       // 1 hour
 
-func New(action, subject, email string, expirationDuration time.Duration) *JwtClient {
+func New(action, subject, email string, expirationDuration time.Duration) *JwtService {
 	now := time.Now()
 
-	client := &JwtClient{
+	client := &JwtService{
 		claims: JwtClaims{
 			RegisteredClaims: jwt.RegisteredClaims{
 				Issuer:    os.Getenv("JWT_ISS"),
@@ -44,14 +44,14 @@ func New(action, subject, email string, expirationDuration time.Duration) *JwtCl
 	return client
 }
 
-func NewAccessJwt(userId, email string) *JwtClient {
+func NewAccessJwt(userId, email string) *JwtService {
 	return New("access", userId, email, accessExpirationDuration)
 }
 
-func NewRefreshJwt(userId, email string) *JwtClient {
+func NewRefreshJwt(userId, email string) *JwtService {
 	return New("refresh", userId, email, refreshExpirationDuration)
 }
 
-func NewResetPasswordJwt(email string) *JwtClient {
+func NewResetPasswordJwt(email string) *JwtService {
 	return New("reset-password", email, email, resetPasswordExpirationDuration)
 }

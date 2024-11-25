@@ -2,7 +2,8 @@ package auth
 
 import (
 	"net/http"
-	"piccolo/api/jwtoken"
+	"piccolo/api/helper"
+	"piccolo/api/service/jwtservice"
 	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
@@ -22,7 +23,7 @@ func getRefreshTokenString(c echo.Context) (string, error) {
 	}
 
 	// fallback to using the auth header
-	tokenString, err := jwtoken.ExtractTokenString(c.Request().Header.Get("x-refresh-token"))
+	tokenString, err := helper.ExtractTokenString(c.Request().Header.Get("x-refresh-token"))
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +51,7 @@ func (mod *AuthModule) refreshHandler(c echo.Context) error {
 		})
 	}
 
-	isValid := jwtoken.VerifyToken(refreshToken)
+	isValid := jwtservice.VerifyToken(refreshToken)
 	if !isValid {
 		return c.JSON(http.StatusUnauthorized, types.SuccessRes{
 			Success: false,
@@ -58,10 +59,10 @@ func (mod *AuthModule) refreshHandler(c echo.Context) error {
 		})
 	}
 
-	userId := jwtoken.GetUserId(refreshToken)
-	userEmail := jwtoken.GetUserEmail(refreshToken)
+	userId := jwtservice.GetUserId(refreshToken)
+	userEmail := jwtservice.GetUserEmail(refreshToken)
 
-	accessToken, err := jwtoken.NewAccessJwt(userId, userEmail).GenerateToken()
+	accessToken, err := jwtservice.NewAccessJwt(userId, userEmail).GenerateToken()
 	if err != nil {
 		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{

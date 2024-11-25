@@ -4,12 +4,12 @@ import (
 	"log/slog"
 	"net/http"
 	"piccolo/api/helper"
-	"piccolo/api/repo"
+	"piccolo/api/repo/sharedalbumrepo"
 
 	"github.com/labstack/echo/v4"
 )
 
-func CanReadSharedAlbum(sharedAlbumRepo *repo.SharedAlbumRepo) echo.MiddlewareFunc {
+func CanReadSharedAlbum(sharedAlbumRepo *sharedalbumrepo.SharedAlbumRepo) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			albumId := helper.GetIdParam(c)
@@ -19,6 +19,7 @@ func CanReadSharedAlbum(sharedAlbumRepo *repo.SharedAlbumRepo) echo.MiddlewareFu
 
 			ctx := c.Request().Context()
 			readAccessHash := c.QueryParam("share")
+
 			canRead, err := sharedAlbumRepo.CanReadSharedAlbum(ctx, albumId, readAccessHash)
 			if err != nil {
 				slog.Debug(err.Error())

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"net/http"
-	"piccolo/api/jwtoken"
+	"piccolo/api/service/jwtservice"
 	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
@@ -41,7 +41,7 @@ func (mod *AuthModule) forgotPasswordHandler(c echo.Context) error {
 		})
 	}
 
-	resetPasswordToken, err := jwtoken.NewResetPasswordJwt(user.Email.String).GenerateToken()
+	resetPasswordToken, err := jwtservice.NewResetPasswordJwt(user.Email.String).GenerateToken()
 	if err != nil {
 		mod.server.Logger.Error(err.Error())
 	}

@@ -1,28 +1,15 @@
-package service
+package photoservice
 
 import (
 	"context"
 	"fmt"
 	"mime/multipart"
 	"piccolo/api/model"
-	"piccolo/api/repo"
 	"piccolo/api/types"
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
-
-type PhotoService struct {
-	server    *types.Server
-	photoRepo *repo.PhotoRepo
-}
-
-func NewPhotoService(server *types.Server, photoRepo *repo.PhotoRepo) *PhotoService {
-	return &PhotoService{
-		server:    server,
-		photoRepo: photoRepo,
-	}
-}
 
 func (svc *PhotoService) handleFileUpload(ctx context.Context, fileHeader *multipart.FileHeader, userId string, resultCh chan<- model.Photo) {
 	fileSize := int32(fileHeader.Size)

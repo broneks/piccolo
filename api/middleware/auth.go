@@ -3,7 +3,8 @@ package middleware
 import (
 	"log/slog"
 	"net/http"
-	"piccolo/api/jwtoken"
+	"piccolo/api/helper"
+	"piccolo/api/service/jwtservice"
 	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
@@ -22,7 +23,7 @@ func getAccesssTokenString(c echo.Context) (string, error) {
 	}
 
 	// fallback to using the auth header
-	tokenString, err := jwtoken.ExtractTokenString(c.Request().Header.Get("Authorization"))
+	tokenString, err := helper.ExtractTokenString(c.Request().Header.Get("Authorization"))
 	if err != nil {
 		slog.Debug(err.Error())
 		return "", err
@@ -39,7 +40,7 @@ func Auth() echo.MiddlewareFunc {
 				slog.Error(err.Error())
 			}
 
-			isAuthenticated := jwtoken.VerifyToken(tokenString)
+			isAuthenticated := jwtservice.VerifyToken(tokenString)
 			if !isAuthenticated {
 				return c.JSON(http.StatusUnauthorized, types.SuccessRes{
 					Success: false,

@@ -2,18 +2,19 @@ package page
 
 import (
 	"piccolo/api/middleware"
-	"piccolo/api/repo"
-	"piccolo/api/service"
+	"piccolo/api/repo/sharedalbumrepo"
+	"piccolo/api/repo/userrepo"
+	"piccolo/api/service/authservice"
 	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
 )
 
 func Routes(e *echo.Echo, server *types.Server) {
-	userRepo := repo.NewUserRepo(server.DB)
-	sharedAlbumRepo := repo.NewSharedAlbumRepo(server.DB)
+	userRepo := userrepo.New(server.DB)
+	sharedAlbumRepo := sharedalbumrepo.New(server.DB)
 
-	authService := service.NewAuthService(server, userRepo)
+	authService := authservice.New(server, userRepo)
 
 	resetPassword := e.Group("/reset-password", middleware.CanResetPassword(server))
 

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"net/http"
-	"piccolo/api/jwtoken"
+	"piccolo/api/service/jwtservice"
 	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
@@ -60,7 +60,7 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 		mod.server.Logger.Error(err.Error())
 	}
 
-	accessToken, err := jwtoken.NewAccessJwt(user.Id.String, user.Email.String).GenerateToken()
+	accessToken, err := jwtservice.NewAccessJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
 		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
@@ -69,7 +69,7 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 		})
 	}
 
-	refreshToken, err := jwtoken.NewRefreshJwt(user.Id.String, user.Email.String).GenerateToken()
+	refreshToken, err := jwtservice.NewRefreshJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
 		mod.server.Logger.Error(err.Error())
 	}
