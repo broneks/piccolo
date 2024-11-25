@@ -57,10 +57,17 @@ func Start() {
 
 	e := echo.New()
 
+	e.Pre(middleware.HttpsRedirect())
+	e.Pre(middleware.HttpsNonWWWRedirect())
+	e.Pre(echoMiddleware.RemoveTrailingSlash())
+
 	e.Use(middleware.Logger())
+	e.Use(middleware.CacheControl())
+	e.Use(middleware.Cors())
+	e.Use(middleware.Csrf())
+	e.Use(middleware.Secure())
 	e.Use(echoMiddleware.Recover())
 	e.Use(echoMiddleware.RequestID())
-	e.Use(echoMiddleware.Secure())
 
 	e.Static("/", "static")
 

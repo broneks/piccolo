@@ -22,10 +22,10 @@ func handleGetResetPasswordPage() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token := c.QueryParam("token")
 
+		pageInfo := NewPageInfo(c, "Reset Password")
+
 		return c.Render(http.StatusOK, "reset_password.html", &ResetPasswordPayload{
-			PageInfo: PageInfo{
-				Title: "Reset Password",
-			},
+			PageInfo:        pageInfo,
 			Token:           token,
 			Success:         false,
 			Error:           "",
@@ -62,10 +62,10 @@ func handlePostResetPasswordPage(authService *authservice.AuthService) echo.Hand
 			}
 		}
 
+		pageInfo := NewPageInfo(c, "Reset Password")
+
 		return c.Render(http.StatusOK, "reset_password.html", &ResetPasswordPayload{
-			PageInfo: PageInfo{
-				Title: "Reset Password",
-			},
+			PageInfo:        pageInfo,
 			Token:           token,
 			Success:         success,
 			Error:           error,
