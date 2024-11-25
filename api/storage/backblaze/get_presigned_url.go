@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const expirationDuration = time.Hour * 24
+const expirationDuration = time.Hour
 const fileNotFoundImageUrl = "/image-not-found.png"
 
 func (bc *BackblazeClient) GetPresignedUrl(ctx context.Context, filename, userId string) (string, time.Duration) {

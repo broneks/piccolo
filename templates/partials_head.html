@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.PageInfo.Title}}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
+    <script nonce="{{ .PageInfo.Nonce }}">
       tailwind.config = {
         theme: {
           extend: {

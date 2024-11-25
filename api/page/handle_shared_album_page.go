@@ -60,10 +60,10 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *sharedalbumrep
 			}
 		}
 
+		pageInfo := NewPageInfo(c, album.Name.String)
+
 		return c.Render(http.StatusOK, "shared_album.html", &SharedAlbumPayload{
-			PageInfo: PageInfo{
-				Title: album.Name.String,
-			},
+			PageInfo:   pageInfo,
 			Album:      album,
 			CoverPhoto: coverPhoto,
 			Photos:     photosWithUrl,
