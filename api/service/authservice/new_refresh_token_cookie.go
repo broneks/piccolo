@@ -2,21 +2,30 @@ package authservice
 
 import (
 	"net/http"
+	"os"
 	"time"
 )
 
 func (svc *AuthService) NewRefreshTokenCookie(value string) *http.Cookie {
+	env := os.Getenv("ENV")
+
 	cookie := &http.Cookie{
 		Name:     "piccolo-refresh-token",
 		Value:    value,
 		HttpOnly: true,
-		Secure:   false, // TODO change this for production
-		// SameSite: http.SameSiteStrictMode, // Prevents CSRF by restricting cross-site cookie transmission TODO
-		Path: "/",
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+	}
+
+	if env == "local" {
+		cookie.Secure = false
+		cookie.SameSite = http.SameSiteNoneMode
 	}
 
 	if value == "" {
 		cookie.Expires = time.Unix(0, 0)
+		cookie.MaxAge = -1
 	}
 
 	return cookie
