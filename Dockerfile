@@ -1,15 +1,35 @@
-FROM golang:alpine
+FROM golang:1.23.2-alpine AS builder
 
-RUN apk update && apk add --no-cache git && apk add --no-cach bash && apk add build-base
-
-RUN mkdir /app
 WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
 
 COPY . .
 
-RUN go install github.com/air-verse/air@latest
-RUN go mod download
+RUN go build -o bin/piccolo ./cmd/piccolo
 
-EXPOSE 8000
+FROM golang:1.23.2-alpine AS runner
 
-CMD [ "make", "run" ]
+WORKDIR /root/
+
+COPY . .
+COPY --from=builder /app/bin/piccolo .
+
+ARG ENV=production
+ENV ENV=$ENV
+
+RUN if [ "$ENV" = "local" ]; then \
+      go mod download; \
+      go install github.com/air-verse/air@latest; \
+    else \
+      go build --o bin/piccolo ./cmd/piccolo; \
+    fi
+
+EXPOSE 8001
+
+CMD if [ "$ENV" = "local" ]; then \
+      air; \
+    else \
+      ./piccolo; \
+    fi
