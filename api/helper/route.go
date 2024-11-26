@@ -25,6 +25,16 @@ func GetIdParam(c echo.Context) string {
 	return id
 }
 
+func GetIdParamByName(c echo.Context, name string) string {
+	id := c.Param(name)
+
+	if id == "" || !isValidUUID(id) {
+		return ""
+	}
+
+	return id
+}
+
 func GetListParam(c echo.Context, name string) []string {
 	param := strings.Trim(c.QueryParam(name), " ")
 
