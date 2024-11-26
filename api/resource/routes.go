@@ -16,8 +16,6 @@ import (
 )
 
 func Routes(g *echo.Group, server *types.Server) {
-	g.RouteNotFound("/*", handleNotFound)
-
 	g.GET("/health", handleHealth(server))
 
 	v1 := g.Group("/v1", middleware.SetUserData())
