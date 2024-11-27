@@ -22,7 +22,7 @@ migrate_create:
 	migrate create -ext sql -dir db/migrations -seq $(name)
 
 migrate_up:
-	migrate -database $(DATABASE_URL)?sslmode=disable -path db/migrations up
+	migrate -database $(DATABASE_URL) -path db/migrations up
 
 migrate_down:
-	migrate -database $(DATABASE_URL)?sslmode=disable -path db/migrations down 1
+	migrate -database $(DATABASE_URL) -path db/migrations down 1

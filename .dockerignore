@@ -1,7 +1,12 @@
 .git
 .gitignore
+.github
+.air.toml
+.dockerignore
+.env
 .env.sample
-
+docker-compose.yml
+Makefile
 db/schema.sql
 data
 pg_data

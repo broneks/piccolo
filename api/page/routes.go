@@ -11,6 +11,10 @@ import (
 )
 
 func Routes(e *echo.Echo, server *types.Server) {
+	e.GET("/hello", func(c echo.Context) error {
+		return c.String(200, "Hello, World!")
+	})
+
 	userRepo := userrepo.New(server.DB)
 	sharedAlbumRepo := sharedalbumrepo.New(server.DB)
 
