@@ -8,7 +8,11 @@ services:
       - DATABASE_HOST=${DB_HOST}
       - DATABASE_PORT=${DB_PORT}
     tty: true
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ENV: ${ENV}
     ports:
       - 8001:8001
     restart: on-failure
@@ -16,6 +20,7 @@ services:
       - .:/app
     depends_on:
       - postgres
+      - redis
 
   postgres:
     image: postgres:latest
