@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 	"piccolo/api"
 
 	"github.com/joho/godotenv"
@@ -10,7 +10,7 @@ import (
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		slog.Debug("Error loading .env file", "error", err)
 	}
 }
 
