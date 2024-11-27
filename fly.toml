@@ -20,3 +20,6 @@ primary_region = 'yyz'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+
+[deploy]
+  release_command = '/go/bin/migrate -database $DATABASE_URL -path db/migrations up'
