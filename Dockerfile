@@ -29,8 +29,6 @@ RUN if [ "$ENV" = "local" ]; then \
 
 EXPOSE 8001
 
-ENTRYPOINT ["db/migrations.sh"]
-
 CMD if [ "$ENV" = "local" ]; then \
       air; \
     else \
