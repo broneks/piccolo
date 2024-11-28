@@ -23,7 +23,6 @@ RUN if [ "$ENV" = "local" ]; then \
       go mod download; \
       go install github.com/air-verse/air@latest; \
     else \
-      go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest; \
       go build --o bin/piccolo ./cmd/piccolo; \
     fi
 

@@ -6,8 +6,23 @@ on:
       - main
 
 jobs:
+  migrate:
+    name: Migrate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+      - uses: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+      - run:
+          migrate -database $DATABASE_URL -path db/migrations up
+        env:
+          FLY_DATABASE_URL: ${{ secrets.FLY_DATABASE_URL }}
+
   deploy:
     name: Deploy
+    needs: migrate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,14 +30,3 @@ jobs:
       - run: flyctl deploy --remote-only --ha=false
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
-  # migrate:
-  #   name: Migrate
-  #   needs: deploy
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: superfly/flyctl-actions/setup-flyctl@master
-  #     - run: flyctl ssh console -C "db/migrations.sh"
-  #       env:
-  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
