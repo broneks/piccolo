@@ -1,6 +1,7 @@
 package page
 
 import (
+	"net/http"
 	"piccolo/api/middleware"
 	"piccolo/api/repo/sharedalbumrepo"
 	"piccolo/api/repo/userrepo"
@@ -11,8 +12,8 @@ import (
 )
 
 func Routes(e *echo.Echo, server *types.Server) {
-	e.GET("/hello", func(c echo.Context) error {
-		return c.String(200, "Hello, World!")
+	e.GET("/", func(c echo.Context) error {
+		return c.NoContent(http.StatusOK)
 	})
 
 	userRepo := userrepo.New(server.DB)
