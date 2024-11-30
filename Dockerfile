@@ -13,13 +13,13 @@ RUN if [ "$ENV" = "local" ]; then \
       go install github.com/air-verse/air@latest; \
     else \
       go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest; \
-      go build -o bin/piccolo ./cmd/piccolo; \
+      go build -o ./bin/piccolo ./cmd/piccolo; \
     fi
 
-EXPOSE 8001
+EXPOSE 8000
 
 CMD if [ "$ENV" = "local" ]; then \
       air; \
     else \
-      ./piccolo; \
+      ./bin/piccolo; \
     fi
