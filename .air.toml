@@ -1,6 +1,6 @@
 [build]
   bin = "tmp/piccolo"
-  cmd = "go build -o tmp/piccolo cmd/piccolo"
+  cmd = "go build -o tmp/piccolo ./cmd/piccolo"
   watch_dir = ["."]
   include_ext = ["go", "html"]
 

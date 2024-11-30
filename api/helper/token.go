@@ -17,6 +17,7 @@ func ExtractTokenString(authHeader string) (string, error) {
 			return "", fmt.Errorf("token is missing")
 		}
 
+		return tokenString, nil
 	}
 
 	return "", fmt.Errorf("invalid authorization header format")
