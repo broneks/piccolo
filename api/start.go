@@ -56,10 +56,13 @@ func Start() {
 
 	e := echo.New()
 
+	e.IPExtractor = echo.ExtractIPDirect()
+
 	e.Pre(middleware.HttpsRedirect())
 	e.Pre(middleware.HttpsNonWWWRedirect())
 	e.Pre(echoMiddleware.RemoveTrailingSlash())
 
+	e.Use(middleware.RateLimiter())
 	e.Use(middleware.Logger())
 	e.Use(middleware.CacheControl())
 	e.Use(middleware.Cors())
@@ -70,7 +73,6 @@ func Start() {
 
 	e.Static("/", "static")
 
-	e.IPExtractor = echo.ExtractIPDirect()
 	e.Validator = validatorservice.New()
 	e.Renderer = rendererservice.New("templates/*.html")
 	e.HTTPErrorHandler = httpErrorHandler

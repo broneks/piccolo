@@ -14,9 +14,15 @@ func httpErrorHandler(err error, c echo.Context) {
 		return
 	}
 
+	var message any
+
 	code := http.StatusInternalServerError
 	if he, ok := err.(*echo.HTTPError); ok {
 		code = he.Code
+
+		if he.Message != nil {
+			message = he.Message
+		}
 	}
 
 	url := c.Request().URL.String()
@@ -24,7 +30,7 @@ func httpErrorHandler(err error, c echo.Context) {
 	if strings.HasPrefix(url, "/api") && url != "/api/health" {
 		c.JSON(code, types.SuccessRes{
 			Success: false,
-			Message: fmt.Sprintf("%d error", code),
+			Message: fmt.Sprintf("%d error: %s", code, message),
 		})
 		return
 	}
