@@ -15,6 +15,7 @@ type LoginReq struct {
 
 func (mod *AuthModule) loginHandler(c echo.Context) error {
 	ctx := c.Request().Context()
+	ip := c.RealIP()
 	req := new(LoginReq)
 
 	var err error
@@ -43,6 +44,7 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 	}
 
 	if user == nil {
+		mod.banHammerService.RecordFailedAttempt(ctx, ip)
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid email or password.",
@@ -50,9 +52,17 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 	}
 
 	if !mod.authService.VerifyPassword(user.Hash.String, req.Password) {
+		mod.banHammerService.RecordFailedAttempt(ctx, ip)
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid email or password.",
+		})
+	}
+
+	if !user.IsActive() {
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: "User is not active.",
 		})
 	}
 

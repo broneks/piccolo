@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	redisrate "github.com/go-redis/redis_rate/v10"
@@ -20,7 +20,7 @@ const rateRequest = "rate_request_%s"
 func NewRedisRateLimiter() *RedisRateLimiter {
 	opts, err := redis.ParseURL(os.Getenv("REDIS_URL"))
 	if err != nil {
-		log.Fatalf("cannot create redis connection: %v", err)
+		slog.Error("cannot create redis connection", "error", err)
 	}
 
 	rdb := redis.NewClient(opts)
