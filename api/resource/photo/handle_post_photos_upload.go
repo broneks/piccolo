@@ -1,6 +1,7 @@
 package photo
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/types"
 
@@ -13,7 +14,7 @@ func (mod *PhotoModule) postPhotosUploadHandler(c echo.Context) error {
 
 	form, err := c.MultipartForm()
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to grab mulipart form data", "err", err)
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
@@ -35,7 +36,7 @@ func (mod *PhotoModule) postPhotosUploadHandler(c echo.Context) error {
 	}
 
 	if _, err = mod.photoService.UploadFiles(ctx, files, userId); err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to upload files to cloud storage", "err", err)
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{

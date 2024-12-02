@@ -2,6 +2,7 @@ package banhammerservice
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 )
 
@@ -28,7 +29,7 @@ func (svc *BanHammerService) RecordFailedAttempt(ctx context.Context, ip string)
 		}
 		// Cleanup the attempts key
 		svc.rdb.Del(ctx, attemptsKey)
-		slog.Info("IP %s has been banned for %s\n", ip, banDuration)
+		slog.Info(fmt.Sprintf("IP %s has been banned for %s\n", ip, banDuration))
 	}
 
 	return nil

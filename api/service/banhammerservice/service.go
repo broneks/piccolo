@@ -23,7 +23,7 @@ const (
 func New() *BanHammerService {
 	opts, err := redis.ParseURL(os.Getenv("REDIS_URL"))
 	if err != nil {
-		slog.Error("cannot create redis connection", "error", err)
+		slog.Error("cannot create redis connection", "err", err)
 	}
 
 	rdb := redis.NewClient(opts)

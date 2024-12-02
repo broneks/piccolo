@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/types"
 
@@ -10,7 +11,7 @@ import (
 func (mod *AuthModule) logoutHandler(c echo.Context) error {
 	accessCookie, err := c.Cookie("piccolo-access-token")
 	if err != nil || accessCookie == nil {
-		mod.server.Logger.Debug(err.Error())
+		slog.Debug("acess token not found", "err", err)
 		return c.JSON(http.StatusForbidden, types.SuccessRes{
 			Success: false,
 			Message: "Forbidden",

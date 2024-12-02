@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"log/slog"
 	"piccolo/api/service/jwtservice"
 
@@ -18,7 +17,7 @@ func SetUserData() echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			tokenString, err := getAccesssTokenString(c)
 			if err != nil {
-				slog.Error(fmt.Sprintf("error setting user data: %v", err.Error()))
+				slog.Error("Error setting user data", "err", err)
 			}
 
 			if tokenString != "" {

@@ -3,6 +3,7 @@ package photoservice
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"mime/multipart"
 	"piccolo/api/model"
 	"piccolo/api/types"
@@ -16,12 +17,12 @@ func (svc *PhotoService) handleFileUpload(ctx context.Context, fileHeader *multi
 
 	file, err := fileHeader.Open()
 	if err != nil {
-		svc.server.Logger.Error(fmt.Sprintf("Error opening file %s: %v", fileHeader.Filename, err))
+		slog.Error("error opening file", "err", err)
 		return
 	}
 	defer file.Close()
 
-	svc.server.Logger.Debug(fmt.Sprintf("Uploading file: %s", fileHeader.Filename))
+	slog.Debug("uploading file", "filename", fileHeader.Filename)
 
 	location, err := svc.server.ObjectStorage.UploadFile(ctx, types.FileUpload{
 		File:     &file,
@@ -30,11 +31,11 @@ func (svc *PhotoService) handleFileUpload(ctx context.Context, fileHeader *multi
 		UserId:   userId,
 	})
 	if err != nil {
-		svc.server.Logger.Error(fmt.Sprintf("Error uploading file \"%s\": %v", fileHeader.Filename, err))
+		slog.Error(fmt.Sprintf("error uploading file \"%s\"", fileHeader.Filename), "err", err)
 		return
 	}
 
-	svc.server.Logger.Debug(fmt.Sprintf("File uploaded successfully: %s\n", location))
+	slog.Debug("file uploaded successfully", "location", location)
 
 	photo := model.Photo{
 		Location:    pgtype.Text{String: location, Valid: true},
@@ -56,7 +57,7 @@ func (svc *PhotoService) UploadFiles(ctx context.Context, fileHeaders []*multipa
 
 	for _, fileHeader := range fileHeaders {
 		if fileHeader == nil {
-			svc.server.Logger.Debug("received nil fileHeader")
+			slog.Debug("recieved nil fileHeader")
 			continue
 		}
 

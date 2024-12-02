@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/types"
 
@@ -19,6 +20,7 @@ func (mod *AuthModule) resetPasswordHandler(c echo.Context) error {
 	var err error
 
 	if err = c.Bind(req); err != nil {
+		slog.Error("failed to bind reset password request data", "err", err)
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: err.Error(),

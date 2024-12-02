@@ -1,6 +1,7 @@
 package album
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/model"
 	"piccolo/api/types"
@@ -25,7 +26,7 @@ func (mod *AlbumModule) postAlbumsCreateHandler(c echo.Context) error {
 	var err error
 
 	if err = c.Bind(req); err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to bind create album request data", "err", err)
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid input",
@@ -59,7 +60,7 @@ func (mod *AlbumModule) postAlbumsCreateHandler(c echo.Context) error {
 
 	err = mod.albumRepo.InsertOne(ctx, album)
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to insert album", "err", err)
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",

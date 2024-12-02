@@ -8,13 +8,6 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-type ServerLogger interface {
-	Debug(msg string, args ...any)
-	Error(msg string, args ...any)
-	Info(msg string, args ...any)
-	Warn(msg string, args ...any)
-}
-
 type ServerMailer interface {
 	SendResetPassword(ctx context.Context, email, token string) error
 }
@@ -44,7 +37,6 @@ type ServerObjectStorage interface {
 }
 
 type Server struct {
-	Logger        ServerLogger
 	Mailer        ServerMailer
 	DB            ServerDB
 	Cache         ServerCache

@@ -1,6 +1,7 @@
 package page
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/helper"
 	"piccolo/api/model"
@@ -54,7 +55,7 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *sharedalbumrep
 		if album.CoverPhotoId.String != "" {
 			photo, err := sharedAlbumRepo.GetPhoto(ctx, albumId, album.CoverPhotoId.String)
 			if err != nil {
-				server.Logger.Debug(err.Error())
+				slog.Debug("failed to get photo", "err", err)
 			} else {
 				coverPhoto = model.NewPhotoWithUrl(ctx, server, photo)
 			}
