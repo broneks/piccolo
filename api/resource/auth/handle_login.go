@@ -39,7 +39,7 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 		mod.server.Logger.Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
-			Message: "Unexpected error",
+			Message: "Invalid email or password.",
 		})
 	}
 
