@@ -37,7 +37,7 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 	user, err := mod.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
 		mod.server.Logger.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid email or password.",
 		})
