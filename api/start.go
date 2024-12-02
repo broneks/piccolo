@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
 	"piccolo/api/helper"
@@ -24,11 +23,9 @@ import (
 func newServer(ctx context.Context) *types.Server {
 	var err error
 
-	logger := slog.Default()
-
 	dbClient, err := pg.NewClient(ctx)
 	if err != nil {
-		logger.Error(fmt.Sprintf("Cannot create database client: %v", err.Error()))
+		slog.Error("cannot create database client", "err", err)
 		os.Exit(1)
 	}
 
@@ -36,14 +33,13 @@ func newServer(ctx context.Context) *types.Server {
 
 	backblazeClient, err := backblaze.NewClient(ctx)
 	if err != nil {
-		logger.Error(fmt.Sprintf("Cannot create backblaze client: %v", err.Error()))
+		slog.Error("cannot create backblaze client", "err", err)
 		os.Exit(1)
 	}
 
 	mailerClient := mailer.New()
 
 	return &types.Server{
-		Logger:        logger,
 		Mailer:        mailerClient,
 		DB:            dbClient,
 		Cache:         redisClient,

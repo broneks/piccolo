@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/consts"
 	"piccolo/api/service/jwtservice"
@@ -29,7 +30,7 @@ func CanResetPassword(server *types.Server) echo.MiddlewareFunc {
 
 			isBlacklisted, err := server.Cache.IsListItem(ctx, consts.ResetPasswordTokenBlacklistKey, tokenString)
 			if err != nil {
-				server.Logger.Error(err.Error())
+				slog.Error("failed to check password blacklist item", "err", err)
 			}
 			if isBlacklisted {
 				return echo.NewHTTPError(http.StatusForbidden)

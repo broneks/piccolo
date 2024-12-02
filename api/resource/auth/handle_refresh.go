@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/helper"
 	"piccolo/api/service/jwtservice"
@@ -34,7 +35,7 @@ func getRefreshTokenString(c echo.Context) (string, error) {
 func (mod *AuthModule) refreshHandler(c echo.Context) error {
 	refreshToken, err := getRefreshTokenString(c)
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Debug("failed to get refresh token", "err", err)
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
@@ -64,7 +65,7 @@ func (mod *AuthModule) refreshHandler(c echo.Context) error {
 
 	accessToken, err := jwtservice.NewAccessJwt(userId, userEmail).GenerateToken()
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to generate new access token", "err", err)
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",

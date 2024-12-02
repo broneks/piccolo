@@ -1,6 +1,7 @@
 package album
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/helper"
 	"piccolo/api/types"
@@ -22,7 +23,7 @@ func (mod *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 
 	form, err := c.MultipartForm()
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to grab multipart form data", "err", err)
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
@@ -45,7 +46,7 @@ func (mod *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 
 	photoIds, err := mod.photoService.UploadFiles(ctx, files, userId)
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to upload photos", "err", err)
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
@@ -56,7 +57,7 @@ func (mod *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 	}
 
 	if err = mod.albumRepo.InsertPhotos(ctx, albumId, photoIds, userId); err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to insert photos", "err", err)
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{

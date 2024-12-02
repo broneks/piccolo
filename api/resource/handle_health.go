@@ -1,7 +1,7 @@
 package resource
 
 import (
-	"fmt"
+	"log/slog"
 	"net/http"
 	"piccolo/api/types"
 
@@ -15,17 +15,17 @@ func handleHealth(server *types.Server) echo.HandlerFunc {
 		var err error
 
 		if err = server.DB.Ping(ctx); err != nil {
-			server.Logger.Error(fmt.Sprintf("postgres ping failed: %v", err.Error()))
+			slog.Error("postgres ping failed", "err", err)
 			return c.NoContent(http.StatusServiceUnavailable)
 		}
 
 		if err = server.Cache.Ping(ctx); err != nil {
-			server.Logger.Error(fmt.Sprintf("redis ping failed: %v", err.Error()))
+			slog.Error("redis ping failed", "err", err)
 			return c.NoContent(http.StatusServiceUnavailable)
 		}
 
 		if err = server.ObjectStorage.Ping(ctx); err != nil {
-			server.Logger.Error(fmt.Sprintf("backblaze ping failed: %v", err.Error()))
+			slog.Error("backblaze ping failed", "err", err)
 			return c.NoContent(http.StatusServiceUnavailable)
 		}
 

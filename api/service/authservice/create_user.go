@@ -3,6 +3,7 @@ package authservice
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"piccolo/api/model"
 	"time"
 
@@ -16,7 +17,7 @@ func (svc *AuthService) CreateUser(ctx context.Context, username, email, passwor
 
 	hash, err := svc.hashPassword(password)
 	if err != nil {
-		svc.server.Logger.Error(err.Error())
+		slog.Error("failed to hash user password", "err", err)
 		return fmt.Errorf("Cannot hash password")
 	}
 

@@ -2,7 +2,6 @@ package helper
 
 import (
 	"errors"
-	"fmt"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgconn"
@@ -23,7 +22,7 @@ func CheckSqlError(err error) string {
 			return pgErr.Message
 		}
 	} else {
-		slog.Info(fmt.Sprintf("Unexpected non-sql error: %v", err.Error()))
+		slog.Info("Unexpected non-sql error", "err", err)
 	}
 
 	return ""

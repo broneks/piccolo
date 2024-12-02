@@ -28,7 +28,7 @@ func getClaims(tokenString string) *JwtClaims {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 	if err != nil {
-		slog.Debug(fmt.Sprintf("error parsing token: %v", err.Error()))
+		slog.Debug("error parsing token", "err", err)
 		return nil
 	}
 

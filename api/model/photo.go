@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"piccolo/api/consts"
 	"piccolo/api/types"
 
@@ -30,7 +31,7 @@ func (photo *Photo) GetUrl(ctx context.Context, server *types.Server) string {
 
 	val, err := server.Cache.Get(ctx, key)
 	if err != nil {
-		server.Logger.Error(err.Error())
+		slog.Error("failed to get cached photo url", "err", err)
 		return ""
 	}
 
@@ -41,7 +42,7 @@ func (photo *Photo) GetUrl(ctx context.Context, server *types.Server) string {
 
 		err := server.Cache.Set(ctx, key, url, expirationDuration)
 		if err != nil {
-			server.Logger.Error(err.Error())
+			slog.Error("failed to set photo url in cache", "err", err)
 		}
 
 		return url

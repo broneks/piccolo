@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/service/jwtservice"
 	"piccolo/api/types"
@@ -19,6 +20,7 @@ func (mod *AuthModule) forgotPasswordHandler(c echo.Context) error {
 	var err error
 
 	if err = c.Bind(req); err != nil {
+		slog.Error("failed to bind forgot password request data", "err", err)
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: err.Error(),
@@ -34,7 +36,7 @@ func (mod *AuthModule) forgotPasswordHandler(c echo.Context) error {
 
 	user, err := mod.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to get user by email", "err", err)
 		return c.JSON(http.StatusUnprocessableEntity, types.SuccessRes{
 			Success: false,
 			Message: "Cannot reset password.",
@@ -43,12 +45,12 @@ func (mod *AuthModule) forgotPasswordHandler(c echo.Context) error {
 
 	resetPasswordToken, err := jwtservice.NewResetPasswordJwt(user.Email.String).GenerateToken()
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to generate reset password token", "err", err)
 	}
 
 	err = mod.server.Mailer.SendResetPassword(ctx, user.Email.String, resetPasswordToken)
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to send reset password email", "err", err)
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",

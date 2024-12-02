@@ -13,7 +13,7 @@ func (svc *BanHammerService) IsBanned(ctx context.Context, ip string) (bool, tim
 
 	ttl, err := svc.rdb.TTL(ctx, key).Result()
 	if err != nil && err != redis.Nil {
-		slog.Error("Error checking ban status:", "error", err)
+		slog.Error("error checking ban status:", "error", err)
 	}
 
 	return ttl > 0, ttl

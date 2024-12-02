@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/service/jwtservice"
 	"piccolo/api/types"
@@ -21,6 +22,7 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 	var err error
 
 	if err = c.Bind(req); err != nil {
+		slog.Error("failed to bind login request data", "err", err)
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: err.Error(),
@@ -36,7 +38,7 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 
 	user, err := mod.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to get user by email", "err", err)
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid email or password.",
@@ -67,12 +69,12 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 	}
 
 	if err = mod.userRepo.UpdateLastLoginAt(ctx, user.Id.String); err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to update user last login at", "err", err)
 	}
 
 	accessToken, err := jwtservice.NewAccessJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to generate new access token", "err", err)
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
@@ -81,7 +83,7 @@ func (mod *AuthModule) loginHandler(c echo.Context) error {
 
 	refreshToken, err := jwtservice.NewRefreshJwt(user.Id.String, user.Email.String).GenerateToken()
 	if err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to generate new refresh token", "err", err)
 	}
 
 	c.SetCookie(mod.authService.NewAccessTokenCookie(accessToken))

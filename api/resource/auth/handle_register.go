@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/helper"
 	"piccolo/api/types"
@@ -20,7 +21,7 @@ func (mod *AuthModule) registerHandler(c echo.Context) error {
 	var err error
 
 	if err = c.Bind(req); err != nil {
-		mod.server.Logger.Error(err.Error())
+		slog.Error("failed to bind register user request data", "err", err)
 		return c.JSON(http.StatusBadRequest, types.SuccessRes{
 			Success: false,
 			Message: "Invalid input",
@@ -44,7 +45,7 @@ func (mod *AuthModule) registerHandler(c echo.Context) error {
 			})
 
 		default:
-			mod.server.Logger.Error(err.Error())
+			slog.Error("failed to create user", "err", err)
 			return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 				Success: false,
 				Message: "Unexpected error",

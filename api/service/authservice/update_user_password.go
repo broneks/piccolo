@@ -3,6 +3,7 @@ package authservice
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"piccolo/api/consts"
 	"piccolo/api/service/jwtservice"
 )
@@ -19,19 +20,19 @@ func (svc *AuthService) UpdateUserPassword(ctx context.Context, token, newPasswo
 
 	user, err := svc.userRepo.GetByEmail(ctx, email)
 	if err != nil {
-		svc.server.Logger.Error(err.Error())
+		slog.Debug("failed to get user by email", "err", err)
 		return fmt.Errorf("Cannot find user")
 	}
 
 	hash, err := svc.hashPassword(newPassword)
 	if err != nil {
-		svc.server.Logger.Error(err.Error())
+		slog.Error("failed to hash user new password", "err", err)
 		return fmt.Errorf("Cannot hash password")
 	}
 
 	err = svc.userRepo.UpdatePassword(ctx, user.Id.String, hash)
 	if err != nil {
-		svc.server.Logger.Error(err.Error())
+		slog.Error("failed to update user password", "err", err)
 		return fmt.Errorf("Cannot update user password")
 	}
 
