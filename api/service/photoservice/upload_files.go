@@ -53,6 +53,11 @@ func (svc *PhotoService) UploadFiles(ctx context.Context, fileHeaders []*multipa
 	var mu sync.Mutex
 	var photos []model.Photo
 
+	isUserFileStorageExceeded, err := svc.isUserFileStorageExceeded(ctx, userId, fileHeaders)
+	if isUserFileStorageExceeded || err != nil {
+		return []string{}, err
+	}
+
 	resultCh := make(chan model.Photo, len(fileHeaders))
 
 	for _, fileHeader := range fileHeaders {
@@ -80,12 +85,12 @@ func (svc *PhotoService) UploadFiles(ctx context.Context, fileHeaders []*multipa
 	}
 
 	if len(photos) == 0 {
-		return nil, nil
+		return []string{}, nil
 	}
 
 	ids, err := svc.photoRepo.InsertMany(ctx, photos, userId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to insert photos: %v", err)
+		return []string{}, fmt.Errorf("failed to upload photos: %v", err)
 	}
 
 	return ids, nil

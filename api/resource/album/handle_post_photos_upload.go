@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"piccolo/api/helper"
 	"piccolo/api/types"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -46,12 +47,18 @@ func (mod *AlbumModule) postAlbumPhotosUploadHandler(c echo.Context) error {
 
 	photoIds, err := mod.photoService.UploadFiles(ctx, files, userId)
 	if err != nil {
+		message := "Unexpected error"
+
+		if strings.Contains(err.Error(), "file storage limit exceeded") {
+			message = err.Error()
+		}
+
 		slog.Error("failed to upload photos", "err", err)
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
 				Success: false,
-				Message: "Unexpected error",
+				Message: message,
 			},
 		)
 	}
