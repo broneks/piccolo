@@ -34,6 +34,7 @@ type ServerObjectStorage interface {
 	GetPresignedUrl(ctx context.Context, filename, userId string) (string, time.Duration)
 	Ping(ctx context.Context) error
 	UploadFile(ctx context.Context, fileUpload FileUpload) (string, error)
+	DeleteFile(ctx context.Context, fileName, userId string) error
 }
 
 type Server struct {
