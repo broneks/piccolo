@@ -13,7 +13,7 @@ func (repo *PhotoRepo) GetUserFileStorage(ctx context.Context, userId string) (f
 		cast(sum(photos.file_size) as DECIMAL(10,2)) / (1024 * 1024) as used_mb
 	from photos where user_id = @userId`
 
-	var usedMB float32
+	var usedMB *float32
 
 	args := pgx.NamedArgs{
 		"userId": userId,
@@ -26,5 +26,9 @@ func (repo *PhotoRepo) GetUserFileStorage(ctx context.Context, userId string) (f
 		return 0, fmt.Errorf("query error: %v", err)
 	}
 
-	return usedMB, nil
+	if usedMB == nil {
+		return 0, nil
+	}
+
+	return *usedMB, nil
 }
