@@ -35,7 +35,7 @@ func (mod *AuthModule) registerHandler(c echo.Context) error {
 		})
 	}
 
-	mod.authService.CreateUser(ctx, req.Email, req.Email, req.Password)
+	err = mod.authService.CreateUser(ctx, req.Email, req.Email, req.Password)
 	if err != nil {
 		switch helper.CheckSqlError(err) {
 		case "unique-violation":
