@@ -30,6 +30,13 @@ func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
 
 	err := mod.albumRepo.LikePhoto(ctx, albumId, photoId, userId)
 	if err != nil {
+		if err.Error() == "unauthorized" {
+			return c.JSON(http.StatusNotFound, types.SuccessRes{
+				Success: false,
+				Message: "Not found",
+			})
+		}
+
 		switch helper.CheckSqlError(err) {
 		case "unique-violation":
 			return c.JSON(http.StatusBadRequest, types.SuccessRes{
