@@ -3,6 +3,7 @@
   cmd = "go build -o tmp/piccolo ./cmd/piccolo"
   watch_dir = ["."]
   include_ext = ["go", "html"]
+  exclude_dir = ["pg_data"]
 
 [log]
   log_level = "warn"

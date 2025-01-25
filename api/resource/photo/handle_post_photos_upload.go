@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"piccolo/api/types"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -36,12 +37,18 @@ func (mod *PhotoModule) postPhotosUploadHandler(c echo.Context) error {
 	}
 
 	if _, err = mod.photoService.UploadFiles(ctx, files, userId); err != nil {
+		message := "Unexpected error"
+
+		if strings.Contains(err.Error(), "file storage limit exceeded") {
+			message = err.Error()
+		}
+
 		slog.Error("failed to upload files to cloud storage", "err", err)
 		return c.JSON(
 			http.StatusBadRequest,
 			types.SuccessRes{
 				Success: false,
-				Message: "Unexpected error",
+				Message: message,
 			},
 		)
 	}

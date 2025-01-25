@@ -7,6 +7,7 @@ import (
 	"piccolo/api/repo/userrepo"
 	"piccolo/api/resource/album"
 	"piccolo/api/resource/auth"
+	"piccolo/api/resource/me"
 	"piccolo/api/resource/photo"
 	"piccolo/api/service/authservice"
 	"piccolo/api/service/banhammerservice"
@@ -31,6 +32,9 @@ func Routes(g *echo.Group, server *types.Server) {
 
 	authModule := auth.NewModule(server, userRepo, banHammerService, authService)
 	authModule.Routes(v1)
+
+	meModule := me.NewModule(server, photoService)
+	meModule.Routes(v1)
 
 	photoModule := photo.NewModule(server, photoRepo, photoService)
 	photoModule.Routes(v1)
