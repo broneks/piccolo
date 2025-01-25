@@ -15,7 +15,7 @@ type Photo struct {
 	UserId      pgtype.Text        `json:"userId"`
 	Location    pgtype.Text        `json:"-"`
 	Filename    pgtype.Text        `json:"filename"`
-	FileSize    pgtype.Int4        `json:"fileSize"`
+	FileSize    pgtype.Int4        `json:"fileSize"` // in bytes
 	ContentType pgtype.Text        `json:"contentType"`
 	CreatedAt   pgtype.Timestamptz `json:"createdAt"`
 	UpdatedAt   pgtype.Timestamptz `json:"-"`
