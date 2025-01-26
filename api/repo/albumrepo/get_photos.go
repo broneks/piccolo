@@ -5,12 +5,17 @@ import (
 	"fmt"
 	"log/slog"
 	"piccolo/api/model"
+	"piccolo/api/types"
 
 	"github.com/jackc/pgx/v5"
 )
 
-// Checks for read access
 func (repo *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([]model.Photo, error) {
+	return repo.GetPhotosWithParams(ctx, albumId, userId, types.NewDefaultListQueryParams())
+}
+
+// Checks for read access
+func (repo *AlbumRepo) GetPhotosWithParams(ctx context.Context, albumId, userId string, queryParams types.ListQueryParams) ([]model.Photo, error) {
 	var err error
 
 	canRead, err := repo.CanReadAlbum(ctx, albumId, userId)
@@ -21,7 +26,7 @@ func (repo *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([
 		return nil, fmt.Errorf("unauthorized")
 	}
 
-	query := `select
+	query := queryParams.WrapQuery(`select
 		p.id,
 		p.user_id,
 		p.location,
@@ -32,10 +37,14 @@ func (repo *AlbumRepo) GetPhotos(ctx context.Context, albumId, userId string) ([
 		p.updated_at
 	from photos p
 	join album_photos ap on p.id = ap.photo_id
-	where ap.album_id = $1
-	order by p.created_at desc`
+	where ap.album_id = @albumId
+	order by p.created_at desc`)
 
-	rows, err := repo.db.Query(ctx, query, albumId)
+	args := queryParams.WrapNamedArgs(pgx.NamedArgs{
+		"albumId": albumId,
+	})
+
+	rows, err := repo.db.Query(ctx, query, args)
 	if err != nil {
 		slog.Debug(err.Error())
 		return nil, fmt.Errorf("unable to query photos: %v", err)

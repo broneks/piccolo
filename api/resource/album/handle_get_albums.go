@@ -1,7 +1,9 @@
 package album
 
 import (
+	"log/slog"
 	"net/http"
+	"piccolo/api/types"
 
 	"github.com/labstack/echo/v4"
 )
@@ -9,8 +11,27 @@ import (
 func (mod *AlbumModule) getAlbumsHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
+	queryParams := new(types.ListQueryParams)
 
-	albums, _ := mod.albumRepo.GetAll(ctx, userId)
+	var err error
+
+	if err = c.Bind(queryParams); err != nil {
+		slog.Error("failed to bind get albums query params", "err", err)
+
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: err.Error(),
+		})
+	}
+
+	if err = c.Validate(queryParams); err != nil {
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: err.Error(),
+		})
+	}
+
+	albums, _ := mod.albumRepo.GetAllWithParams(ctx, userId, *queryParams)
 
 	if len(albums) == 0 {
 		return c.JSON(http.StatusOK, []any{})

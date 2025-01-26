@@ -1,6 +1,7 @@
 package photo
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/helper"
 	"piccolo/api/types"
@@ -11,6 +12,9 @@ import (
 func (mod *PhotoModule) getPhotoAlbumsHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
+	queryParams := new(types.ListQueryParams)
+
+	var err error
 
 	photoId := helper.GetIdParam(c)
 	if photoId == "" {
@@ -20,7 +24,23 @@ func (mod *PhotoModule) getPhotoAlbumsHandler(c echo.Context) error {
 		})
 	}
 
-	albums, err := mod.photoRepo.GetAlbums(ctx, photoId, userId)
+	if err = c.Bind(queryParams); err != nil {
+		slog.Error("failed to bind get photo albums query params", "err", err)
+
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: err.Error(),
+		})
+	}
+
+	if err = c.Validate(queryParams); err != nil {
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: err.Error(),
+		})
+	}
+
+	albums, err := mod.photoRepo.GetAlbumsWithParams(ctx, photoId, userId, *queryParams)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, types.SuccessRes{
 			Success: false,

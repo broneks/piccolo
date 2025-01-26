@@ -4,12 +4,17 @@ import (
 	"context"
 	"fmt"
 	"piccolo/api/model"
+	"piccolo/api/types"
 
 	"github.com/jackc/pgx/v5"
 )
 
 func (repo *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([]model.Album, error) {
-	query := `select
+	return repo.GetAlbumsWithParams(ctx, photoId, userId, types.NewDefaultListQueryParams())
+}
+
+func (repo *PhotoRepo) GetAlbumsWithParams(ctx context.Context, photoId, userId string, queryParams types.ListQueryParams) ([]model.Album, error) {
+	query := queryParams.WrapQuery(`select
 		a.id,
 		a.user_id,
 		a.name,
@@ -23,12 +28,13 @@ func (repo *PhotoRepo) GetAlbums(ctx context.Context, photoId, userId string) ([
 	join album_photos ap on a.id = ap.album_id
 	where ap.photo_id = @photoId
 	and ap.user_id = @userId
-	order by a.created_at desc`
+	order by a.created_at desc`)
 
-	args := pgx.NamedArgs{
+	args := queryParams.WrapNamedArgs(pgx.NamedArgs{
 		"photoId": photoId,
 		"userId":  userId,
-	}
+	})
+
 	rows, err := repo.db.Query(ctx, query, args)
 	if err != nil {
 		return nil, fmt.Errorf("unable to query albums: %v", err)
