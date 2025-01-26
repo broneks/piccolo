@@ -47,6 +47,7 @@ func (mod *PhotoModule) deletePhotosHandler(c echo.Context) error {
 
 	photos, err := mod.photoRepo.GetByIds(ctx, photoIds, userId)
 	if err != nil {
+		slog.Error("error deleting photo", "err", err)
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error occurred",
@@ -61,6 +62,7 @@ func (mod *PhotoModule) deletePhotosHandler(c echo.Context) error {
 
 	rowsAffected, err := mod.photoRepo.RemoveMany(ctx, photoIds, userId)
 	if err != nil || rowsAffected == 0 {
+		slog.Error("error removing photos", "err", err)
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error occurred",

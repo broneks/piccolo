@@ -1,6 +1,7 @@
 package album
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/helper"
 	"piccolo/api/types"
@@ -32,6 +33,7 @@ func (mod *AlbumModule) getAlbumPhotosLikesHandler(c echo.Context) error {
 			})
 		}
 
+		slog.Error("error getting album photo likes", "err", err)
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",

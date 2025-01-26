@@ -18,7 +18,7 @@ func (repo *PhotoRepo) RemoveOne(ctx context.Context, photoId, userId string) (i
 
 	cmd, err := repo.db.Exec(ctx, query, args)
 	if err != nil {
-		return 0, fmt.Errorf("unable to delete row: %w", err)
+		return 0, fmt.Errorf("unable to delete photo: %w", err)
 	}
 
 	return cmd.RowsAffected(), nil

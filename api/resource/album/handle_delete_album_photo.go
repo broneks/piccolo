@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (mod *AlbumModule) postAlbumPhotoFavouriteHandler(c echo.Context) error {
+func (mod *AlbumModule) deleteAlbumPhotoHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
@@ -29,7 +29,7 @@ func (mod *AlbumModule) postAlbumPhotoFavouriteHandler(c echo.Context) error {
 		})
 	}
 
-	err := mod.albumRepo.FavouritePhoto(ctx, albumId, photoId, userId)
+	rowsAffected, err := mod.albumRepo.RemovePhotoOne(ctx, albumId, photoId, userId)
 	if err != nil {
 		if err.Error() == "unauthorized" {
 			return c.JSON(http.StatusNotFound, types.SuccessRes{
@@ -38,24 +38,22 @@ func (mod *AlbumModule) postAlbumPhotoFavouriteHandler(c echo.Context) error {
 			})
 		}
 
-		switch helper.CheckSqlError(err) {
-		case "unique-violation":
-			return c.JSON(http.StatusBadRequest, types.SuccessRes{
-				Success: false,
-				Message: "Already favourited",
-			})
+		slog.Error("error removing album photo", "err", err)
+		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
+			Success: false,
+			Message: "Unexpected error",
+		})
+	}
 
-		default:
-			slog.Error("error creating album photo favourites", "err", err)
-			return c.JSON(http.StatusInternalServerError, types.SuccessRes{
-				Success: false,
-				Message: "Unexpected error",
-			})
-		}
+	if rowsAffected == 0 {
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: "Album photo is not found",
+		})
 	}
 
 	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,
-		Message: "Favourited photo",
+		Message: "Deleted album photo",
 	})
 }

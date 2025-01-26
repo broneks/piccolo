@@ -15,7 +15,6 @@ func (mod *MeModule) userFileStorageHandler(c echo.Context) error {
 	userFileStorage, err := mod.photoService.GetUserFileStorage(ctx, userId)
 	if err != nil {
 		slog.Error("error getting user file storage", "err", err)
-
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error occurred",

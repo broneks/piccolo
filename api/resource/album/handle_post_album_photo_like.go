@@ -1,6 +1,7 @@
 package album
 
 import (
+	"log/slog"
 	"net/http"
 	"piccolo/api/helper"
 	"piccolo/api/types"
@@ -8,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
+func (mod *AlbumModule) postAlbumPhotoLikeHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
@@ -45,6 +46,7 @@ func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
 			})
 
 		default:
+			slog.Error("error creating album photo like", "err", err)
 			return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 				Success: false,
 				Message: "Unexpected error",

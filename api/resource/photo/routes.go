@@ -17,5 +17,6 @@ func (mod *PhotoModule) Routes(g *echo.Group) {
 
 	photo.GET("", mod.getPhotoHandler)
 	photo.DELETE("", mod.deletePhotoHandler)
+
 	photo.GET("/albums", mod.getPhotoAlbumsHandler)
 }
