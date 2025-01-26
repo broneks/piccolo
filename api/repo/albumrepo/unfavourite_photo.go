@@ -8,7 +8,7 @@ import (
 )
 
 // Checks for read access
-func (repo *AlbumRepo) UnlikePhoto(ctx context.Context, albumId, photoId, userId string) (int64, error) {
+func (repo *AlbumRepo) UnfavouritePhoto(ctx context.Context, albumId, photoId, userId string) (int64, error) {
 
 	var err error
 
@@ -20,7 +20,7 @@ func (repo *AlbumRepo) UnlikePhoto(ctx context.Context, albumId, photoId, userId
 		return 0, fmt.Errorf("unauthorized")
 	}
 
-	query := `delete from album_photo_likes
+	query := `delete from album_photo_favourites
 		where album_id = @albumId
 		and photo_id = @photoId
 		and user_id = @userId`

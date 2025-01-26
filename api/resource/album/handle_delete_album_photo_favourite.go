@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
+func (mod *AlbumModule) deleteAlbumPhotoFavourite(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
@@ -28,7 +28,7 @@ func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
 		})
 	}
 
-	err := mod.albumRepo.LikePhoto(ctx, albumId, photoId, userId)
+	rowsAffected, err := mod.albumRepo.UnfavouritePhoto(ctx, albumId, photoId, userId)
 	if err != nil {
 		if err.Error() == "unauthorized" {
 			return c.JSON(http.StatusNotFound, types.SuccessRes{
@@ -37,23 +37,21 @@ func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
 			})
 		}
 
-		switch helper.CheckSqlError(err) {
-		case "unique-violation":
-			return c.JSON(http.StatusBadRequest, types.SuccessRes{
-				Success: false,
-				Message: "Already liked",
-			})
+		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
+			Success: false,
+			Message: "Unexpected error",
+		})
+	}
 
-		default:
-			return c.JSON(http.StatusInternalServerError, types.SuccessRes{
-				Success: false,
-				Message: "Unexpected error",
-			})
-		}
+	if rowsAffected == 0 {
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: "Photo is not favourited",
+		})
 	}
 
 	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,
-		Message: "Liked photo",
+		Message: "Unfavourited photo",
 	})
 }

@@ -28,4 +28,7 @@ func (mod *AlbumModule) Routes(g *echo.Group) {
 
 	albumPhoto.POST("/like", mod.postAlbumPhotoLike)
 	albumPhoto.DELETE("/like", mod.deleteAlbumPhotoLike)
+
+	albumPhoto.POST("/favourite", mod.postAlbumPhotoFavourite)
+	albumPhoto.DELETE("/favourite", mod.deleteAlbumPhotoFavourite)
 }

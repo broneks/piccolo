@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
+func (mod *AlbumModule) postAlbumPhotoFavourite(c echo.Context) error {
 	ctx := c.Request().Context()
 	userId := c.Get("userId").(string)
 
@@ -28,7 +28,7 @@ func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
 		})
 	}
 
-	err := mod.albumRepo.LikePhoto(ctx, albumId, photoId, userId)
+	err := mod.albumRepo.FavouritePhoto(ctx, albumId, photoId, userId)
 	if err != nil {
 		if err.Error() == "unauthorized" {
 			return c.JSON(http.StatusNotFound, types.SuccessRes{
@@ -41,7 +41,7 @@ func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
 		case "unique-violation":
 			return c.JSON(http.StatusBadRequest, types.SuccessRes{
 				Success: false,
-				Message: "Already liked",
+				Message: "Already favourited",
 			})
 
 		default:
@@ -54,6 +54,6 @@ func (mod *AlbumModule) postAlbumPhotoLike(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,
-		Message: "Liked photo",
+		Message: "Favourited photo",
 	})
 }

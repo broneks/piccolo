@@ -28,7 +28,7 @@ func (mod *AlbumModule) deleteAlbumPhotoLike(c echo.Context) error {
 		})
 	}
 
-	err := mod.albumRepo.UnlikePhoto(ctx, albumId, photoId, userId)
+	rowsAffected, err := mod.albumRepo.UnlikePhoto(ctx, albumId, photoId, userId)
 	if err != nil {
 		if err.Error() == "unauthorized" {
 			return c.JSON(http.StatusNotFound, types.SuccessRes{
@@ -40,6 +40,13 @@ func (mod *AlbumModule) deleteAlbumPhotoLike(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, types.SuccessRes{
 			Success: false,
 			Message: "Unexpected error",
+		})
+	}
+
+	if rowsAffected == 0 {
+		return c.JSON(http.StatusBadRequest, types.SuccessRes{
+			Success: false,
+			Message: "Photo is not liked",
 		})
 	}
 
