@@ -9,7 +9,7 @@ import (
 	"github.com/mailersend/mailersend-go"
 )
 
-const resetPasswordTemplateId = "pxkjn416wzqgz781"
+const resetPasswordTemplateId = "yzkq3408j20gd796"
 const resetPasswordRoute = "/reset-password"
 
 func (mail *Mailer) SendResetPassword(ctx context.Context, email, token string) error {
