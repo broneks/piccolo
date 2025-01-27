@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (repo *SharedAlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]model.Photo, error) {
+func (repo *SharedAlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]model.AlbumPhoto, error) {
 	query := `select
 		p.id,
 		p.user_id,
@@ -18,7 +18,8 @@ func (repo *SharedAlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]m
 		p.file_size,
 		p.content_type,
 		p.created_at,
-		p.updated_at
+		p.updated_at,
+		ap.created_at as added_at
 	from photos p
 	join album_photos ap on p.id = ap.photo_id
 	where ap.album_id = $1
@@ -31,5 +32,5 @@ func (repo *SharedAlbumRepo) GetPhotos(ctx context.Context, albumId string) ([]m
 	}
 	defer rows.Close()
 
-	return pgx.CollectRows(rows, pgx.RowToStructByName[model.Photo])
+	return pgx.CollectRows(rows, pgx.RowToStructByName[model.AlbumPhoto])
 }

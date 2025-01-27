@@ -15,8 +15,8 @@ import (
 type SharedAlbumPayload struct {
 	PageInfo
 	*model.Album
-	CoverPhoto *model.PhotoWithUrl
-	Photos     []*model.PhotoWithUrl
+	CoverPhoto *model.AlbumPhotoWithUrl
+	Photos     []*model.AlbumPhotoWithUrl
 }
 
 func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *sharedalbumrepo.SharedAlbumRepo) echo.HandlerFunc {
@@ -29,7 +29,7 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *sharedalbumrep
 		wg.Add(2)
 
 		var album *model.Album
-		var photos []model.Photo
+		var photos []model.AlbumPhoto
 		var albumErr, photosErr error
 
 		go func() {
@@ -48,16 +48,16 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *sharedalbumrep
 			return echo.NewHTTPError(http.StatusInternalServerError)
 		}
 
-		photosWithUrl := model.NewPhotosWithUrl(ctx, server, photos)
+		photosWithUrl := model.NewAlbumPhotosWithUrl(ctx, server, photos)
 
-		var coverPhoto *model.PhotoWithUrl
+		var coverPhoto *model.AlbumPhotoWithUrl
 
 		if album.CoverPhotoId.String != "" {
 			photo, err := sharedAlbumRepo.GetPhoto(ctx, albumId, album.CoverPhotoId.String)
 			if err != nil {
 				slog.Debug("failed to get photo", "err", err)
 			} else {
-				coverPhoto = model.NewPhotoWithUrl(ctx, server, photo)
+				coverPhoto = model.NewAlbumPhotoWithUrl(ctx, server, photo)
 			}
 		}
 

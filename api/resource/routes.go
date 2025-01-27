@@ -39,6 +39,6 @@ func Routes(g *echo.Group, server *types.Server) {
 	photoModule := photo.NewModule(server, photoRepo, photoService)
 	photoModule.Routes(v1)
 
-	albumModule := album.NewModule(server, albumRepo, photoService)
+	albumModule := album.NewModule(server, albumRepo, photoRepo, photoService)
 	albumModule.Routes(v1)
 }

@@ -50,7 +50,12 @@ func (repo *AlbumRepo) InsertPhotos(ctx context.Context, albumId string, photoId
 		if err != nil {
 			if sqlErr := helper.CheckSqlError(err); sqlErr == "unique-violation" {
 				slog.Debug(fmt.Sprintf("photo \"%s\" already exists", photoId))
-				continue
+
+				if len(photoIds) == 1 {
+					return err
+				} else {
+					continue
+				}
 			}
 
 			slog.Debug(err.Error())

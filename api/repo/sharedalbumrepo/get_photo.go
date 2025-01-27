@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (repo *SharedAlbumRepo) GetPhoto(ctx context.Context, albumId, photoId string) (*model.Photo, error) {
+func (repo *SharedAlbumRepo) GetPhoto(ctx context.Context, albumId, photoId string) (*model.AlbumPhoto, error) {
 	query := `select
 		p.id,
 		p.user_id,
@@ -17,14 +17,15 @@ func (repo *SharedAlbumRepo) GetPhoto(ctx context.Context, albumId, photoId stri
 		p.file_size,
 		p.content_type,
 		p.created_at,
-		p.updated_at
+		p.updated_at,
+		ap.created_at as added_at
 	from photos p
 	join album_photos ap on p.id = ap.photo_id
 	where ap.album_id = @albumId
 	and ap.photo_id = @photoId`
 
 	var err error
-	var photo model.Photo
+	var photo model.AlbumPhoto
 
 	args := pgx.NamedArgs{
 		"albumId": albumId,
@@ -40,6 +41,7 @@ func (repo *SharedAlbumRepo) GetPhoto(ctx context.Context, albumId, photoId stri
 		&photo.ContentType,
 		&photo.CreatedAt,
 		&photo.UpdatedAt,
+		&photo.AddedAt,
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
