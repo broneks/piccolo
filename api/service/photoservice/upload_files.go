@@ -70,7 +70,7 @@ func (svc *PhotoService) UploadFiles(ctx context.Context, fileHeaders []*multipa
 
 		go func(fh *multipart.FileHeader) {
 			defer wg.Done()
-			svc.handleFileUpload(ctx, fileHeader, userId, resultCh)
+			svc.handleFileUpload(context.WithoutCancel(ctx), fileHeader, userId, resultCh)
 		}(fileHeader)
 	}
 

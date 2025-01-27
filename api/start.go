@@ -73,7 +73,7 @@ func Start() {
 	e.Renderer = rendererservice.New("templates/*.html")
 	e.HTTPErrorHandler = httpErrorHandler
 
-	server := newServer(context.Background())
+	server := newServer(e.Server.BaseContext(e.Listener))
 
 	page.Routes(e, server)
 	resource.Routes(e.Group("/api"), server)

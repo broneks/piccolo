@@ -38,7 +38,7 @@ func (photo *Photo) GetUrl(ctx context.Context, server *types.Server) string {
 	if val != "" {
 		return val
 	} else {
-		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(context.Background(), photo.Filename.String, photo.UserId.String)
+		url, expirationDuration := server.ObjectStorage.GetPresignedUrl(ctx, photo.Filename.String, photo.UserId.String)
 
 		err := server.Cache.Set(ctx, key, url, expirationDuration)
 		if err != nil {
