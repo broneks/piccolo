@@ -23,7 +23,7 @@ func (repo *UserRepo) GetByEmail(ctx context.Context, email string) (*model.User
 
 	var user model.User
 
-	err := repo.db.QueryRow(context.Background(), query, email).Scan(
+	err := repo.db.QueryRow(ctx, query, email).Scan(
 		&user.Id,
 		&user.Username,
 		&user.Email,

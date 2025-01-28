@@ -7,6 +7,7 @@ import (
 	"piccolo/api/helper"
 	"piccolo/api/model"
 	"piccolo/api/types"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -50,7 +51,10 @@ func (mod *PhotoModule) deletePhotoHandler(c echo.Context) error {
 		})
 	}
 
-	go deletePhotoFromObjectStorage(context.Background(), mod, photo, userId)
+	deleteFromObjectStorageCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+
+	go deletePhotoFromObjectStorage(deleteFromObjectStorageCtx, mod, photo, userId)
 
 	return c.JSON(http.StatusOK, types.SuccessRes{
 		Success: true,

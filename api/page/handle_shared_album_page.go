@@ -1,6 +1,7 @@
 package page
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"piccolo/api/helper"
@@ -34,12 +35,12 @@ func handleSharedAlbumPage(server *types.Server, sharedAlbumRepo *sharedalbumrep
 
 		go func() {
 			defer wg.Done()
-			album, albumErr = sharedAlbumRepo.GetById(ctx, albumId)
+			album, albumErr = sharedAlbumRepo.GetById(context.WithoutCancel(ctx), albumId)
 		}()
 
 		go func() {
 			defer wg.Done()
-			photos, photosErr = sharedAlbumRepo.GetPhotos(ctx, albumId)
+			photos, photosErr = sharedAlbumRepo.GetPhotos(context.WithoutCancel(ctx), albumId)
 		}()
 
 		wg.Wait()
