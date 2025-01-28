@@ -9,7 +9,7 @@ import (
 )
 
 // Checks for read access
-func (repo *AlbumRepo) GetPhoto(ctx context.Context, albumId, photoId, userId string) (*model.Photo, error) {
+func (repo *AlbumRepo) GetPhoto(ctx context.Context, albumId, photoId, userId string) (*model.AlbumPhoto, error) {
 	var err error
 
 	canRead, err := repo.CanReadAlbum(ctx, albumId, userId)
@@ -29,12 +29,13 @@ func (repo *AlbumRepo) GetPhoto(ctx context.Context, albumId, photoId, userId st
 		p.content_type,
 		p.created_at,
 		p.updated_at
+		ap.created_at as added_at
 	from photos p
 	join album_photos ap on p.id = ap.photo_id
 	where ap.album_id = @albumId
 	and ap.photo_id = @photoId`
 
-	var photo model.Photo
+	var photo model.AlbumPhoto
 
 	args := pgx.NamedArgs{
 		"albumId": albumId,
@@ -50,6 +51,7 @@ func (repo *AlbumRepo) GetPhoto(ctx context.Context, albumId, photoId, userId st
 		&photo.ContentType,
 		&photo.CreatedAt,
 		&photo.UpdatedAt,
+		&photo.AddedAt,
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {

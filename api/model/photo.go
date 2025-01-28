@@ -21,11 +21,6 @@ type Photo struct {
 	UpdatedAt   pgtype.Timestamptz `json:"-"`
 }
 
-type PhotoWithUrl struct {
-	*Photo
-	Url string `json:"url"`
-}
-
 func (photo *Photo) GetUrl(ctx context.Context, server *types.Server) string {
 	key := fmt.Sprintf(consts.PhotoPresignedUrlKeyFormat, photo.Id.String)
 
@@ -49,6 +44,11 @@ func (photo *Photo) GetUrl(ctx context.Context, server *types.Server) string {
 	}
 }
 
+type PhotoWithUrl struct {
+	*Photo
+	Url string `json:"url"`
+}
+
 func NewPhotoWithUrl(ctx context.Context, server *types.Server, photo *Photo) *PhotoWithUrl {
 	return &PhotoWithUrl{
 		Photo: photo,
@@ -60,10 +60,7 @@ func NewPhotosWithUrl(ctx context.Context, server *types.Server, photos []Photo)
 	var photosWithUrl []*PhotoWithUrl
 
 	for _, photo := range photos {
-		photosWithUrl = append(photosWithUrl, &PhotoWithUrl{
-			Photo: &photo,
-			Url:   photo.GetUrl(ctx, server),
-		})
+		photosWithUrl = append(photosWithUrl, NewPhotoWithUrl(ctx, server, &photo))
 	}
 
 	return photosWithUrl

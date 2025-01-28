@@ -43,6 +43,7 @@ func (mod *AlbumModule) getAlbumPhotosHandler(c echo.Context) error {
 
 	photos, err := mod.albumRepo.GetPhotosWithParams(ctx, albumId, userId, *queryParams)
 	if err != nil {
+		slog.Debug("failed to get album photos", "err", err)
 		return c.JSON(http.StatusNotFound, types.SuccessRes{
 			Success: false,
 			Message: "Not found",
@@ -53,7 +54,7 @@ func (mod *AlbumModule) getAlbumPhotosHandler(c echo.Context) error {
 		return c.JSON(http.StatusOK, []any{})
 	}
 
-	photosWithUrl := model.NewPhotosWithUrl(ctx, mod.server, photos)
+	photosWithUrl := model.NewAlbumPhotosWithUrl(ctx, mod.server, photos)
 
 	return c.JSON(http.StatusOK, photosWithUrl)
 }
