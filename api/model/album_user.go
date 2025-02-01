@@ -12,9 +12,6 @@ type AlbumUser struct {
 }
 
 type AlbumUserWithUser struct {
-	AlbumId   pgtype.Text        `json:"albumId"`
-	UserId    pgtype.Text        `json:"userId"`
-	Role      pgtype.Text        `json:"role"`
-	CreatedAt pgtype.Timestamptz `json:"createdAt"`
-	User      `json:"user"`
+	AlbumUser
+	User `json:"user"`
 }

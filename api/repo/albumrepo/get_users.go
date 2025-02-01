@@ -35,7 +35,7 @@ func (repo *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]
 	from users u
 	join album_users au on u.id = au.user_id
 	where au.album_id = $1
-	order by u.created_at des`
+	order by u.created_at desc`
 
 	var albumUsers []model.AlbumUserWithUser
 
@@ -49,10 +49,10 @@ func (repo *AlbumRepo) GetUsers(ctx context.Context, albumId, userId string) ([]
 		albumUser := new(model.AlbumUserWithUser)
 
 		err = rows.Scan(
-			&albumUser.AlbumId,
-			&albumUser.UserId,
-			&albumUser.Role,
-			&albumUser.CreatedAt,
+			&albumUser.AlbumUser.AlbumId,
+			&albumUser.AlbumUser.UserId,
+			&albumUser.AlbumUser.Role,
+			&albumUser.AlbumUser.CreatedAt,
 			&albumUser.User.Id,
 			&albumUser.User.Username,
 			&albumUser.User.Email,
